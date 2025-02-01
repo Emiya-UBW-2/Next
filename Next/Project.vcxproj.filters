@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="source">
+      <UniqueIdentifier>{6375a775-fbd8-48f6-86e5-5bf7f79006ba}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\FrameWork.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\main.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\MainGame.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Algorithm.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="source\FrameWork.hpp">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="source\json.hpp">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="source\MainGame.hpp">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Define.hpp">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Algorithm.hpp">
+      <Filter>source</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

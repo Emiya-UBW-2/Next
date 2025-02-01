@@ -153,10 +153,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="test.cpp" />
+    <ClCompile Include="source\Algorithm.cpp" />
+    <ClCompile Include="source\FrameWork.cpp" />
+    <ClCompile Include="source\main.cpp" />
+    <ClCompile Include="source\MainGame.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\プロジェクトに追加すべきファイル_VC用\DxLib.h" />
+    <ClInclude Include="source\Algorithm.hpp" />
+    <ClInclude Include="source\Define.hpp" />
+    <ClInclude Include="source\FrameWork.hpp" />
+    <ClInclude Include="source\json.hpp" />
+    <ClInclude Include="source\MainGame.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
