@@ -311,7 +311,7 @@ public:
 	void SetVec(const Mathf::Vector3& Vec) { m_Vec = Vec; }
 	void SetGunRad(float rad) { m_GunRad = rad; }
 
-	void SetBullet(int ID, const Mathf::Vector3& Pos, const Mathf::Vector3& Vec) {
+	bool SetBullet(int ID, const Mathf::Vector3& Pos, const Mathf::Vector3& Vec) {
 		if (ShotInterval.at(ID) == 0.f) {
 			Mathf::Vector3 CaseOffset(static_cast<float>(GetRand(100)-50)/100.f*0.01f, 0.f, 0.f);
 			Mathf::Vector3 CaseSpeed(0.f,0.f,-10.f);
@@ -319,10 +319,11 @@ public:
 				if (!b.IsActive()) {
 					b.Init(Pos, m_Vec, Vec, 10.f);
 					ShotInterval.at(ID) = 0.25f;
-					break;
+					return true;
 				}
 			}
 		}
+		return false;
 	}
 
 	void SetDamage(int Damage) {
@@ -485,6 +486,12 @@ public:
 	int m_Font = 0;
 
 	int m_BGM = 0;
+	std::array<int, 10> m_ShotSE{};
+	int m_ShotSENow = 0;
+	std::array<int, 10> m_DamageSE{};
+	int m_DamageSENow = 0;
+	std::array<int, 10> m_DeathSE{};
+	int m_DeathSENow = 0;
 public:
 	MainGame() {}
 	~MainGame() {}

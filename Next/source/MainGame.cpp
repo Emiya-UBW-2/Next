@@ -33,7 +33,20 @@ void MainGame::Init() {
 	m_meter = LoadGraph("data/UI/boostmeter.bmp", TRUE);
 	m_Font = CreateFontToHandle("Agency FB", 12, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1);
 
-	m_BGM = LoadSoundMem("data/BGM.wav");
+	SetCreateSoundDataType(DX_SOUNDDATATYPE_MEMNOPRESS);
+	for (auto& s : m_ShotSE) {
+		s = LoadSoundMem("data/Audio/Shot.wav");
+	}
+	for (auto& s : m_DamageSE) {
+		s = LoadSoundMem("data/Audio/Damage.wav");
+	}
+	for (auto& s : m_DeathSE) {
+		s = LoadSoundMem("data/Audio/Death.wav");
+	}
+
+	SetCreateSoundDataType(DX_SOUNDDATATYPE_FILE);
+	m_BGM = LoadSoundMem("data/Audio/BGM.wav");
+	SetCreateSoundDataType(DX_SOUNDDATATYPE_MEMNOPRESS);
 
 	PlaySoundMem(m_BGM, DX_PLAYTYPE_BACK);
 }
@@ -96,7 +109,10 @@ void MainGame::Update() {
 		}
 
 		if (ShotKey) {
-			m_Characters.back().SetBullet(0, m_Characters.back().GetPosition(), m_Characters.back().GetVec().Nomalize() * 2.f);
+			if (m_Characters.back().SetBullet(0, m_Characters.back().GetPosition(), m_Characters.back().GetVec().Nomalize() * 2.f)) {
+				PlaySoundMem(m_ShotSE.at(m_ShotSENow), DX_PLAYTYPE_BACK);
+				++m_ShotSENow %= static_cast<int>(m_ShotSE.size());
+			}
 		}
 
 		//マウス座標を取得しておく
@@ -122,7 +138,10 @@ void MainGame::Update() {
 
 		m_Characters.back().SetGunRad(std::atan2f(Vector.x, Vector.y));
 		if (ShotSubKey) {
-			m_Characters.back().SetBullet(1, PG, Vector.Nomalize() * 1.f);
+			if (m_Characters.back().SetBullet(1, PG, Vector.Nomalize() * 1.f)) {
+				PlaySoundMem(m_ShotSE.at(m_ShotSENow), DX_PLAYTYPE_BACK);
+				++m_ShotSENow %= static_cast<int>(m_ShotSE.size());
+			}
 		}
 
 		m_Characters.back().SetVec(Vec);
@@ -196,7 +215,10 @@ void MainGame::Update() {
 		auto& interval = m_ShotInterval.at(&e - &m_Characters.front());
 		if (ShotSubKey && interval == 0.f) {
 			interval = static_cast<float>(GetRand(100)) / 100.f + 1.f;
-			e.SetBullet(1, e.GetGunPos(), Vector.Nomalize() * 1.f);
+			if (e.SetBullet(1, e.GetGunPos(), Vector.Nomalize() * 1.f)) {
+				PlaySoundMem(m_ShotSE.at(m_ShotSENow), DX_PLAYTYPE_BACK);
+				++m_ShotSENow %= static_cast<int>(m_ShotSE.size());
+			}
 		}
 		interval = Mathf::Max(interval - FrameWork::Instance()->GetDeltaTime(), 0.f);
 
@@ -215,6 +237,14 @@ void MainGame::Update() {
 						Mathf::Vector3 Pos(Ret.SegA_MinDist_Pos.x, Ret.SegA_MinDist_Pos.y, Ret.SegA_MinDist_Pos.z);
 						if (e2.CanDamage()) {
 							e2.SetDamage(34);
+							if (e2.IsAlive()) {
+								PlaySoundMem(m_DamageSE.at(m_DamageSENow), DX_PLAYTYPE_BACK);
+								++m_DamageSENow %= static_cast<int>(m_DamageSE.size());
+							}
+							else {
+								PlaySoundMem(m_DeathSE.at(m_DeathSENow), DX_PLAYTYPE_BACK);
+								++m_DeathSENow %= static_cast<int>(m_DeathSE.size());
+							}
 						}
 						b.DisActive();
 						m_HitEffect.SetHitEffect(Pos + e2.GetVec().Nomalize() * 0.1f);
