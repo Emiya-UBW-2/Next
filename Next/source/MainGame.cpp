@@ -2,11 +2,74 @@
 
 Mathf::Vector3 CamPos;
 
+void MainGame::Init() {
+
+	for (auto& e : m_Characters) {
+		int index = static_cast<int>(&e - &m_Characters.front());
+		Mathf::Vector3 Pos(static_cast<float>(GetRand(index + 1)) * 0.1f, static_cast<float>(index) * 0.5f, 20.f);
+		if (index == (m_Characters.size() - 1)) {
+			Pos.y += 1.5f;
+			e.Init(Pos, "plane", 0.03f);
+		}
+		else {
+			e.Init(Pos, "enemy", 0.01f);
+		}
+	}
+
+	m_BoostTimer = 1.f;
+
+	CamPos = m_Characters.back().GetPosition();
+	CamPos.z = 10.f;
+
+	m_Sonic.Init();
+	m_DeathEffect.Init();
+	m_HitEffect.Init();
+
+	for (int loop = 0; loop < m_BlockPos.size(); ++loop) {
+		m_BlockPos.at(loop) = static_cast<float>(GetRand(200) - 100) / 100.f;
+	}
+
+	m_gauge = LoadGraph("data/UI/boostgauge.bmp", TRUE);
+	m_meter = LoadGraph("data/UI/boostmeter.bmp", TRUE);
+	m_Font = CreateFontToHandle("Agency FB", 12, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1);
+
+	m_BGM = LoadSoundMem("data/BGM.wav");
+
+	PlaySoundMem(m_BGM, DX_PLAYTYPE_BACK);
+}
+
 void MainGame::Update() {
-	{
-		Mathf::Vector3 Vec = m_Character.GetVec();
+	if (m_Characters.back().IsAlive()) {
+		Mathf::Vector3 Vec = m_Characters.back().GetVec();
 
 		bool UpKey = CheckHitKey(KEY_INPUT_W);
+		if (!m_BoostActive) {
+			UpKey = false;
+		}
+		if (UpKey) {
+			m_BoostInterval = 0.5f;
+			if (m_BoostActive) {
+				m_BoostTimer = Mathf::Max(m_BoostTimer - FrameWork::Instance()->GetDeltaTime(), 0.f);
+				if (m_BoostTimer == 0.f) {
+					m_BoostActive = false;
+				}
+			}
+		}
+		else {
+			m_BoostInterval = Mathf::Max(m_BoostInterval - FrameWork::Instance()->GetDeltaTime(), 0.f);
+			if (m_BoostInterval == 0.f) {
+				if (m_BoostActive) {
+					m_BoostTimer = Mathf::Min(m_BoostTimer + FrameWork::Instance()->GetDeltaTime(), 1.f);
+				}
+				else {
+					m_BoostTimer = Mathf::Min(m_BoostTimer + FrameWork::Instance()->GetDeltaTime() * 0.5f, 1.f);
+				}
+			}
+			if (m_BoostTimer == 1.f) {
+				m_BoostActive = true;
+			}
+		}
+
 		bool DownKey = CheckHitKey(KEY_INPUT_S);
 		bool LeftKey = CheckHitKey(KEY_INPUT_A);
 		bool RightKey = CheckHitKey(KEY_INPUT_D);
@@ -33,7 +96,7 @@ void MainGame::Update() {
 		}
 
 		if (ShotKey) {
-			m_Character.SetBullet(0, m_Character.GetPosition(), m_Character.GetVec().Nomalize() * 2.f);
+			m_Characters.back().SetBullet(0, m_Characters.back().GetPosition(), m_Characters.back().GetVec().Nomalize() * 2.f);
 		}
 
 		//マウス座標を取得しておく
@@ -45,9 +108,9 @@ void MainGame::Update() {
 		MouseX = MouseX * FrameWork::Instance()->GetScreenWidth() / FrameWork::Instance()->GetWindowWidth();
 		MouseY = MouseY * FrameWork::Instance()->GetScreenHeight() / FrameWork::Instance()->GetWindowHeight();
 
-		Mathf::Vector3 MP1(MouseX, MouseY, 0.f);
+		Mathf::Vector3 MP1(static_cast<float>(MouseX), static_cast<float>(MouseY), 0.f);
 
-		Mathf::Vector3 PG = m_Character.GetGunPos();
+		Mathf::Vector3 PG = m_Characters.back().GetGunPos();
 		Mathf::Vector3 P1 = GetDisplayPoint(PG.x - CamPos.x, PG.y - CamPos.y, PG.z - CamPos.z);
 		Mathf::Vector3 P1X = GetDisplayPoint(PG.x + 1.f - CamPos.x, PG.y + 0.f - CamPos.y, PG.z - CamPos.z);
 		Mathf::Vector3 P1Z = GetDisplayPoint(PG.x + 0.f - CamPos.x, PG.y + 1.f - CamPos.y, PG.z - CamPos.z);
@@ -57,12 +120,12 @@ void MainGame::Update() {
 		Vector.y = Mathf::Vector3::Dot((MP1 - P1).Nomalize(), (P1Z - P1).Nomalize());//Cos
 		Vector.z = 0.f;
 
-		m_Character.SetGunRad(std::atan2f(Vector.x, Vector.y));
+		m_Characters.back().SetGunRad(std::atan2f(Vector.x, Vector.y));
 		if (ShotSubKey) {
-			m_Character.SetBullet(1, PG, Vector.Nomalize() * 2.f);
+			m_Characters.back().SetBullet(1, PG, Vector.Nomalize() * 1.f);
 		}
 
-		m_Character.SetVec(Vec);
+		m_Characters.back().SetVec(Vec);
 
 		if (UpKey) {
 			if (prevUpKey != UpKey) {
@@ -73,60 +136,207 @@ void MainGame::Update() {
 			}
 			if (m_SonicTimer > 0.025f) {
 				m_SonicTimer -= 0.025f;
-				m_Sonic.SetSonic(m_Character.GetPosition());
+				m_Sonic.SetSonic(m_Characters.back().GetPosition());
 			}
 		}
-		m_Sonic.Update();
 
 		prevUpKey = UpKey;
 	}
-	m_Character.Update();
+	else {
+		m_BoostTimer = 1.f;
+		m_BoostActive = true;
+	}
+	Mathf::Easing(&m_BoostMeterRand, m_BoostTimer + static_cast<float>(GetRand(200) - 100) / 100.f * 0.1f, 0.9f);
 
-	for (auto& e : m_Enemy) {
+	for (auto& e : m_Characters) {
+		if ((&e - &m_Characters.front()) == (m_Characters.size() - 1)) { continue; }
+		Mathf::Vector3 ToP = e.GetPosition() - m_Characters.back().GetPosition();
 		Mathf::Vector3 Vec = e.GetVec();
-		//Vec.x = 0.f;
-		if (e.GetPosition().x < m_Character.GetPosition().x) {
+		//Vec.x = 0.f;wwwww
+
+		bool IsBoost = (ToP.y) > 3.f;
+		bool IsUp = (ToP.y < 0.f);
+		if (!IsBoost && std::abs(ToP.x) > 0.15f) {
+			IsUp = false;
+		}
+		bool IsRight = (ToP.x < 0.f);
+
+		for (auto& e2 : m_Characters) {
+			if (&e != &e2) {
+				Mathf::Vector3 To = e.GetPosition() - e2.GetPosition();
+				if (std::abs(To.x) < 0.05f && std::abs(To.y) < 0.5f) {
+					IsRight = To.x > 0;
+					IsUp = To.y > 0;
+				}
+			}
+		}
+
+		if (IsRight) {
 			Vec.x = Mathf::Clamp(Vec.x + 0.5f * FrameWork::Instance()->GetDeltaTime(), -0.25f, 0.25f);
 		}
 		else {
 			Vec.x = Mathf::Clamp(Vec.x - 0.5f * FrameWork::Instance()->GetDeltaTime(), -0.25f, 0.25f);
 		}
 
-		if (e.GetPosition().y < m_Character.GetPosition().y) {
-			Mathf::Easing(&Vec.y, 1.5f, 0.95f);
+		if (IsUp) {
+			Mathf::Easing(&Vec.y, IsBoost ? 3.f : 1.5f, 0.95f);
 		}
 		else {
-			Mathf::Easing(&Vec.y, 0.65f, 0.95f);
+			Mathf::Easing(&Vec.y, 0.75f, 0.95f);
 		}
 		e.SetVec(Vec);
-	}
-	for (auto& b : m_Character.GetBulletList()) {
-		if (b.IsActive()) {
-			SEGMENT_SEGMENT_RESULT Ret;
-			for (auto& e : m_Enemy) {
-				Mathf::GetSegmenttoSegment(b.GetRePos(), b.GetPosition(), e.GetRePos(), e.GetPosition(),&Ret);
-				float len = 0.025f;
-				if (Ret.SegA_SegB_MinDist_Square <= (len * len)) {
-					Mathf::Vector3 Pos(Ret.SegA_MinDist_Pos.x, Ret.SegA_MinDist_Pos.y, Ret.SegA_MinDist_Pos.z);
+		//
+		Mathf::Vector3 Vector = m_Characters.back().GetPosition() - e.GetGunPos();
+		bool ShotSubKey = (0.5f < Vector.Length()) && (Vector.Length() < 1.f);
+		if (Vector.y > 0.f) {
+			ShotSubKey = (0.1f < Vector.Length()) && (Vector.Length() < 0.25f);
+		}
+		e.SetGunRad(std::atan2f(Vector.x, Vector.y));
 
-					b.DisActive();
-					m_HitEffect.SetHitEffect(Pos+e.GetVec().Nomalize()*0.1f);
-					break;
+		auto& interval = m_ShotInterval.at(&e - &m_Characters.front());
+		if (ShotSubKey && interval == 0.f) {
+			interval = static_cast<float>(GetRand(100)) / 100.f + 1.f;
+			e.SetBullet(1, e.GetGunPos(), Vector.Nomalize() * 1.f);
+		}
+		interval = Mathf::Max(interval - FrameWork::Instance()->GetDeltaTime(), 0.f);
+
+		m_MainTimer += FrameWork::Instance()->GetDeltaTime();
+	}
+	for (auto& e : m_Characters) {
+		for (auto& b : e.GetBulletList()) {
+			if (b.IsActive()) {
+				SEGMENT_SEGMENT_RESULT Ret;
+				for (auto& e2 : m_Characters) {
+					if (&e == &e2) { continue; }
+					if (!e2.IsAlive()) { continue; }
+					Mathf::GetSegmenttoSegment(b.GetRePos(), b.GetPosition(), e2.GetRePos(), e2.GetPosition(), &Ret);
+					float len = 0.025f;
+					if (Ret.SegA_SegB_MinDist_Square <= (len * len)) {
+						Mathf::Vector3 Pos(Ret.SegA_MinDist_Pos.x, Ret.SegA_MinDist_Pos.y, Ret.SegA_MinDist_Pos.z);
+						if (e2.CanDamage()) {
+							e2.SetDamage(34);
+						}
+						b.DisActive();
+						m_HitEffect.SetHitEffect(Pos + e2.GetVec().Nomalize() * 0.1f);
+						break;
+					}
 				}
 			}
 		}
 	}
+	for (auto& e : m_Characters) {
+		if (!e.IsAlive()) {
+			if (e.GetPosition().z > 1.f) {
+				auto& interval = m_DeathEffectInterval.at(&e - &m_Characters.front());
+				if (interval == 0.f) {
+					interval = 0.1f;
+					m_HitEffect.SetHitEffect(e.GetPosition() + e.GetVec().Nomalize() * 0.1f);
+				}
+			}
+			if (e.GetPosition().z <= 0.f) {
+				auto& interval = m_DeathEffectFlag.at(&e - &m_Characters.front());
+				if (interval == false) {
+					interval = true;
+					m_DeathEffect.SetDeathEffect(e.GetPosition() + e.GetVec().Nomalize() * 0.1f);
+				}
+			}
+		}
+		else {
+			auto& interval = m_DeathEffectFlag.at(&e - &m_Characters.front());
+			interval = false;
+		}
+		{
+			auto& interval = m_DeathEffectInterval.at(&e - &m_Characters.front());
+			interval = Mathf::Max(interval - FrameWork::Instance()->GetDeltaTime(), 0.f);
+		}
+	}
+	m_Sonic.Update();
+	m_DeathEffect.Update();
 	m_HitEffect.Update();
 
-	for (auto& e : m_Enemy) {
+	for (auto& e : m_Characters) {
+		if (e.CanRespawn() && !e.IsAlive()) {
+			e.SetDamage(-MaxHP);
+			Mathf::Vector3 Pos = CamPos + Mathf::Vector3(0.f, -1.f, 0.f);
+			Pos.z = 20.f;
+			e.SetPos(Pos);
+		}
 		e.Update();
 	}
 	{
-		Mathf::Vector3 Pos = m_Character.GetPosition();
+		Mathf::Vector3 Pos = m_Characters.back().GetPosition();
 		Pos.x -= 0.75f;
 		Pos.y -= 0.15f;
 
 		Mathf::Easing(&CamPos, Pos, 0.9f);
 		CamPos.z = 10.f;
 	}
+}
+
+void MainGame::DrawMain() {
+	DrawBox(0, 0, FrameWork::Instance()->GetScreenWidth(), FrameWork::Instance()->GetScreenHeight(), GetColor(192, 0, 0), TRUE);
+
+	//
+	for (int loop = -5; loop < 20; ++loop) {
+		float timeTemp = static_cast<float>(loop + (int)(CamPos.y) * 3.f) / 3.f;
+
+		Mathf::Vector3 P1 = GetDisplayPoint(0.f, timeTemp - CamPos.y, 0.f - CamPos.z);
+		Mathf::Vector3 P2 = GetDisplayPoint(2.f, timeTemp - CamPos.y, 0.f - CamPos.z);
+		Mathf::Vector3 P3 = GetDisplayPoint(2.f, timeTemp - CamPos.y + 0.1f, 0.f - CamPos.z);
+		DrawTriangle(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(P2.x), static_cast<int>(P2.y), static_cast<int>(P3.x), static_cast<int>(P3.y), GetColor(0, 0, 0), TRUE);
+	}
+
+	//
+	for (int loop = -5; loop < 20; ++loop) {
+		float timeTemp = (static_cast<float>(loop + (int)(CamPos.y) * 3.f) + 0.5f) / 3.f;
+
+		Mathf::Vector3 P1 = GetDisplayPoint(0.f, timeTemp - CamPos.y, 0.f - CamPos.z);
+		Mathf::Vector3 P2 = GetDisplayPoint(2.f, timeTemp - CamPos.y, 0.f - CamPos.z);
+		Mathf::Vector3 P3 = GetDisplayPoint(2.f, timeTemp - CamPos.y + 0.1f, 0.f - CamPos.z);
+		DrawTriangle(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(P2.x), static_cast<int>(P2.y), static_cast<int>(P3.x), static_cast<int>(P3.y), GetColor(255, 0, 0), TRUE);
+	}
+
+	for (auto& e : m_Characters) {
+		e.DrawShadow();
+	}
+
+
+	for (auto& e : m_Characters) {
+		e.Draw();
+	}
+
+	m_Sonic.Draw();
+	m_DeathEffect.Draw();
+	m_HitEffect.Draw();
+
+}
+
+void MainGame::DrawUI() {
+	if (!m_Characters.back().IsAlive()) { return; }
+
+	DrawRotaGraph(960 - 32, 720 - 32, 1.0, 0.0, m_gauge, TRUE);
+	DrawRotaGraph(960 - 32, 720 - 32, 1.0, static_cast<double>(Mathf::Deg2Rad((m_BoostMeterRand -1.f) * 90.f)), m_meter, TRUE);
+	if (!m_BoostActive && (static_cast<int>(m_MainTimer *10)%10<5)) {
+		DrawFormatString2ToHandle(960 - 32 - 128 + 32, 720 - 32 - 128 + 64, GetColor(255, 0, 0), GetColor(0, 0, 0), m_Font, "OVER HEAT!");
+	}
+	/*
+	DrawBox(0, 0, 255, 255, GetColor(0, 255, 0), TRUE);
+	DrawRotaGraph(128, 128, 1.0, 0.0, m_gauge, TRUE);
+	for (int loop = 0; loop < 90; loop++) {
+		if (loop % 5 == 0) {
+			int x1 = 128 - sin(Mathf::Deg2Rad(loop)) * (128 - 5);
+			int y1 = 128 - cos(Mathf::Deg2Rad(loop)) * (128 - 5);
+			int x2 = 128 - sin(Mathf::Deg2Rad(loop)) * (128 - 10);
+			int y2 = 128 - cos(Mathf::Deg2Rad(loop)) * (128 - 10);
+			DrawLine(x1, y1, x2, y2, GetColor(0, 0, 0), 1);
+		}
+		if (loop % 30 == 0) {
+			int x1 = 128 - sin(Mathf::Deg2Rad(loop)) * (128 - 5);
+			int y1 = 128 - cos(Mathf::Deg2Rad(loop)) * (128 - 5);
+			int x2 = 128 - sin(Mathf::Deg2Rad(loop)) * (128 - 15);
+			int y2 = 128 - cos(Mathf::Deg2Rad(loop)) * (128 - 15);
+			DrawLine(x1, y1, x2, y2, GetColor(0, 0, 0), 1);
+		}
+	}
+	//*/
 }

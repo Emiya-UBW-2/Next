@@ -33,7 +33,7 @@ private:
 	FrameWork(FrameWork&&) = delete;
 	FrameWork& operator=(FrameWork&&) = delete;
 private:
-	int m_WindowWidth = 960;			//ウィンドウサイズX
+	int m_WindowWidth = 1280;			//ウィンドウサイズX
 	int m_WindowHeight = 720;			//ウィンドウサイズY
 
 	int m_ScreenWidth = 960;			//スクリーンサイズX

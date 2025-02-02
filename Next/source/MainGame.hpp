@@ -8,6 +8,8 @@
 
 extern Mathf::Vector3 CamPos;
 
+constexpr int MaxHP = 100;
+
 static Mathf::Vector3 GetDisplayPoint(float X, float Y, float Z) {
 	float Rad1 = Mathf::Deg2Rad(-30.f + 90.f);
 	float Rad2 = Mathf::Deg2Rad(-30.f);
@@ -23,8 +25,7 @@ static Mathf::Vector3 GetDisplayPoint(float X, float Y, float Z) {
 	return Ret;
 }
 
-struct SmokeData
-{
+struct SmokeData {
 	Mathf::Vector3 Pos;
 	float Size{};
 	float Seed{};
@@ -40,30 +41,33 @@ public:
 			s.Size = 0.f;
 		}
 	}
-	void Update(const Mathf::Vector3& Pos) {
+	void Update(const Mathf::Vector3& Pos, float Per) {
 		for (auto& s : m_SmokePoint) {
 			s.Size += FrameWork::Instance()->GetDeltaTime();
 		}
 		m_SmokePoint.at(m_SmokePointNum).Pos = Pos;
 		m_SmokePoint.at(m_SmokePointNum).Size = 0.f;
+		m_SmokePoint.at(m_SmokePointNum).Seed = Per;
 		++m_SmokePointNum %= static_cast<int>(m_SmokePoint.size());
 	}
 	void DrawShadow() const {
 		for (int loop = 0; loop < static_cast<int>(m_SmokePoint.size()); ++loop) {
 			auto& s1 = m_SmokePoint.at(static_cast<size_t>(loop));
 			auto& s2 = m_SmokePoint.at(static_cast<size_t>((loop + 1) % static_cast<int>(m_SmokePoint.size())));
-			if (s1.Size == 0.f) { continue; }
+			if (s1.Size == 0.f || s1.Size > 3.f) { continue; }
 			Mathf::Vector3 P1 = GetDisplayPoint(s1.Pos.x - CamPos.x, s1.Pos.y - CamPos.y, 0.f - CamPos.z);
 			Mathf::Vector3 P2 = GetDisplayPoint(s2.Pos.x - CamPos.x, s2.Pos.y - CamPos.y, 0.f - CamPos.z);
-			DrawLine(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(P2.x), static_cast<int>(P2.y), GetColor(0, 0, 0), static_cast<int>(s1.Size * 10));
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * std::sin(Mathf::Deg2Rad(s1.Size * 180.f)) * s1.Seed));
+			DrawLine(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(P2.x), static_cast<int>(P2.y), GetColor(0, 0, 0), static_cast<int>(s1.Size * 2));
 		}
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 	}
 	void Draw() const {
 		for (int loop = 0; loop < static_cast<int>(m_SmokePoint.size()); ++loop) {
 			auto& s1 = m_SmokePoint.at(static_cast<size_t>(loop));
 			auto& s2 = m_SmokePoint.at(static_cast<size_t>((loop + 1) % static_cast<int>(m_SmokePoint.size())));
-			if (s1.Size == 0.f) { continue; }
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * 2.f * s1.Size));
+			if (s1.Size == 0.f || s1.Size > 3.f) { continue; }
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * std::sin(Mathf::Deg2Rad(s1.Size * 180.f)) * s1.Seed));
 			Mathf::Vector3 P1 = GetDisplayPoint(s1.Pos.x - CamPos.x, s1.Pos.y - CamPos.y, s1.Pos.z - CamPos.z);
 			Mathf::Vector3 P2 = GetDisplayPoint(s2.Pos.x - CamPos.x, s2.Pos.y - CamPos.y, s2.Pos.z - CamPos.z);
 			DrawLine(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(P2.x), static_cast<int>(P2.y), GetColor(255, 255, 255), static_cast<int>(s1.Size * 10));
@@ -108,6 +112,47 @@ public:
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(32.f / s.Size));
 			Mathf::Vector3 P1 = GetDisplayPoint(s.Pos.x - CamPos.x, s.Pos.y - CamPos.y, s.Pos.z - CamPos.z);
 			DrawRotaGraph3(static_cast<int>(P1.x), static_cast<int>(P1.y), 640 / 2, 640 / 2, double(s.Size), double(s.Size / 2), double(Mathf::Deg2Rad(30)), m_Screen, TRUE);
+		}
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+	}
+};
+
+class DeathEffect {
+private:
+	int m_Screen = 0;
+	std::array<SmokeData, 64> m_Position;
+	int m_Pos = 0;
+public:
+	void SetDeathEffect(const Mathf::Vector3& Pos) {
+		m_Position.at(m_Pos).Pos = Pos;
+		m_Position.at(m_Pos).Size = 0.f;
+		++m_Pos %= static_cast<int>(m_Position.size());
+	}
+public:
+	void Init() {
+		m_Screen = MakeScreen(640, 640, TRUE);
+		SetDrawScreen(m_Screen);
+		ClearDrawScreen();
+		{
+			DrawCircle(640 / 2, 640 / 2, 640 / 2, GetColor(255, 255, 255), FALSE, 15);
+		}
+		for (auto& s : m_Position) {
+			s.Size = 1000.f;
+		}
+	}
+	void Update() {
+		for (auto& s : m_Position) {
+			if (s.Size > 10.f) { continue; }
+			s.Size += FrameWork::Instance()->GetDeltaTime();
+		}
+	}
+	void Draw() const {
+		for (auto& s : m_Position) {
+			if (s.Size > 10.f) { continue; }
+
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(32.f / s.Size));
+			Mathf::Vector3 P1 = GetDisplayPoint(s.Pos.x - CamPos.x, s.Pos.y - CamPos.y, s.Pos.z - CamPos.z);
+			DrawRotaGraph3(static_cast<int>(P1.x), static_cast<int>(P1.y), 640 / 2, 640 / 2, double(s.Size), double(s.Size*0.8f), double(Mathf::Deg2Rad(30)), m_Screen, TRUE);
 		}
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 	}
@@ -162,7 +207,8 @@ public:
 };
 
 class Bullet {
-	Mathf::Vector3 m_Vec;
+	Mathf::Vector3 m_BaseVec;
+	Mathf::Vector3 m_AddVec;
 	Mathf::Vector3 m_Pos;
 	Mathf::Vector3 m_RePos;
 	float m_Time = 100.f;
@@ -179,17 +225,18 @@ public:
 		m_Time = 2.f;
 	}
 public:
-	void Init(const Mathf::Vector3& Pos, const Mathf::Vector3& Vec, float Size) {
+	void Init(const Mathf::Vector3& Pos, const Mathf::Vector3& BaseVec, const Mathf::Vector3& AddVec, float Size) {
 		m_Pos = Pos;
 		m_RePos = m_Pos;
-		m_Vec = Vec;
+		m_BaseVec = BaseVec;
+		m_AddVec = AddVec;
 		m_Time = 0.f;
 		m_Size = Size;
 		m_Wave = 0.f;
 	}
 	void Update() {
 		m_RePos = m_Pos;
-		m_Pos += m_Vec * FrameWork::Instance()->GetDeltaTime();
+		m_Pos += (m_BaseVec + m_AddVec) * FrameWork::Instance()->GetDeltaTime();
 		m_Time += FrameWork::Instance()->GetDeltaTime();
 		if (m_Pos.z < 0.f) {
 			if (m_Wave == 0.f) {
@@ -201,8 +248,12 @@ public:
 
 	void DrawShadow() const {
 		if (m_Wave > 0.f) { return; }
+		Mathf::Vector3 PP = m_Pos - m_AddVec.Nomalize() * 0.003f * m_Size;
 		Mathf::Vector3 P1 = GetDisplayPoint(m_Pos.x - CamPos.x, m_Pos.y - CamPos.y, 0.f - CamPos.z);
-		DrawCircle(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(m_Size), GetColor(0, 0, 0), TRUE);
+		Mathf::Vector3 P2 = GetDisplayPoint(PP.x - CamPos.x, PP.y - CamPos.y, 0.f - CamPos.z);
+		DrawLine(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(P2.x), static_cast<int>(P2.y), GetColor(0, 0, 0), static_cast<int>(m_Size));
+		DrawCircle(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(m_Size / 2 - 1), GetColor(0, 0, 0), TRUE);
+		DrawCircle(static_cast<int>(P2.x), static_cast<int>(P2.y), static_cast<int>(m_Size / 2 - 1), GetColor(0, 0, 0), TRUE);
 	}
 	void Draw() const {
 		if (m_Wave > 0.f) {
@@ -214,8 +265,12 @@ public:
 			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 		}
 		else {
+			Mathf::Vector3 PP = m_Pos - m_AddVec.Nomalize() * 0.003f* m_Size;
 			Mathf::Vector3 P1 = GetDisplayPoint(m_Pos.x - CamPos.x, m_Pos.y - CamPos.y, m_Pos.z - CamPos.z);
-			DrawCircle(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(m_Size), GetColor(255, 255, 255), TRUE);
+			Mathf::Vector3 P2 = GetDisplayPoint(PP.x - CamPos.x, PP.y - CamPos.y, PP.z - CamPos.z);
+			DrawLine(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(P2.x), static_cast<int>(P2.y), GetColor(255, 255, 255), static_cast<int>(m_Size));
+			DrawCircle(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(m_Size / 2 - 1), GetColor(255, 255, 255), TRUE);
+			DrawCircle(static_cast<int>(P2.x), static_cast<int>(P2.y), static_cast<int>(m_Size / 2 - 1), GetColor(255, 255, 255), TRUE);
 		}
 	}
 };
@@ -235,6 +290,11 @@ class Character {
 	float time = 0.f;
 	int m_GraphAnim = 0;
 
+	float m_DamageTime = 0.f;
+
+	int m_HitPoint = MaxHP;
+	float m_RespawnTime = 0.f;
+
 	std::array<Bullet, 64> m_Bullet{};
 	std::array<float, 2> ShotInterval{};
 public:
@@ -245,6 +305,9 @@ public:
 	const Mathf::Vector3& GetPosition() const { return  m_Pos; }
 	const Mathf::Vector3& GetGunPos() const { return  m_GunPos; }
 
+	bool CanDamage() const { return m_DamageTime == 0.f; }
+	bool CanRespawn() const { return m_RespawnTime == 0.f; }
+	bool IsAlive() const { return m_HitPoint > 0; }
 	void SetVec(const Mathf::Vector3& Vec) { m_Vec = Vec; }
 	void SetGunRad(float rad) { m_GunRad = rad; }
 
@@ -254,18 +317,24 @@ public:
 			Mathf::Vector3 CaseSpeed(0.f,0.f,-10.f);
 			for (auto& b : m_Bullet) {
 				if (!b.IsActive()) {
-					b.Init(Pos, m_Vec + Vec, 2.f);
-					ShotInterval.at(ID) = 0.1f;
+					b.Init(Pos, m_Vec, Vec, 10.f);
+					ShotInterval.at(ID) = 0.25f;
 					break;
 				}
 			}
 		}
 	}
-public:
-	void Init(const Mathf::Vector3& Pos, std::string Name, float Ofs) {
+
+	void SetDamage(int Damage) {
+		m_DamageTime = 1.f;
+		m_HitPoint = static_cast<int>(Mathf::Clamp(static_cast<float>(m_HitPoint - Damage), 0.f, static_cast<float>(MaxHP)));
+		if (m_HitPoint == 0) {
+			m_RespawnTime = 3.f;
+		}
+	}
+	void SetPos(const Mathf::Vector3& Pos) {
 		m_Pos = Pos;
 		m_RePos = m_Pos;
-		m_GunPosOffset = Ofs;
 
 		m_Vec.x = 0.f;
 		m_Vec.y = 1.f;
@@ -274,6 +343,11 @@ public:
 		m_Rad = 0.f;
 		m_Smoke.at(0).Init(m_Pos + Mathf::Vector3(-0.02f, 0.0f, 0.f));
 		m_Smoke.at(1).Init(m_Pos + Mathf::Vector3(0.02f, 0.0f, 0.f));
+	}
+public:
+	void Init(const Mathf::Vector3& Pos, std::string Name, float Ofs) {
+		SetPos(Pos);
+		m_GunPosOffset = Ofs;
 
 		m_GraphHandle.at(0) = LoadGraph(("data/" + Name + "/0.bmp").c_str(), TRUE);
 		m_GraphHandle.at(1) = LoadGraph(("data/" + Name + "/1.bmp").c_str(), TRUE);
@@ -290,7 +364,14 @@ public:
 	}
 	void Update() {
 		m_RePos = m_Pos;
-		m_Pos += m_Vec * FrameWork::Instance()->GetDeltaTime();
+		if (m_Pos.z > 0.f) {
+
+			m_Pos += m_Vec * FrameWork::Instance()->GetDeltaTime();
+
+		}
+		if (!IsAlive()) {
+			m_Pos.z -= 10.f * FrameWork::Instance()->GetDeltaTime();
+		}
 		m_GunPos = m_Pos - m_Vec.Nomalize() * m_GunPosOffset;
 
 		m_Rad = std::atan2f(m_Vec.x, m_Vec.y);
@@ -298,12 +379,14 @@ public:
 		Mathf::Vector3 Offset = Mathf::Vector3(-0.03f * -std::sin(-m_Rad), -0.03f * std::cos(-m_Rad), 0.f);
 
 		float Per = 0.02f * 1.f/m_Vec.y;
-		m_Smoke.at(0).Update(m_Pos + Offset + Mathf::Vector3(-Per * std::cos(-m_Rad), -Per * std::sin(-m_Rad), 0.f));
-		m_Smoke.at(1).Update(m_Pos + Offset + Mathf::Vector3(Per * std::cos(-m_Rad), Per * std::sin(-m_Rad), 0.f));
+		m_Smoke.at(0).Update(m_Pos + Offset + Mathf::Vector3(-Per * std::cos(-m_Rad), -Per * std::sin(-m_Rad), 0.f), IsAlive() ? 1.f : 0.f);
+		m_Smoke.at(1).Update(m_Pos + Offset + Mathf::Vector3(Per * std::cos(-m_Rad), Per * std::sin(-m_Rad), 0.f), IsAlive() ? 1.f : 0.f);
 
 		for (auto& s : ShotInterval) {
 			s = Mathf::Max(s - FrameWork::Instance()->GetDeltaTime(), 0.f);
 		}
+		m_DamageTime = Mathf::Max(m_DamageTime - FrameWork::Instance()->GetDeltaTime(), 0.f);
+		m_RespawnTime = Mathf::Max(m_RespawnTime - FrameWork::Instance()->GetDeltaTime(), 0.f);
 		time += FrameWork::Instance()->GetDeltaTime();
 		float timeRate = (1.f / m_Vec.Length()) * 0.07f;
 		if (time > timeRate) {
@@ -319,6 +402,9 @@ public:
 	}
 
 	void DrawShadow() const {
+		if (!IsAlive()) {
+			if (m_Pos.z < 0.f) { return; }
+		}
 		for (auto& s : m_Smoke) {
 			s.DrawShadow();
 		}
@@ -329,10 +415,17 @@ public:
 			}
 		}
 
+		if (!IsAlive()) {
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * 2.f * m_Pos.z / 20.f));
+		}
+
+
 		Mathf::Vector3 P1 = GetDisplayPoint(m_Pos.x - CamPos.x, m_Pos.y - CamPos.y, 0.f - CamPos.z);
 		SetDrawBright(0, 0, 0);
 		DrawRotaGraph(static_cast<int>(P1.x), static_cast<int>(P1.y), 1.0, static_cast<double>(m_Rad * 1.5f), m_GraphHandle.at(m_GraphAnim), TRUE);
 		SetDrawBright(255, 255, 255);
+
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 	}
 	void Draw() const {
 		for (auto& s : m_Smoke) {
@@ -345,78 +438,64 @@ public:
 			}
 		}
 
-		Mathf::Vector3 P2 = GetDisplayPoint(m_GunPos.x - CamPos.x, m_GunPos.y - CamPos.y, m_GunPos.z - CamPos.z);
-		DrawRotaGraph(static_cast<int>(P2.x), static_cast<int>(P2.y), 1.0, static_cast<double>(m_GunRad + Mathf::Deg2Rad(-30.f)), m_SubHandle, TRUE);
+		if (!IsAlive()) {
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f *2.f * m_Pos.z / 20.f));
+		}
 
-		Mathf::Vector3 P1 = GetDisplayPoint(m_Pos.x - CamPos.x, m_Pos.y - CamPos.y, m_Pos.z - CamPos.z);
-		DrawRotaGraph(static_cast<int>(P1.x), static_cast<int>(P1.y), 1.0, static_cast<double>(m_Rad * 1.5f), m_GraphHandle.at(m_GraphAnim), TRUE);
+		if (CanDamage() || (static_cast<int>(m_DamageTime * 100) % 10 < 5)) {
+			SetDrawBright(255, 255 * m_HitPoint / MaxHP, 255 * m_HitPoint / MaxHP);
 
+			Mathf::Vector3 P2 = GetDisplayPoint(m_GunPos.x - CamPos.x, m_GunPos.y - CamPos.y, m_GunPos.z - CamPos.z);
+			DrawRotaGraph(static_cast<int>(P2.x), static_cast<int>(P2.y), 1.0, static_cast<double>(m_GunRad + Mathf::Deg2Rad(-30.f)), m_SubHandle, TRUE);
+
+			Mathf::Vector3 P1 = GetDisplayPoint(m_Pos.x - CamPos.x, m_Pos.y - CamPos.y, m_Pos.z - CamPos.z);
+			DrawRotaGraph(static_cast<int>(P1.x), static_cast<int>(P1.y), 1.0, static_cast<double>(m_Rad * 1.5f), m_GraphHandle.at(m_GraphAnim), TRUE);
+			SetDrawBright(255, 255, 255);
+		}
+
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 	}
 };
 
 class MainGame {
 public:
-	Character m_Character;
-	Sonic m_Sonic;
+	Sonic m_Sonic{};
+	DeathEffect m_DeathEffect{};
+	HitEffect m_HitEffect{};
+	std::array<Character, 8> m_Characters{};
 
-	HitEffect m_HitEffect;
-	std::array<Character,8> m_Enemy;
+	std::array<float, 8> m_ShotInterval{};
+	std::array<float, 8> m_DeathEffectInterval{};
+	std::array<int, 8> m_DeathEffectFlag{};
+
+	float m_MainTimer = 0.f;
 
 	float m_SonicTimer = 0.f;
 	bool prevUpKey = false;
 
-	std::array<float, 100> m_BlockPos;
+	std::array<float, 100> m_BlockPos{};
+
+	bool m_BoostActive = true;
+	float m_BoostTimer = 1.f;
+	float m_BoostMeterRand = 0.f;
+	float m_BoostInterval = 0.f;
+
+	int m_gauge = 0;
+	int m_meter = 0;
+	int m_Font = 0;
+
+	int m_BGM = 0;
 public:
 	MainGame() {}
 	~MainGame() {}
 public:
-	void Init() {
-		{
-			Mathf::Vector3 Pos(0.f, 0.f, 20.f);
-			m_Character.Init(Pos, "plane", 0.03f);
-			m_Sonic.Init();
-		}
-		CamPos = m_Character.GetPosition();
-		CamPos.z = 10.f;
-
-		for (auto& e : m_Enemy) {
-			Mathf::Vector3 Pos(&e - &m_Enemy.front(), 0.f, 20.f); Pos.x /= 10.f;
-			e.Init(Pos, "enemy",0.01f);
-		}
-
-		m_HitEffect.Init();
-
-		for (int loop = 0; loop < m_BlockPos.size(); ++loop) {
-			m_BlockPos.at(loop) = static_cast<float>(GetRand(200)-100) / 100.f;
-		}
-	}
+	void Init();
 	void Update();
 	void Draw() {
-		DrawBox(0, 0, FrameWork::Instance()->GetScreenWidth(), FrameWork::Instance()->GetScreenHeight(), GetColor(255, 0, 0), TRUE);
-
-		//
-		for (auto& e : m_Enemy) {
-			e.DrawShadow();
-		}
-		m_Character.DrawShadow();
-
-
-		for (int loop = -5; loop < 10; ++loop) {
-			float timeTemp = static_cast<float>(loop + (int)(CamPos.y) * 3.f) / 3.f;
-
-			Mathf::Vector3 P1 = GetDisplayPoint(0.f, timeTemp - CamPos.y, 0.f - CamPos.z);
-			Mathf::Vector3 P2 = GetDisplayPoint(2.f, timeTemp - CamPos.y, 0.f - CamPos.z);
-			Mathf::Vector3 P3 = GetDisplayPoint(2.f, timeTemp - CamPos.y + 0.2f, 0.f - CamPos.z);
-			DrawTriangle(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(P2.x), static_cast<int>(P2.y), static_cast<int>(P3.x), static_cast<int>(P3.y), GetColor(0, 0, 0), TRUE);
-		}
-
-		for (auto& e : m_Enemy) {
-			e.Draw();
-		}
-		m_Character.Draw();
-
-		m_Sonic.Draw();
-		m_HitEffect.Draw();
+		DrawMain();
+		DrawUI();
 	}
 private:
+	void DrawMain();
+	void DrawUI();
 };

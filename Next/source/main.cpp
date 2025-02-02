@@ -30,12 +30,12 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		SetDrawScreen(DX_SCREEN_BACK);
 		ClearDrawScreen();
 		{
-			DrawExtendGraph(0, 0, FrameWork::Instance()->GetWindowWidth(), FrameWork::Instance()->GetWindowHeight(), BackScreen, FALSE);
+			int Width = FrameWork::Instance()->GetWindowHeight() * FrameWork::Instance()->GetScreenWidth() / FrameWork::Instance()->GetScreenHeight();
+			DrawExtendGraph(FrameWork::Instance()->GetWindowWidth() / 2 - Width / 2, 0, FrameWork::Instance()->GetWindowWidth() / 2 + Width / 2, FrameWork::Instance()->GetWindowHeight(), BackScreen, FALSE);
 			//デバッグ表示
 			clsDx();
 			printfDx("FPS:%4.1f\n", GetFPS());
-			printfDx("処理時間:%5.2fms\n", (float)(FrameWork::Instance()->GetNowTimeStart()) / 1000.f);
-			printfDx("デルタタイム:%5.2fs\n", FrameWork::Instance()->GetDeltaTime());
+			//printfDx("デルタタイム:%5.2fs\n", FrameWork::Instance()->GetDeltaTime());
 		}
 		if (!FrameWork::Instance()->Flip()) {
 			break;
