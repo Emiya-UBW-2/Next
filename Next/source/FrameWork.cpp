@@ -2,6 +2,8 @@
 
 const FrameWork* FrameWork::m_Singleton = nullptr;
 
+int MenuEnter = 0;
+
 void FrameWork::Init()
 {
 	SetOutApplicationLogValidFlag(FALSE);

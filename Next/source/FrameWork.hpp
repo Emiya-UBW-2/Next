@@ -2,6 +2,11 @@
 
 #include "Define.hpp"
 
+extern int MenuEnter;
+
+static bool IsMenuButtonTrigger() { return MenuEnter == 1; }
+static bool IsMenuButtonPress() { return MenuEnter != 0; }
+
 class FrameWork {
 private:
 	static const FrameWork* m_Singleton;

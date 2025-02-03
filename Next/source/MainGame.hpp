@@ -115,6 +115,9 @@ public:
 		}
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 	}
+	void Dispose() {
+		DeleteGraph(m_Screen);
+	}
 };
 
 class DeathEffect {
@@ -155,6 +158,9 @@ public:
 			DrawRotaGraph3(static_cast<int>(P1.x), static_cast<int>(P1.y), 640 / 2, 640 / 2, double(s.Size), double(s.Size*0.8f), double(Mathf::Deg2Rad(30)), m_Screen, TRUE);
 		}
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+	}
+	void Dispose() {
+		DeleteGraph(m_Screen);
 	}
 };
 
@@ -204,6 +210,9 @@ public:
 		}
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 	}
+	void Dispose() {
+		DeleteGraph(m_Screen);
+	}
 };
 
 class Bullet {
@@ -216,22 +225,25 @@ class Bullet {
 
 	float m_Wave = 0.f;
 	Mathf::Vector3 m_WavePoint;
+	int m_Damage = 0;
 public:
 	const Mathf::Vector3& GetPosition() const { return  m_Pos; }
 	const Mathf::Vector3& GetRePos() const { return  m_RePos; }
+	const int GetDamage() const { return m_Damage; }
 
 	bool IsActive() const { return m_Time < 2.f; }
 	void DisActive() {
 		m_Time = 2.f;
 	}
 public:
-	void Init(const Mathf::Vector3& Pos, const Mathf::Vector3& BaseVec, const Mathf::Vector3& AddVec, float Size) {
+	void Init(const Mathf::Vector3& Pos, const Mathf::Vector3& BaseVec, const Mathf::Vector3& AddVec, float Size, int Damage) {
 		m_Pos = Pos;
 		m_RePos = m_Pos;
 		m_BaseVec = BaseVec;
 		m_AddVec = AddVec;
 		m_Time = 0.f;
 		m_Size = Size;
+		m_Damage = Damage;
 		m_Wave = 0.f;
 	}
 	void Update() {
@@ -275,7 +287,6 @@ public:
 	}
 };
 
-
 class Character {
 	Mathf::Vector3 m_Vec{};
 	Mathf::Vector3 m_Pos{};
@@ -317,7 +328,7 @@ public:
 			Mathf::Vector3 CaseSpeed(0.f,0.f,-10.f);
 			for (auto& b : m_Bullet) {
 				if (!b.IsActive()) {
-					b.Init(Pos, m_Vec, Vec, 10.f);
+					b.Init(Pos, m_Vec, Vec, 10.f, (ID == 0) ? 100 : 34);
 					ShotInterval.at(ID) = 0.25f;
 					return true;
 				}
@@ -456,6 +467,70 @@ public:
 
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 	}
+
+	void Dispose() {
+		DeleteGraph(m_GraphHandle.at(0));
+		DeleteGraph(m_GraphHandle.at(1));
+		DeleteGraph(m_GraphHandle.at(2));
+		DeleteGraph(m_GraphHandle.at(3));
+		DeleteGraph(m_SubHandle);
+	}
+};
+
+class TitleScene {
+	int m_Title = 0;
+	int m_TitleImage = 0;
+
+	int m_FontBig = 0;
+	bool m_IsEnd = false;
+	float m_Timer = 0.f;
+public:
+	TitleScene() {}
+	~TitleScene() {}
+public:
+	void Init() {
+		m_FontBig = CreateFontToHandle("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1);
+		m_Title = LoadGraph("data/UI/Title.png");
+		m_TitleImage = LoadGraph("data/UI/titleImage.bmp");
+
+		m_IsEnd = false;
+	}
+	void Update() {
+		if (IsMenuButtonTrigger()) {
+			m_IsEnd = true;
+		}
+		m_Timer += FrameWork::Instance()->GetDeltaTime();
+	}
+	void Draw() {
+		int YposBase = FrameWork::Instance()->GetScreenHeight() *2 / 3;
+		DrawBox(0, YposBase, FrameWork::Instance()->GetScreenWidth(), FrameWork::Instance()->GetScreenHeight(), GetColor(255, 0, 0), TRUE);
+
+		for (int loop = 0; loop < 5; loop++) {
+			float per = std::sin(Mathf::Deg2Rad(90 * (m_Timer + (float)loop / 5 - (int)(m_Timer + (float)loop / 5))));
+			int Ypos = YposBase + static_cast<int>(per * (FrameWork::Instance()->GetScreenHeight() * 3/ 4 + 50));
+			DrawBox(0, Ypos - static_cast<int>(50.f * per), FrameWork::Instance()->GetScreenWidth(), Ypos, GetColor(192, 0, 0), TRUE);
+		}
+
+
+		DrawBox(0, 0, FrameWork::Instance()->GetScreenWidth(), YposBase, GetColor(128, 128, 128), TRUE);
+
+		DrawGraph(0, 50 + 50.f * std::sin(Mathf::Deg2Rad(m_Timer * 0.3f * 180.f)), m_TitleImage, TRUE);
+
+		SetDrawBlendMode(DX_BLENDMODE_MUL, 255);
+		DrawGraph(FrameWork::Instance()->GetScreenWidth() / 2 - 768 / 2, 64, m_Title, TRUE);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+
+		if ((static_cast<int>(m_Timer * 10) % 10 < 5)) {
+			const char* Str = "Press Space To Start";
+			int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), m_FontBig);
+			DrawFormatString2ToHandle(FrameWork::Instance()->GetScreenWidth() / 2 - Width / 2, FrameWork::Instance()->GetScreenHeight() * 3 / 4, GetColor(255, 255, 255), GetColor(0, 0, 0), m_FontBig, Str);
+		}
+	}
+	void Dispose() {
+		DeleteFontToHandle(m_FontBig);
+		DeleteGraph(m_Title);
+	}
+	bool IsEnd()const { return m_IsEnd; }
 };
 
 class MainGame {
@@ -470,6 +545,7 @@ public:
 	std::array<int, 8> m_DeathEffectFlag{};
 
 	float m_MainTimer = 0.f;
+	float m_TotalTimer = 60.f * 2.f;
 
 	float m_SonicTimer = 0.f;
 	bool prevUpKey = false;
@@ -481,9 +557,13 @@ public:
 	float m_BoostMeterRand = 0.f;
 	float m_BoostInterval = 0.f;
 
+	int m_FinImage = 0;
+
 	int m_gauge = 0;
 	int m_meter = 0;
 	int m_Font = 0;
+	int m_FontBig = 0;
+	int m_FontResult = 0;
 
 	int m_BGM = 0;
 	std::array<int, 10> m_ShotSE{};
@@ -492,6 +572,12 @@ public:
 	int m_DamageSENow = 0;
 	std::array<int, 10> m_DeathSE{};
 	int m_DeathSENow = 0;
+
+	int m_ScoreSE{};
+
+	Mathf::Vector3 CamPosBuf;
+
+	bool m_IsEnd = false;
 public:
 	MainGame() {}
 	~MainGame() {}
@@ -500,9 +586,33 @@ public:
 	void Update();
 	void Draw() {
 		DrawMain();
-		DrawUI();
+		if (m_MainTimer >= -3.5f) {
+			DrawUI();
+		}
+		else {
+			DrawResult();
+		}
 	}
+	void Dispose();
+	bool IsEnd()const { return m_IsEnd; }
 private:
 	void DrawMain();
 	void DrawUI();
+private:
+	float m_Respawn = 0.f;
+	float m_Kill = 0.f;
+	float m_HitRatio = 0.f;
+
+	int m_RespawnScore = 0;
+	int m_KillScore = 0;
+	int m_HitScore = 0;
+	int m_ShotScore = 0;
+
+	float m_ResultTimer = 0.f;
+	std::array<float, 5> m_ResultAnim{};
+	int m_ResultClear = 0;
+private:
+	void InitResult();
+	void UpdateResult();
+	void DrawResult();
 };
