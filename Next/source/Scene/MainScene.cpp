@@ -23,9 +23,7 @@ void MainGame::InitSub() {
 	CamPos = m_Characters.back().GetPosition();
 	CamPos.z = 10.f;
 
-	m_Sonic.Init();
-	m_DeathEffect.Init();
-	m_HitEffect.Init();
+	m_EffectControl.Init();
 
 	for (int loop = 0; loop < m_BlockPos.size(); ++loop) {
 		m_BlockPos.at(loop) = static_cast<float>(GetRand(200) - 100) / 100.f;
@@ -177,7 +175,7 @@ void MainGame::UpdateSub() {
 			}
 			if (m_SonicTimer > 0.025f) {
 				m_SonicTimer -= 0.025f;
-				m_Sonic.SetSonic(m_Characters.back().GetPosition());
+				m_EffectControl.SetEffect(EnumEffect::Sonic, m_Characters.back().GetPosition());
 			}
 		}
 
@@ -285,7 +283,7 @@ void MainGame::UpdateSub() {
 								}
 							}
 							b.DisActive();
-							m_HitEffect.SetHitEffect(Pos + e2.GetVec().Nomalize() * 0.1f);
+							m_EffectControl.SetEffect(EnumEffect::Hit, Pos + e2.GetVec().Nomalize() * 0.1f);
 							break;
 						}
 					}
@@ -299,14 +297,14 @@ void MainGame::UpdateSub() {
 				auto& interval = m_DeathEffectInterval.at(&e - &m_Characters.front());
 				if (interval == 0.f) {
 					interval = 0.1f;
-					m_HitEffect.SetHitEffect(e.GetPosition() + e.GetVec().Nomalize() * 0.1f);
+					m_EffectControl.SetEffect(EnumEffect::Hit, e.GetPosition() + e.GetVec().Nomalize() * 0.1f);
 				}
 			}
 			if (e.GetPosition().z <= 0.f) {
 				auto& interval = m_DeathEffectFlag.at(&e - &m_Characters.front());
 				if (interval == false) {
 					interval = true;
-					m_DeathEffect.SetDeathEffect(e.GetPosition() + e.GetVec().Nomalize() * 0.1f);
+					m_EffectControl.SetEffect(EnumEffect::Death, e.GetPosition() + e.GetVec().Nomalize() * 0.1f);
 					PlaySoundMem(m_DeathSE.at(m_DeathSENow), DX_PLAYTYPE_BACK);
 					++m_DeathSENow %= static_cast<int>(m_DeathSE.size());
 				}
@@ -321,9 +319,7 @@ void MainGame::UpdateSub() {
 			interval = Mathf::Max(interval - FrameWork::Instance()->GetDeltaTime(), 0.f);
 		}
 	}
-	m_Sonic.Update();
-	m_DeathEffect.Update();
-	m_HitEffect.Update();
+	m_EffectControl.Update();
 
 	for (auto& e : m_Characters) {
 		if (e.CanRespawn() && !e.IsAlive()) {
@@ -381,10 +377,7 @@ void MainGame::DisposeSub()
 		e.Dispose();
 	}
 
-
-	m_Sonic.Dispose();
-	m_DeathEffect.Dispose();
-	m_HitEffect.Dispose();
+	m_EffectControl.Dispose();
 
 	DeleteGraph(m_gauge);
 	DeleteGraph(m_meter);
@@ -438,10 +431,7 @@ void MainGame::DrawMain() {
 		e.Draw();
 	}
 
-	m_Sonic.Draw();
-	m_DeathEffect.Draw();
-	m_HitEffect.Draw();
-
+	m_EffectControl.Draw();
 }
 
 void MainGame::DrawUI() {

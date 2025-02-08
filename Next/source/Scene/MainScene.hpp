@@ -28,14 +28,142 @@ static Mathf::Vector3 GetDisplayPoint(float X, float Y, float Z) {
 	return Ret;
 }
 
-struct SmokeData {
-	Mathf::Vector3 Pos;
-	float Size{};
-	float Seed{};
+enum class EnumEffect {
+	None,
+
+	Smoke,
+	Sonic,
+	Death,
+	Hit,
 };
+
+struct EffectPositionData {
+	EnumEffect EffectType{ EnumEffect::None};
+	Mathf::Vector3 Pos{};
+	float Size{};
+	float Alpha{};
+	float Rad{};
+
+	int m_Screen = 0;
+	int m_Screen2 = 0;//TODO
+public:
+	bool IsActive() const {
+		switch (EffectType) {
+		case EnumEffect::Smoke:
+			break;
+		case EnumEffect::Sonic:
+			return (this->Size <= 3.f);
+			break;
+		case EnumEffect::Death:
+			return (this->Size <= 3.f);
+			break;
+		case EnumEffect::Hit:
+			return (this->Size <= 0.5f);
+			break;
+		default:
+			break;
+		}
+		return false;
+	}
+public:
+	void Init(int Graph1, int Graph2) {
+		Size = 1000.f;
+		m_Screen = Graph1;
+		m_Screen2 = Graph2;
+	}
+	void Set(EnumEffect Type, const Mathf::Vector3& Pos) {
+		this->EffectType = Type;
+		switch (EffectType) {
+		case EnumEffect::Smoke:
+			break;
+		case EnumEffect::Sonic:
+		{
+			this->Pos = Pos;
+			this->Size = 0.f;
+		}
+			break;
+		case EnumEffect::Death:
+		{
+			this->Pos = Pos;
+			this->Size = 0.f;
+		}
+			break;
+		case EnumEffect::Hit:
+		{
+			this->Pos = Pos;
+			this->Size = 0.f;
+			this->Rad = Mathf::Deg2Rad(static_cast<float>(-90 + GetRand(180)));
+		}
+			break;
+		default:
+			break;
+		}
+	}
+	void DrawShadow() const {
+		switch (EffectType) {
+		case EnumEffect::Smoke:
+			break;
+		case EnumEffect::Sonic:
+			break;
+		case EnumEffect::Death:
+			break;
+		case EnumEffect::Hit:
+			break;
+		default:
+			break;
+		}
+	}
+	void Draw() const {
+		switch (EffectType) {
+		case EnumEffect::Smoke:
+			break;
+		case EnumEffect::Sonic:
+		{
+			if (!IsTriMonoMode) {
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(32.f / this->Size));
+			}
+			Mathf::Vector3 P1 = GetDisplayPoint(this->Pos.x - CamPos.x, this->Pos.y - CamPos.y, this->Pos.z - CamPos.z);
+			DrawRotaGraph3(static_cast<int>(P1.x), static_cast<int>(P1.y), 640 / 2, 640 / 2, double(this->Size), double(this->Size / 2), double(Mathf::Deg2Rad(30)), m_Screen, TRUE);
+			if (!IsTriMonoMode) {
+				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+			}
+		}
+			break;
+		case EnumEffect::Death:
+		{
+			if (!IsTriMonoMode) {
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(32.f / this->Size));
+			}
+			Mathf::Vector3 P1 = GetDisplayPoint(this->Pos.x - CamPos.x, this->Pos.y - CamPos.y, this->Pos.z - CamPos.z);
+			DrawRotaGraph3(static_cast<int>(P1.x), static_cast<int>(P1.y), 640 / 2, 640 / 2, double(this->Size), double(this->Size * 0.8f), double(Mathf::Deg2Rad(30)), m_Screen, TRUE);
+			if (!IsTriMonoMode) {
+				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+			}
+		}
+			break;
+		case EnumEffect::Hit:
+		{
+			float alpha = std::sin(Mathf::Deg2Rad(this->Size / 0.5f * 180.f));
+			float scale = this->Size * 0.15f / 0.5f;// std::sin(Mathf::Deg2Rad(this->Size / 0.5f * 180.f)) * 0.25f;
+			if (!IsTriMonoMode) {
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * alpha));
+			}
+			Mathf::Vector3 P1 = GetDisplayPoint(this->Pos.x - CamPos.x, this->Pos.y - CamPos.y, this->Pos.z - CamPos.z);
+			DrawRotaGraph3(static_cast<int>(P1.x), static_cast<int>(P1.y), 640 / 2, 640 / 2, double(scale), double(scale), double(this->Rad + Mathf::Deg2Rad(30 + this->Rad * this->Size * 3.f * 180.f)), m_Screen2, TRUE);
+			if (!IsTriMonoMode) {
+				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+			}
+		}
+			break;
+		default:
+			break;
+		}
+	}
+};
+
 class Smoke {
 private:
-	std::array<SmokeData, 90> m_SmokePoint;
+	std::array<EffectPositionData, 90> m_SmokePoint;
 	int m_SmokePointNum = 0;
 public:
 	void Init(const Mathf::Vector3& Pos) {
@@ -50,7 +178,7 @@ public:
 		}
 		m_SmokePoint.at(m_SmokePointNum).Pos = Pos;
 		m_SmokePoint.at(m_SmokePointNum).Size = 0.f;
-		m_SmokePoint.at(m_SmokePointNum).Seed = Per;
+		m_SmokePoint.at(m_SmokePointNum).Alpha = Per;
 		++m_SmokePointNum %= static_cast<int>(m_SmokePoint.size());
 	}
 	void DrawShadow() const {
@@ -61,7 +189,7 @@ public:
 			Mathf::Vector3 P1 = GetDisplayPoint(s1.Pos.x - CamPos.x, s1.Pos.y - CamPos.y, 0.f - CamPos.z);
 			Mathf::Vector3 P2 = GetDisplayPoint(s2.Pos.x - CamPos.x, s2.Pos.y - CamPos.y, 0.f - CamPos.z);
 			if (!IsTriMonoMode) {
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * std::sin(Mathf::Deg2Rad(s1.Size * 180.f)) * s1.Seed));
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * std::sin(Mathf::Deg2Rad(s1.Size * 180.f)) * s1.Alpha));
 			}
 			DrawLine(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(P2.x), static_cast<int>(P2.y), GetColor(0, 0, 0), static_cast<int>(s1.Size * 2));
 		}
@@ -75,7 +203,7 @@ public:
 			auto& s2 = m_SmokePoint.at(static_cast<size_t>((loop + 1) % static_cast<int>(m_SmokePoint.size())));
 			if (s1.Size == 0.f || s1.Size > 3.f) { continue; }
 			if (!IsTriMonoMode) {
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * std::sin(Mathf::Deg2Rad(s1.Size * 180.f)) * s1.Seed));
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * std::sin(Mathf::Deg2Rad(s1.Size * 180.f)) * s1.Alpha));
 			}
 			Mathf::Vector3 P1 = GetDisplayPoint(s1.Pos.x - CamPos.x, s1.Pos.y - CamPos.y, s1.Pos.z - CamPos.z);
 			Mathf::Vector3 P2 = GetDisplayPoint(s2.Pos.x - CamPos.x, s2.Pos.y - CamPos.y, s2.Pos.z - CamPos.z);
@@ -87,151 +215,61 @@ public:
 	}
 };
 
-class Sonic {
+
+class EffectControl {
 private:
 	int m_Screen = 0;
-	std::array<SmokeData, 64> m_Position;
+	int m_Screen2 = 0;
+	std::array<EffectPositionData, 64> m_Position;
 	int m_Pos = 0;
 public:
-	void SetSonic(const Mathf::Vector3& Pos) {
-		m_Position.at(m_Pos).Pos = Pos;
-		m_Position.at(m_Pos).Size = 0.f;
+	void SetEffect(EnumEffect Type, const Mathf::Vector3& Pos) {
+		m_Position.at(m_Pos).Set(Type, Pos);
 		++m_Pos %= static_cast<int>(m_Position.size());
 	}
 public:
 	void Init() {
+		//Sonic
+		//Death
 		m_Screen = MakeScreen(640, 640, TRUE);
 		SetDrawScreen(m_Screen);
 		ClearDrawScreen();
 		{
 			DrawCircle(640 / 2, 640 / 2, 640 / 2, GetColor(255, 255, 255), FALSE, 15);
 		}
-		for (auto& s : m_Position) {
-			s.Size = 1000.f;
-		}
-	}
-	void Update() {
-		for (auto& s : m_Position) {
-			if (s.Size > 10.f) { continue; }
-			s.Size += FrameWork::Instance()->GetDeltaTime();
-		}
-	}
-	void Draw() const {
-		for (auto& s : m_Position) {
-			if (s.Size > 10.f) { continue; }
-			if (!IsTriMonoMode) {
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(32.f / s.Size));
-			}
-			Mathf::Vector3 P1 = GetDisplayPoint(s.Pos.x - CamPos.x, s.Pos.y - CamPos.y, s.Pos.z - CamPos.z);
-			DrawRotaGraph3(static_cast<int>(P1.x), static_cast<int>(P1.y), 640 / 2, 640 / 2, double(s.Size), double(s.Size / 2), double(Mathf::Deg2Rad(30)), m_Screen, TRUE);
-		}
-		if (!IsTriMonoMode) {
-			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
-		}
-	}
-	void Dispose() {
-		DeleteGraph(m_Screen);
-	}
-};
-
-class DeathEffect {
-private:
-	int m_Screen = 0;
-	std::array<SmokeData, 64> m_Position;
-	int m_Pos = 0;
-public:
-	void SetDeathEffect(const Mathf::Vector3& Pos) {
-		m_Position.at(m_Pos).Pos = Pos;
-		m_Position.at(m_Pos).Size = 0.f;
-		++m_Pos %= static_cast<int>(m_Position.size());
-	}
-public:
-	void Init() {
-		m_Screen = MakeScreen(640, 640, TRUE);
-		SetDrawScreen(m_Screen);
+		//Hit
+		m_Screen2 = MakeScreen(640, 640, TRUE);
+		SetDrawScreen(m_Screen2);
 		ClearDrawScreen();
 		{
-			DrawCircle(640 / 2, 640 / 2, 640 / 2, GetColor(255, 255, 255), FALSE, 15);
-		}
-		for (auto& s : m_Position) {
-			s.Size = 1000.f;
-		}
-	}
-	void Update() {
-		for (auto& s : m_Position) {
-			if (s.Size > 3.f) { continue; }
-			s.Size += FrameWork::Instance()->GetDeltaTime();
-		}
-	}
-	void Draw() const {
-		for (auto& s : m_Position) {
-			if (s.Size > 3.f) { continue; }
-			if (!IsTriMonoMode) {
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(32.f / s.Size));
-			}
-			Mathf::Vector3 P1 = GetDisplayPoint(s.Pos.x - CamPos.x, s.Pos.y - CamPos.y, s.Pos.z - CamPos.z);
-			DrawRotaGraph3(static_cast<int>(P1.x), static_cast<int>(P1.y), 640 / 2, 640 / 2, double(s.Size), double(s.Size * 0.8f), double(Mathf::Deg2Rad(30)), m_Screen, TRUE);
-		}
-		if (!IsTriMonoMode) {
-			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
-		}
-	}
-	void Dispose() {
-		DeleteGraph(m_Screen);
-	}
-};
-
-class HitEffect {
-private:
-	int m_Screen = 0;
-	std::array<SmokeData, 16> m_Position;
-	int m_Pos = 0;
-public:
-	void SetHitEffect(const Mathf::Vector3& Pos) {
-		m_Position.at(m_Pos).Pos = Pos;
-		m_Position.at(m_Pos).Size = 0.f;
-		m_Position.at(m_Pos).Seed = Mathf::Deg2Rad(static_cast<float>(-90 + GetRand(180)));
-		++m_Pos %= static_cast<int>(m_Position.size());
-	}
-public:
-	void Init() {
-		m_Screen = MakeScreen(640, 640, TRUE);
-		SetDrawScreen(m_Screen);
-		ClearDrawScreen();
-		{
-			for (int loop = 0; loop < 25; ++loop) {
-				//DrawBox(0 + loop, 0 + loop, 640 - loop, 640 - loop, GetColor(255, 255, 255), FALSE);
-			}
 			DrawCircleAA(640.f / 2, 640.f / 2, 640.f / 2, 5, GetColor(255, 255, 255), FALSE, 50);
 		}
+		//
 		for (auto& s : m_Position) {
-			s.Size = 1000.f;
+			s.Init(m_Screen, m_Screen2);
 		}
 	}
 	void Update() {
 		for (auto& s : m_Position) {
-			if (s.Size > 0.5f) { continue; }
+			if (!s.IsActive()) { continue; }
 			s.Size += FrameWork::Instance()->GetDeltaTime();
+		}
+	}
+	void DrawShadow() const {
+		for (auto& s : m_Position) {
+			if (!s.IsActive()) { continue; }
+			s.DrawShadow();
 		}
 	}
 	void Draw() const {
 		for (auto& s : m_Position) {
-			if (s.Size > 0.5f) { continue; }
-
-			float alpha = std::sin(Mathf::Deg2Rad(s.Size / 0.5f * 180.f));
-			float scale = s.Size * 0.15f / 0.5f;// std::sin(Mathf::Deg2Rad(s.Size / 0.5f * 180.f)) * 0.25f;
-			if (!IsTriMonoMode) {
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * alpha));
-			}
-			Mathf::Vector3 P1 = GetDisplayPoint(s.Pos.x - CamPos.x, s.Pos.y - CamPos.y, s.Pos.z - CamPos.z);
-			DrawRotaGraph3(static_cast<int>(P1.x), static_cast<int>(P1.y), 640 / 2, 640 / 2, double(scale), double(scale), double(s.Seed + Mathf::Deg2Rad(30 + s.Seed * s.Size * 3.f * 180.f)), m_Screen, TRUE);
-		}
-		if (!IsTriMonoMode) {
-			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+			if(!s.IsActive()) { continue; }
+			s.Draw();
 		}
 	}
-	void Dispose() {
+	void Dispose() const {
 		DeleteGraph(m_Screen);
+		DeleteGraph(m_Screen2);
 	}
 };
 
@@ -513,9 +551,7 @@ public:
 class MainGame : public BaseScene {
 	using BaseScene::BaseScene;
 public:
-	Sonic m_Sonic{};
-	DeathEffect m_DeathEffect{};
-	HitEffect m_HitEffect{};
+	EffectControl m_EffectControl;
 	std::array<Character, 8> m_Characters{};
 
 	std::array<float, 8> m_ShotInterval{};
