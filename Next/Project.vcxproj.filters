@@ -4,36 +4,66 @@
     <Filter Include="source">
       <UniqueIdentifier>{6375a775-fbd8-48f6-86e5-5bf7f79006ba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\Sceme">
+      <UniqueIdentifier>{199d9a2f-de85-45fb-aaa6-a30610bab77a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\FrameWork">
+      <UniqueIdentifier>{28e7ef27-4e1e-415c-825d-5f38bc76989a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\FrameWork.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
     <ClCompile Include="source\main.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="source\MainGame.cpp">
-      <Filter>source</Filter>
+    <ClCompile Include="source\Scene\TitleScene.cpp">
+      <Filter>source\Sceme</Filter>
     </ClCompile>
-    <ClCompile Include="source\Algorithm.cpp">
-      <Filter>source</Filter>
+    <ClCompile Include="source\Scene\MainScene.cpp">
+      <Filter>source\Sceme</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Scene\BaseScene.cpp">
+      <Filter>source\Sceme</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Scene\SceneController.cpp">
+      <Filter>source\Sceme</Filter>
+    </ClCompile>
+    <ClCompile Include="source\FrameWork\FrameWork.cpp">
+      <Filter>source\FrameWork</Filter>
+    </ClCompile>
+    <ClCompile Include="source\FrameWork\Algorithm.cpp">
+      <Filter>source\FrameWork</Filter>
+    </ClCompile>
+    <ClCompile Include="source\FrameWork\InputControl.cpp">
+      <Filter>source\FrameWork</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="source\FrameWork.hpp">
-      <Filter>source</Filter>
+    <ClInclude Include="source\Scene\TitleScene.hpp">
+      <Filter>source\Sceme</Filter>
     </ClInclude>
-    <ClInclude Include="source\json.hpp">
-      <Filter>source</Filter>
+    <ClInclude Include="source\Scene\MainScene.hpp">
+      <Filter>source\Sceme</Filter>
     </ClInclude>
-    <ClInclude Include="source\MainGame.hpp">
-      <Filter>source</Filter>
+    <ClInclude Include="source\Scene\BaseScene.hpp">
+      <Filter>source\Sceme</Filter>
     </ClInclude>
-    <ClInclude Include="source\Define.hpp">
-      <Filter>source</Filter>
+    <ClInclude Include="source\Scene\SceneController.hpp">
+      <Filter>source\Sceme</Filter>
     </ClInclude>
-    <ClInclude Include="source\Algorithm.hpp">
-      <Filter>source</Filter>
+    <ClInclude Include="source\FrameWork\Algorithm.hpp">
+      <Filter>source\FrameWork</Filter>
+    </ClInclude>
+    <ClInclude Include="source\FrameWork\Define.hpp">
+      <Filter>source\FrameWork</Filter>
+    </ClInclude>
+    <ClInclude Include="source\FrameWork\FrameWork.hpp">
+      <Filter>source\FrameWork</Filter>
+    </ClInclude>
+    <ClInclude Include="source\FrameWork\json.hpp">
+      <Filter>source\FrameWork</Filter>
+    </ClInclude>
+    <ClInclude Include="source\FrameWork\InputControl.hpp">
+      <Filter>source\FrameWork</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
