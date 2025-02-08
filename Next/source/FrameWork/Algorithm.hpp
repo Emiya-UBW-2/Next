@@ -80,35 +80,23 @@ namespace Mathf {
 		inline static Vector3		Cross(const Vector3& A, const Vector3& B) noexcept { return Vector3(A.y * B.z - A.z * B.y, A.z * B.x - A.x * B.z, A.x * B.y - A.y * B.x); }
 		inline static float			Dot(const Vector3& A, const Vector3& B) noexcept { return A.x * B.x + A.y * B.y + A.z * B.z; }
 	};
-
-	static float Deg2Rad(float value) {
-		return value * DX_PI_F / 180.f;
-	}
-
-	static float Min(float value, float min) {
-		return (value < min) ? value : min;
-	}
-	static float Max(float value, float max) {
-		return (value > max) ? value : max;
-	}
-	static float Clamp(float value, float min, float max) {
-		return Min(Max(value, min), max);
-	}
-
-	static float Lerp(float valueA, float valueB, float per) {
-		return valueA + (valueB - valueA) * per;
-	}
-
+	//角度を度からラジアンに変換
+	static float Deg2Rad(float value) { return value * DX_PI_F / 180.f; }
+	//大きい方、小さい方に制限する
+	extern float Min(float value, float min);
+	extern float Max(float value, float max);
+	//範囲内に収める
+	extern float Clamp(float value, float min, float max);
+	//線形補完
+	extern float Lerp(float valueA, float valueB, float per);
+	//イージング
 	extern float GetEasingRatio(float ratio) noexcept;
-	// 
 	static void Easing(float* A, const float& B, float ratio) noexcept { *A = Lerp(*A, B, GetEasingRatio(ratio)); }
-
 	static void Easing(Vector3* A, const Vector3& B, float ratio) noexcept {
 		A->x = Lerp(A->x, B.x, GetEasingRatio(ratio));
 		A->y = Lerp(A->y, B.y, GetEasingRatio(ratio));
 		A->z = Lerp(A->z, B.z, GetEasingRatio(ratio));
 	}
-
 	// 線分同士の交差判定
 	static bool GetSegmenttoSegment(const Vector3& SegmentAPos1, const Vector3& SegmentAPos2, const Vector3& SegmentBPos1, const Vector3& SegmentBPos2, SEGMENT_SEGMENT_RESULT* Result) noexcept {
 		VECTOR Pos1t = VGet(SegmentAPos1.x, SegmentAPos1.y, SegmentAPos1.z);
