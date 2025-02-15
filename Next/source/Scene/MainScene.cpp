@@ -1,7 +1,5 @@
 #include "MainScene.hpp"
 
-#include "SceneController.hpp"
-
 Mathf::Vector3 CamPos;
 
 
@@ -29,32 +27,32 @@ void MainGame::InitSub() {
 		m_BlockPos.at(loop) = static_cast<float>(GetRand(200) - 100) / 100.f;
 	}
 
-	m_gauge = LoadGraph("data/UI/boostgauge.bmp", TRUE);
-	m_meter = LoadGraph("data/UI/boostmeter.bmp", TRUE);
-	m_FinImage = LoadGraph("data/UI/Fin.png", TRUE);
+	m_gauge.SetHandle(LoadGraph("data/UI/boostgauge.bmp", TRUE));
+	m_meter.SetHandle(LoadGraph("data/UI/boostmeter.bmp", TRUE));
+	m_FinImage.SetHandle(LoadGraph("data/UI/Fin.png", TRUE));
 
-	m_Font = CreateFontToHandle("Agency FB", 12, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1);
-	m_FontBig = CreateFontToHandle("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1);
-	m_FontResult = CreateFontToHandle("BIZ UDゴシック", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1);
+	m_Font.SetHandle(CreateFontToHandle("Agency FB", 12, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1));
+	m_FontBig.SetHandle(CreateFontToHandle("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1));
+	m_FontResult.SetHandle(CreateFontToHandle("BIZ UDゴシック", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1));
 
 
 	SetCreateSoundDataType(DX_SOUNDDATATYPE_MEMNOPRESS);
 	for (auto& s : m_ShotSE) {
-		s = LoadSoundMem("data/Audio/Shot.wav");
+		s.SetHandle(LoadSoundMem("data/Audio/Shot.wav"));
 	}
 	for (auto& s : m_DamageSE) {
-		s = LoadSoundMem("data/Audio/Damage.wav");
+		s.SetHandle(LoadSoundMem("data/Audio/Damage.wav"));
 	}
 	for (auto& s : m_DeathSE) {
-		s = LoadSoundMem("data/Audio/Death.wav");
+		s.SetHandle(LoadSoundMem("data/Audio/Death.wav"));
 	}
-	m_ScoreSE = LoadSoundMem("data/Audio/Score.wav");
+	m_ScoreSE.SetHandle(LoadSoundMem("data/Audio/Score.wav"));
 
 	SetCreateSoundDataType(DX_SOUNDDATATYPE_FILE);
-	m_BGM = LoadSoundMem("data/Audio/BGM.wav");
+	m_BGM.SetHandle(LoadSoundMem("data/Audio/BGM.wav"));
 	SetCreateSoundDataType(DX_SOUNDDATATYPE_MEMNOPRESS);
 
-	PlaySoundMem(m_BGM, DX_PLAYTYPE_BACK);
+	PlaySoundMem(m_BGM.GetHandle(), DX_PLAYTYPE_BACK);
 
 	m_MainTimer = m_TotalTimer + 2.f;
 
@@ -128,22 +126,13 @@ void MainGame::UpdateSub() {
 
 		if (ShotKey) {
 			if (m_Characters.back().SetBullet(0, m_Characters.back().GetPosition(), m_Characters.back().GetVec().Nomalize() * 2.f)) {
-				PlaySoundMem(m_ShotSE.at(m_ShotSENow), DX_PLAYTYPE_BACK);
+				PlaySoundMem(m_ShotSE.at(m_ShotSENow).GetHandle(), DX_PLAYTYPE_BACK);
 				++m_ShotSENow %= static_cast<int>(m_ShotSE.size());
 				m_ShotScore++;
 			}
 		}
 
-		//マウス座標を取得しておく
-		int MouseX;
-		int MouseY;
-		//マウス座標を取得しておく
-		GetMousePoint(&MouseX, &MouseY);
-
-		MouseX = MouseX * FrameWork::Instance()->GetScreenWidth() / FrameWork::Instance()->GetWindowWidth() - 16;
-		MouseY = MouseY * FrameWork::Instance()->GetScreenHeight() / FrameWork::Instance()->GetWindowHeight() - 16;
-
-		Mathf::Vector3 MP1(static_cast<float>(MouseX), static_cast<float>(MouseY), 0.f);
+		Mathf::Vector3 MP1(static_cast<float>(InputControl::Instance()->GetMouseX() + 16), static_cast<float>(InputControl::Instance()->GetMouseY() + 16), 0.f);
 
 		Mathf::Vector3 PG = m_Characters.back().GetGunPos();
 		Mathf::Vector3 P1 = GetDisplayPoint(PG.x - CamPos.x, PG.y - CamPos.y, PG.z - CamPos.z);
@@ -158,7 +147,7 @@ void MainGame::UpdateSub() {
 		m_Characters.back().SetGunRad(std::atan2f(Vector.x, Vector.y));
 		if (ShotSubKey) {
 			if (m_Characters.back().SetBullet(1, PG, Vector.Nomalize() * 1.f)) {
-				PlaySoundMem(m_ShotSE.at(m_ShotSENow), DX_PLAYTYPE_BACK);
+				PlaySoundMem(m_ShotSE.at(m_ShotSENow).GetHandle(), DX_PLAYTYPE_BACK);
 				++m_ShotSENow %= static_cast<int>(m_ShotSE.size());
 				m_ShotScore++;
 			}
@@ -237,7 +226,7 @@ void MainGame::UpdateSub() {
 		if (ShotSubKey && interval == 0.f) {
 			interval = static_cast<float>(GetRand(100)) / 100.f + 1.f;
 			if (e.SetBullet(1, e.GetGunPos(), Vector.Nomalize() * 1.f)) {
-				PlaySoundMem(m_ShotSE.at(m_ShotSENow), DX_PLAYTYPE_BACK);
+				PlaySoundMem(m_ShotSE.at(m_ShotSENow).GetHandle(), DX_PLAYTYPE_BACK);
 				++m_ShotSENow %= static_cast<int>(m_ShotSE.size());
 			}
 		}
@@ -270,7 +259,7 @@ void MainGame::UpdateSub() {
 								}
 
 								if (e2.IsAlive()) {
-									PlaySoundMem(m_DamageSE.at(m_DamageSENow), DX_PLAYTYPE_BACK);
+									PlaySoundMem(m_DamageSE.at(m_DamageSENow).GetHandle(), DX_PLAYTYPE_BACK);
 									++m_DamageSENow %= static_cast<int>(m_DamageSE.size());
 								}
 								else {
@@ -278,7 +267,7 @@ void MainGame::UpdateSub() {
 										m_KillScore++;
 									}
 
-									PlaySoundMem(m_DeathSE.at(m_DeathSENow), DX_PLAYTYPE_BACK);
+									PlaySoundMem(m_DeathSE.at(m_DeathSENow).GetHandle(), DX_PLAYTYPE_BACK);
 									++m_DeathSENow %= static_cast<int>(m_DeathSE.size());
 								}
 							}
@@ -305,7 +294,7 @@ void MainGame::UpdateSub() {
 				if (interval == false) {
 					interval = true;
 					m_EffectControl.SetEffect(EnumEffect::Death, e.GetPosition() + e.GetVec().Nomalize() * 0.1f);
-					PlaySoundMem(m_DeathSE.at(m_DeathSENow), DX_PLAYTYPE_BACK);
+					PlaySoundMem(m_DeathSE.at(m_DeathSENow).GetHandle(), DX_PLAYTYPE_BACK);
 					++m_DeathSENow %= static_cast<int>(m_DeathSE.size());
 				}
 			}
@@ -371,6 +360,16 @@ void MainGame::UpdateSub() {
 	}
 }
 
+void MainGame::DrawSub() {
+	DrawMain();
+	if (m_MainTimer >= -3.5f) {
+		DrawUI();
+	}
+	else {
+		DrawResult();
+	}
+}
+
 void MainGame::DisposeSub()
 {
 	for (auto& e : m_Characters) {
@@ -379,24 +378,24 @@ void MainGame::DisposeSub()
 
 	m_EffectControl.Dispose();
 
-	DeleteGraph(m_gauge);
-	DeleteGraph(m_meter);
-	DeleteGraph(m_FinImage);
+	m_gauge.ReleaseGraph();
+	m_meter.ReleaseGraph();
+	m_FinImage.ReleaseGraph();
 
-	DeleteFontToHandle(m_Font);
-	DeleteFontToHandle(m_FontBig);
-	DeleteFontToHandle(m_FontResult);
+	m_Font.ReleaseFont();
+	m_FontBig.ReleaseFont();
+	m_FontResult.ReleaseFont();
 	for (auto& s : m_ShotSE) {
-		DeleteSoundMem(s);
+		s.ReleaseSound();
 	}
 	for (auto& s : m_DamageSE) {
-		DeleteSoundMem(s);
+		s.ReleaseSound();
 	}
 	for (auto& s : m_DeathSE) {
-		DeleteSoundMem(s);
+		s.ReleaseSound();
 	}
-	DeleteSoundMem(m_ScoreSE);
-	DeleteSoundMem(m_BGM);
+	m_ScoreSE.ReleaseSound();
+	m_BGM.ReleaseSound();
 }
 
 void MainGame::DrawMain() {
@@ -438,7 +437,7 @@ void MainGame::DrawUI() {
 	if (m_MainTimer < 0.f) { return; }
 
 	if (m_MainTimer < m_TotalTimer) {
-		DrawFormatString2ToHandle(32, 32, GetColor(255, 255, 255), GetColor(0, 0, 0), m_FontBig, "%d:%02d.%02d", static_cast<int>(m_MainTimer / 60.f), static_cast<int>(m_MainTimer) % 60, static_cast<int>(m_MainTimer * 100) % 60);
+		DrawFormatString2ToHandle(32, 32, GetColor(255, 255, 255), GetColor(0, 0, 0), m_FontBig.GetHandle(), "%d:%02d.%02d", static_cast<int>(m_MainTimer / 60.f), static_cast<int>(m_MainTimer) % 60, static_cast<int>(m_MainTimer * 100) % 60);
 	}
 
 	if (!m_Characters.back().IsAlive()) { return; }
@@ -453,36 +452,15 @@ void MainGame::DrawUI() {
 		DrawBox(x1, y1, x2, y2, GetColor(0, 0, 0), FALSE);
 		DrawBox(x1 + 1, y1 + 1, x2 - 1, y2 - 1, GetColor(0, 0, 0), FALSE);
 
-		DrawFormatString2ToHandle(x1, y2, GetColor(255, 0, 0), GetColor(0, 0, 0), m_Font, "HP");
+		DrawFormatString2ToHandle(x1, y2, GetColor(255, 0, 0), GetColor(0, 0, 0), m_Font.GetHandle(), "HP");
 	}
 
-	DrawRotaGraph(960 - 32, 720 - 32, 1.0, 0.0, m_gauge, TRUE);
-	DrawRotaGraph(960 - 32, 720 - 32, 1.0, static_cast<double>(Mathf::Deg2Rad((m_BoostMeterRand - 1.f) * 90.f)), m_meter, TRUE);
+	DrawRotaGraph(960 - 32, 720 - 32, 1.0, 0.0, m_gauge.GetHandle(), TRUE);
+	DrawRotaGraph(960 - 32, 720 - 32, 1.0, static_cast<double>(Mathf::Deg2Rad((m_BoostMeterRand - 1.f) * 90.f)), m_meter.GetHandle(), TRUE);
 	if (!m_BoostActive && (static_cast<int>(m_MainTimer * 100) % 10 < 5)) {
-		DrawFormatString2ToHandle(960 - 32 - 128 + 32, 720 - 32 - 128 + 64, GetColor(255, 0, 0), GetColor(0, 0, 0), m_Font, "OVER HEAT!");
+		DrawFormatString2ToHandle(960 - 32 - 128 + 32, 720 - 32 - 128 + 64, GetColor(255, 0, 0), GetColor(0, 0, 0), m_Font.GetHandle(), "OVER HEAT!");
 	}
-	/*
-	DrawBox(0, 0, 255, 255, GetColor(0, 255, 0), TRUE);
-	DrawRotaGraph(128, 128, 1.0, 0.0, m_gauge, TRUE);
-	for (int loop = 0; loop < 90; loop++) {
-		if (loop % 5 == 0) {
-			int x1 = 128 - sin(Mathf::Deg2Rad(loop)) * (128 - 5);
-			int y1 = 128 - cos(Mathf::Deg2Rad(loop)) * (128 - 5);
-			int x2 = 128 - sin(Mathf::Deg2Rad(loop)) * (128 - 10);
-			int y2 = 128 - cos(Mathf::Deg2Rad(loop)) * (128 - 10);
-			DrawLine(x1, y1, x2, y2, GetColor(0, 0, 0), 1);
-		}
-		if (loop % 30 == 0) {
-			int x1 = 128 - sin(Mathf::Deg2Rad(loop)) * (128 - 5);
-			int y1 = 128 - cos(Mathf::Deg2Rad(loop)) * (128 - 5);
-			int x2 = 128 - sin(Mathf::Deg2Rad(loop)) * (128 - 15);
-			int y2 = 128 - cos(Mathf::Deg2Rad(loop)) * (128 - 15);
-			DrawLine(x1, y1, x2, y2, GetColor(0, 0, 0), 1);
-		}
-	}
-	//*/
-
-	DrawFormatString2ToHandle(32, FrameWork::Instance()->GetScreenHeight() - 32, GetColor(255, 255, 255), GetColor(0, 0, 0), m_Font, "AD : 旋回　W : ブースト S : 減速 スペース : 前方射撃 左クリック : 旋回機銃射撃");
+	DrawFormatString2ToHandle(32, FrameWork::Instance()->GetScreenHeight() - 32, GetColor(255, 255, 255), GetColor(0, 0, 0), m_Font.GetHandle(), "AD : 旋回　W : ブースト S : 減速 スペース : 前方射撃 左クリック : 旋回機銃射撃");
 }
 
 void MainGame::InitResult()
@@ -501,10 +479,9 @@ void MainGame::InitResult()
 	}
 }
 
-void MainGame::UpdateResult()
-{
+void MainGame::UpdateResult() {
 	if (m_ResultClear == -1) {
-		PlaySoundMem(m_ScoreSE, DX_PLAYTYPE_LOOP);
+		PlaySoundMem(m_ScoreSE.GetHandle(), DX_PLAYTYPE_LOOP);
 		m_ResultClear++;
 	}
 	if (m_ResultClear == 0) {
@@ -512,12 +489,12 @@ void MainGame::UpdateResult()
 		if (std::abs(m_Respawn - static_cast<float>(m_RespawnScore)) < 1.f) {
 			m_Respawn = static_cast<float>(m_RespawnScore);
 			if (m_ResultTimer == 0.f) {
-				StopSoundMem(m_ScoreSE);
+				StopSoundMem(m_ScoreSE.GetHandle());
 			}
 			m_ResultTimer += FrameWork::Instance()->GetDeltaTime();
 			if (m_ResultTimer > 0.5f) {
 				m_ResultTimer = 0.f;
-				PlaySoundMem(m_ScoreSE, DX_PLAYTYPE_LOOP);
+				PlaySoundMem(m_ScoreSE.GetHandle(), DX_PLAYTYPE_LOOP);
 				m_ResultClear++;
 			}
 		}
@@ -528,12 +505,12 @@ void MainGame::UpdateResult()
 		if (std::abs(m_HitRatio - HitRatio) < 1.f) {
 			m_HitRatio = HitRatio;
 			if (m_ResultTimer == 0.f) {
-				StopSoundMem(m_ScoreSE);
+				StopSoundMem(m_ScoreSE.GetHandle());
 			}
 			m_ResultTimer += FrameWork::Instance()->GetDeltaTime();
 			if (m_ResultTimer > 0.5f) {
 				m_ResultTimer = 0.f;
-				PlaySoundMem(m_ScoreSE, DX_PLAYTYPE_LOOP);
+				PlaySoundMem(m_ScoreSE.GetHandle(), DX_PLAYTYPE_LOOP);
 				m_ResultClear++;
 			}
 		}
@@ -543,19 +520,19 @@ void MainGame::UpdateResult()
 		if (std::abs(m_Kill - static_cast<float>(m_KillScore)) < 1.f) {
 			m_Kill = static_cast<float>(m_KillScore);
 			if (m_ResultTimer == 0.f) {
-				StopSoundMem(m_ScoreSE);
+				StopSoundMem(m_ScoreSE.GetHandle());
 			}
 			m_ResultTimer += FrameWork::Instance()->GetDeltaTime();
 			if (m_ResultTimer > 0.5f) {
 				m_ResultTimer = 0.f;
-				PlaySoundMem(m_ScoreSE, DX_PLAYTYPE_LOOP);
+				PlaySoundMem(m_ScoreSE.GetHandle(), DX_PLAYTYPE_LOOP);
 				m_ResultClear++;
 			}
 		}
 	}
 	if (m_ResultClear >= 3) {
 		if (m_ResultTimer == 0.f) {
-			StopSoundMem(m_ScoreSE);
+			StopSoundMem(m_ScoreSE.GetHandle());
 		}
 		m_ResultTimer += FrameWork::Instance()->GetDeltaTime();
 	}
@@ -580,17 +557,17 @@ void MainGame::UpdateResult()
 void MainGame::DrawResult()
 {
 	DrawBox(0, 0, FrameWork::Instance()->GetScreenWidth(), FrameWork::Instance()->GetScreenHeight(), GetColor(0, 0, 0), TRUE);
-	DrawGraph(FrameWork::Instance()->GetScreenWidth() - 128 - 32, FrameWork::Instance()->GetScreenHeight() - 64 - 32, m_FinImage, FALSE);
+	DrawGraph(FrameWork::Instance()->GetScreenWidth() - 128 - 32, FrameWork::Instance()->GetScreenHeight() - 64 - 32, m_FinImage.GetHandle(), FALSE);
 
 	int num = 0;
 	if (m_ResultClear >= num) {
-		DrawFormatString2ToHandle(64 + static_cast<int>(m_ResultAnim[num]), 64 + num * 32, GetColor(255, 255, 255), GetColor(0, 0, 0), m_FontResult, "Respawn Count : %02d", static_cast<int>(m_Respawn)); num++;
+		DrawFormatString2ToHandle(64 + static_cast<int>(m_ResultAnim[num]), 64 + num * 32, GetColor(255, 255, 255), GetColor(0, 0, 0), m_FontResult.GetHandle(), "Respawn Count : %02d", static_cast<int>(m_Respawn)); num++;
 	}
 	if (m_ResultClear >= num) {
-		DrawFormatString2ToHandle(64 + static_cast<int>(m_ResultAnim[num]), 64 + num * 32, GetColor(255, 255, 255), GetColor(0, 0, 0), m_FontResult, "Hit Ratio : %02d%%", static_cast<int>(m_HitRatio)); num++;
+		DrawFormatString2ToHandle(64 + static_cast<int>(m_ResultAnim[num]), 64 + num * 32, GetColor(255, 255, 255), GetColor(0, 0, 0), m_FontResult.GetHandle(), "Hit Ratio : %02d%%", static_cast<int>(m_HitRatio)); num++;
 	}
 	if (m_ResultClear >= num) {
-		DrawFormatString2ToHandle(64 + static_cast<int>(m_ResultAnim[num]), 64 + num * 32, GetColor(255, 255, 255), GetColor(0, 0, 0), m_FontResult, "Kill : %02d", static_cast<int>(m_Kill)); num++;
+		DrawFormatString2ToHandle(64 + static_cast<int>(m_ResultAnim[num]), 64 + num * 32, GetColor(255, 255, 255), GetColor(0, 0, 0), m_FontResult.GetHandle(), "Kill : %02d", static_cast<int>(m_Kill)); num++;
 	}
 	num++;
 	if (m_ResultClear >= num) {
@@ -608,13 +585,242 @@ void MainGame::DrawResult()
 		else {
 			Result = "C";
 		}
-		DrawFormatString2ToHandle(64 + static_cast<int>(m_ResultAnim[num]), 64 + num * 32, GetColor(255, 255, 255), GetColor(0, 0, 0), m_FontResult, "Rank : %s", Result.c_str()); num++;
+		DrawFormatString2ToHandle(64 + static_cast<int>(m_ResultAnim[num]), 64 + num * 32, GetColor(255, 255, 255), GetColor(0, 0, 0), m_FontResult.GetHandle(), "Rank : %s", Result.c_str()); num++;
 	}
 
 	if (m_ResultClear == 4 && (m_ResultTimer > 0.5f + 1.f) && (static_cast<int>(m_ResultTimer * 10) % 10 < 5)) {
 		const char* Str = "Space :Return Title";
-		int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), m_FontBig);
-		DrawFormatString2ToHandle(FrameWork::Instance()->GetScreenWidth() / 2 - Width / 2, FrameWork::Instance()->GetScreenHeight() * 3 / 4, GetColor(255, 255, 255), GetColor(0, 0, 0), m_FontBig, Str);
+		int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), m_FontBig.GetHandle());
+		DrawFormatString2ToHandle(FrameWork::Instance()->GetScreenWidth() / 2 - Width / 2, FrameWork::Instance()->GetScreenHeight() * 3 / 4, GetColor(255, 255, 255), GetColor(0, 0, 0), m_FontBig.GetHandle(), Str);
 	}
 
+}
+
+void EffectPositionData::Update() {
+	this->Size += FrameWork::Instance()->GetDeltaTime();
+}
+
+void EffectPositionData::Draw() const {
+	switch (EffectType) {
+	case EnumEffect::Smoke:
+		break;
+	case EnumEffect::Sonic:
+	{
+		if (!IsTriMonoMode) {
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(32.f / this->Size));
+		}
+		Mathf::Vector3 P1 = GetDisplayPoint(this->Pos.x - CamPos.x, this->Pos.y - CamPos.y, this->Pos.z - CamPos.z);
+		DrawRotaGraph3(static_cast<int>(P1.x), static_cast<int>(P1.y), 640 / 2, 640 / 2, double(this->Size), double(this->Size / 2), double(Mathf::Deg2Rad(30)), m_Screen.GetHandle(), TRUE);
+		if (!IsTriMonoMode) {
+			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+		}
+	}
+	break;
+	case EnumEffect::Death:
+	{
+		if (!IsTriMonoMode) {
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(32.f / this->Size));
+		}
+		Mathf::Vector3 P1 = GetDisplayPoint(this->Pos.x - CamPos.x, this->Pos.y - CamPos.y, this->Pos.z - CamPos.z);
+		DrawRotaGraph3(static_cast<int>(P1.x), static_cast<int>(P1.y), 640 / 2, 640 / 2, double(this->Size), double(this->Size * 0.8f), double(Mathf::Deg2Rad(30)), m_Screen.GetHandle(), TRUE);
+		if (!IsTriMonoMode) {
+			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+		}
+	}
+	break;
+	case EnumEffect::Hit:
+	{
+		float alpha = std::sin(Mathf::Deg2Rad(this->Size / 0.5f * 180.f));
+		float scale = this->Size * 0.15f / 0.5f;// std::sin(Mathf::Deg2Rad(this->Size / 0.5f * 180.f)) * 0.25f;
+		if (!IsTriMonoMode) {
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * alpha));
+		}
+		Mathf::Vector3 P1 = GetDisplayPoint(this->Pos.x - CamPos.x, this->Pos.y - CamPos.y, this->Pos.z - CamPos.z);
+		DrawRotaGraph3(static_cast<int>(P1.x), static_cast<int>(P1.y), 640 / 2, 640 / 2, double(scale), double(scale), double(this->Rad + Mathf::Deg2Rad(30 + this->Rad * this->Size * 3.f * 180.f)), m_Screen2.GetHandle(), TRUE);
+		if (!IsTriMonoMode) {
+			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+		}
+	}
+	break;
+	default:
+		break;
+	}
+}
+
+void Smoke::Update(const Mathf::Vector3& Pos, float Per) {
+	for (auto& s : m_SmokePoint) {
+		s.Size += FrameWork::Instance()->GetDeltaTime();
+	}
+	m_SmokePoint.at(m_SmokePointNum).Pos = Pos;
+	m_SmokePoint.at(m_SmokePointNum).Size = 0.f;
+	m_SmokePoint.at(m_SmokePointNum).Alpha = Per;
+	++m_SmokePointNum %= static_cast<int>(m_SmokePoint.size());
+}
+
+void Smoke::DrawShadow() const {
+	for (int loop = 0; loop < static_cast<int>(m_SmokePoint.size()); ++loop) {
+		auto& s1 = m_SmokePoint.at(static_cast<size_t>(loop));
+		auto& s2 = m_SmokePoint.at(static_cast<size_t>((loop + 1) % static_cast<int>(m_SmokePoint.size())));
+		if (s1.Size == 0.f || s1.Size > 3.f) { continue; }
+		Mathf::Vector3 P1 = GetDisplayPoint(s1.Pos.x - CamPos.x, s1.Pos.y - CamPos.y, 0.f - CamPos.z);
+		Mathf::Vector3 P2 = GetDisplayPoint(s2.Pos.x - CamPos.x, s2.Pos.y - CamPos.y, 0.f - CamPos.z);
+		if (!IsTriMonoMode) {
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * std::sin(Mathf::Deg2Rad(s1.Size * 180.f)) * s1.Alpha));
+		}
+		DrawLine(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(P2.x), static_cast<int>(P2.y), GetColor(0, 0, 0), static_cast<int>(s1.Size * 2));
+	}
+	if (!IsTriMonoMode) {
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+	}
+}
+
+void Smoke::Draw() const {
+	for (int loop = 0; loop < static_cast<int>(m_SmokePoint.size()); ++loop) {
+		auto& s1 = m_SmokePoint.at(static_cast<size_t>(loop));
+		auto& s2 = m_SmokePoint.at(static_cast<size_t>((loop + 1) % static_cast<int>(m_SmokePoint.size())));
+		if (s1.Size == 0.f || s1.Size > 3.f) { continue; }
+		if (!IsTriMonoMode) {
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * std::sin(Mathf::Deg2Rad(s1.Size * 180.f)) * s1.Alpha));
+		}
+		Mathf::Vector3 P1 = GetDisplayPoint(s1.Pos.x - CamPos.x, s1.Pos.y - CamPos.y, s1.Pos.z - CamPos.z);
+		Mathf::Vector3 P2 = GetDisplayPoint(s2.Pos.x - CamPos.x, s2.Pos.y - CamPos.y, s2.Pos.z - CamPos.z);
+		DrawLine(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(P2.x), static_cast<int>(P2.y), GetColor(255, 255, 255), static_cast<int>(s1.Size * 10));
+	}
+	if (!IsTriMonoMode) {
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+	}
+}
+
+void Bullet::Update() {
+	m_RePos = m_Pos;
+	m_Pos += (m_BaseVec + m_AddVec) * FrameWork::Instance()->GetDeltaTime();
+	m_Time += FrameWork::Instance()->GetDeltaTime();
+	if (m_Pos.z < 0.f) {
+		if (m_Wave == 0.f) {
+			m_WavePoint = m_Pos;
+		}
+		m_Wave += FrameWork::Instance()->GetDeltaTime();
+	}
+}
+
+void Bullet::Draw() const {
+	if (m_Wave > 0.f) {
+		if (!IsTriMonoMode) {
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f / m_Wave));
+		}
+
+		Mathf::Vector3 P1 = GetDisplayPoint(m_WavePoint.x - CamPos.x, m_WavePoint.y - CamPos.y, 0.f - CamPos.z);
+		DrawCircle(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(m_Wave * 30.f), GetColor(255, 255, 255), FALSE);
+
+		if (!IsTriMonoMode) {
+			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+		}
+	}
+	else {
+		Mathf::Vector3 PP = m_Pos - m_AddVec.Nomalize() * 0.003f * m_Size;
+		Mathf::Vector3 P1 = GetDisplayPoint(m_Pos.x - CamPos.x, m_Pos.y - CamPos.y, m_Pos.z - CamPos.z);
+		Mathf::Vector3 P2 = GetDisplayPoint(PP.x - CamPos.x, PP.y - CamPos.y, PP.z - CamPos.z);
+		DrawLine(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(P2.x), static_cast<int>(P2.y), GetColor(255, 255, 255), static_cast<int>(m_Size));
+		DrawCircle(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(m_Size / 2 - 1), GetColor(255, 255, 255), TRUE);
+		DrawCircle(static_cast<int>(P2.x), static_cast<int>(P2.y), static_cast<int>(m_Size / 2 - 1), GetColor(255, 255, 255), TRUE);
+	}
+}
+
+void Character::Update() {
+	m_RePos = m_Pos;
+	if (m_Pos.z > 0.f) {
+
+		m_Pos += m_Vec * FrameWork::Instance()->GetDeltaTime();
+
+	}
+	if (!IsAlive()) {
+		m_Pos.z -= 10.f * FrameWork::Instance()->GetDeltaTime();
+	}
+	m_GunPos = m_Pos - m_Vec.Nomalize() * m_GunPosOffset;
+
+	m_Rad = std::atan2f(m_Vec.x, m_Vec.y);
+
+	Mathf::Vector3 Offset = Mathf::Vector3(-0.03f * -std::sin(-m_Rad), -0.03f * std::cos(-m_Rad), 0.f);
+
+	float Per = 0.02f * 1.f / m_Vec.y;
+	m_Smoke.at(0).Update(m_Pos + Offset + Mathf::Vector3(-Per * std::cos(-m_Rad), -Per * std::sin(-m_Rad), 0.f), IsAlive() ? 1.f : 0.f);
+	m_Smoke.at(1).Update(m_Pos + Offset + Mathf::Vector3(Per * std::cos(-m_Rad), Per * std::sin(-m_Rad), 0.f), IsAlive() ? 1.f : 0.f);
+
+	for (auto& s : ShotInterval) {
+		s = Mathf::Max(s - FrameWork::Instance()->GetDeltaTime(), 0.f);
+	}
+	m_DamageTime = Mathf::Max(m_DamageTime - FrameWork::Instance()->GetDeltaTime(), 0.f);
+	m_RespawnTime = Mathf::Max(m_RespawnTime - FrameWork::Instance()->GetDeltaTime(), 0.f);
+	time += FrameWork::Instance()->GetDeltaTime();
+	float timeRate = (1.f / m_Vec.Length()) * 0.07f;
+	if (time > timeRate) {
+		time -= timeRate;
+		++m_GraphAnim %= static_cast<int>(m_GraphHandle.size());
+	}
+
+	for (auto& b : m_Bullet) {
+		if (b.IsActive()) {
+			b.Update();
+		}
+	}
+}
+
+void Character::DrawShadow() const {
+	if (!IsAlive()) {
+		if (m_Pos.z < 0.f) { return; }
+	}
+	for (auto& s : m_Smoke) {
+		s.DrawShadow();
+	}
+
+	for (auto& b : m_Bullet) {
+		if (b.IsActive()) {
+			b.DrawShadow();
+		}
+	}
+
+	if (!IsAlive()) {
+		if (!IsTriMonoMode) {
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * 2.f * m_Pos.z / 20.f));
+		}
+	}
+
+
+	Mathf::Vector3 P1 = GetDisplayPoint(m_Pos.x - CamPos.x, m_Pos.y - CamPos.y, 0.f - CamPos.z);
+	SetDrawBright(0, 0, 0);
+	DrawRotaGraph(static_cast<int>(P1.x), static_cast<int>(P1.y), 1.0, static_cast<double>(m_Rad * 1.5f), m_GraphHandle.at(m_GraphAnim).GetHandle(), TRUE);
+	SetDrawBright(255, 255, 255);
+
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+}
+
+void Character::Draw() const {
+	for (auto& s : m_Smoke) {
+		s.Draw();
+	}
+
+	for (auto& b : m_Bullet) {
+		if (b.IsActive()) {
+			b.Draw();
+		}
+	}
+
+	if (!IsAlive()) {
+		if (!IsTriMonoMode) {
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * 2.f * m_Pos.z / 20.f));
+		}
+	}
+
+	if (CanDamage() || (static_cast<int>(m_DamageTime * 100) % 10 < 5)) {
+		SetDrawBright(255, 255 * m_HitPoint / MaxHP, 255 * m_HitPoint / MaxHP);
+
+		Mathf::Vector3 P2 = GetDisplayPoint(m_GunPos.x - CamPos.x, m_GunPos.y - CamPos.y, m_GunPos.z - CamPos.z);
+		DrawRotaGraph(static_cast<int>(P2.x), static_cast<int>(P2.y), 1.0, static_cast<double>(m_GunRad + Mathf::Deg2Rad(-30.f)), m_SubHandle.GetHandle(), TRUE);
+
+		Mathf::Vector3 P1 = GetDisplayPoint(m_Pos.x - CamPos.x, m_Pos.y - CamPos.y, m_Pos.z - CamPos.z);
+		DrawRotaGraph(static_cast<int>(P1.x), static_cast<int>(P1.y), 1.0, static_cast<double>(m_Rad * 1.5f), m_GraphHandle.at(m_GraphAnim).GetHandle(), TRUE);
+		SetDrawBright(255, 255, 255);
+	}
+
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 }

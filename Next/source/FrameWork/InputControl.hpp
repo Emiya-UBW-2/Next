@@ -46,18 +46,19 @@ private:
 	InputControl(InputControl&&) = delete;
 	InputControl& operator=(InputControl&&) = delete;
 private:
-	Switch MenuEnter;
-	Switch LMEnter;
+	Switch m_MenuEnter;
+	Switch m_LMEnter;
+	int m_MouseX;
+	int m_MouseY;
 public:
-	const Switch& GetMenuEnter() const { return MenuEnter; }
-	const Switch& GetLMEnter() const { return LMEnter; }
+	const Switch& GetMenuEnter() const { return m_MenuEnter; }
+	const Switch& GetLMEnter() const { return m_LMEnter; }
+	const int GetMouseX() const { return m_MouseX; }
+	const int GetMouseY() const { return m_MouseY; }
 public:
 	void Init() {
-		MenuEnter.Init();
-		LMEnter.Init();
+		m_MenuEnter.Init();
+		m_LMEnter.Init();
 	}
-	void Update() {
-		MenuEnter.Update(CheckHitKey(KEY_INPUT_SPACE));
-		LMEnter.Update((GetMouseInput() & MOUSE_INPUT_LEFT) != 0);
-	}
+	void Update();
 };

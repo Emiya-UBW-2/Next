@@ -2,9 +2,6 @@
 
 #include "../FrameWork/Define.hpp"
 
-#include "BaseScene.hpp"
-
-
 #include <cmath>
 #include <array>
 #include <string>
@@ -44,8 +41,8 @@ struct EffectPositionData {
 	float Alpha{};
 	float Rad{};
 
-	int m_Screen = 0;
-	int m_Screen2 = 0;//TODO
+	GraphHandle m_Screen;
+	GraphHandle m_Screen2;//TODO
 public:
 	bool IsActive() const {
 		switch (EffectType) {
@@ -66,7 +63,7 @@ public:
 		return false;
 	}
 public:
-	void Init(int Graph1, int Graph2) {
+	void Init(const GraphHandle& Graph1, const GraphHandle& Graph2) {
 		Size = 1000.f;
 		m_Screen = Graph1;
 		m_Screen2 = Graph2;
@@ -99,6 +96,7 @@ public:
 			break;
 		}
 	}
+	void Update();
 	void DrawShadow() const {
 		switch (EffectType) {
 		case EnumEffect::Smoke:
@@ -113,52 +111,7 @@ public:
 			break;
 		}
 	}
-	void Draw() const {
-		switch (EffectType) {
-		case EnumEffect::Smoke:
-			break;
-		case EnumEffect::Sonic:
-		{
-			if (!IsTriMonoMode) {
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(32.f / this->Size));
-			}
-			Mathf::Vector3 P1 = GetDisplayPoint(this->Pos.x - CamPos.x, this->Pos.y - CamPos.y, this->Pos.z - CamPos.z);
-			DrawRotaGraph3(static_cast<int>(P1.x), static_cast<int>(P1.y), 640 / 2, 640 / 2, double(this->Size), double(this->Size / 2), double(Mathf::Deg2Rad(30)), m_Screen, TRUE);
-			if (!IsTriMonoMode) {
-				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
-			}
-		}
-			break;
-		case EnumEffect::Death:
-		{
-			if (!IsTriMonoMode) {
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(32.f / this->Size));
-			}
-			Mathf::Vector3 P1 = GetDisplayPoint(this->Pos.x - CamPos.x, this->Pos.y - CamPos.y, this->Pos.z - CamPos.z);
-			DrawRotaGraph3(static_cast<int>(P1.x), static_cast<int>(P1.y), 640 / 2, 640 / 2, double(this->Size), double(this->Size * 0.8f), double(Mathf::Deg2Rad(30)), m_Screen, TRUE);
-			if (!IsTriMonoMode) {
-				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
-			}
-		}
-			break;
-		case EnumEffect::Hit:
-		{
-			float alpha = std::sin(Mathf::Deg2Rad(this->Size / 0.5f * 180.f));
-			float scale = this->Size * 0.15f / 0.5f;// std::sin(Mathf::Deg2Rad(this->Size / 0.5f * 180.f)) * 0.25f;
-			if (!IsTriMonoMode) {
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * alpha));
-			}
-			Mathf::Vector3 P1 = GetDisplayPoint(this->Pos.x - CamPos.x, this->Pos.y - CamPos.y, this->Pos.z - CamPos.z);
-			DrawRotaGraph3(static_cast<int>(P1.x), static_cast<int>(P1.y), 640 / 2, 640 / 2, double(scale), double(scale), double(this->Rad + Mathf::Deg2Rad(30 + this->Rad * this->Size * 3.f * 180.f)), m_Screen2, TRUE);
-			if (!IsTriMonoMode) {
-				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
-			}
-		}
-			break;
-		default:
-			break;
-		}
-	}
+	void Draw() const;
 };
 
 class Smoke {
@@ -172,54 +125,16 @@ public:
 			s.Size = 0.f;
 		}
 	}
-	void Update(const Mathf::Vector3& Pos, float Per) {
-		for (auto& s : m_SmokePoint) {
-			s.Size += FrameWork::Instance()->GetDeltaTime();
-		}
-		m_SmokePoint.at(m_SmokePointNum).Pos = Pos;
-		m_SmokePoint.at(m_SmokePointNum).Size = 0.f;
-		m_SmokePoint.at(m_SmokePointNum).Alpha = Per;
-		++m_SmokePointNum %= static_cast<int>(m_SmokePoint.size());
-	}
-	void DrawShadow() const {
-		for (int loop = 0; loop < static_cast<int>(m_SmokePoint.size()); ++loop) {
-			auto& s1 = m_SmokePoint.at(static_cast<size_t>(loop));
-			auto& s2 = m_SmokePoint.at(static_cast<size_t>((loop + 1) % static_cast<int>(m_SmokePoint.size())));
-			if (s1.Size == 0.f || s1.Size > 3.f) { continue; }
-			Mathf::Vector3 P1 = GetDisplayPoint(s1.Pos.x - CamPos.x, s1.Pos.y - CamPos.y, 0.f - CamPos.z);
-			Mathf::Vector3 P2 = GetDisplayPoint(s2.Pos.x - CamPos.x, s2.Pos.y - CamPos.y, 0.f - CamPos.z);
-			if (!IsTriMonoMode) {
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * std::sin(Mathf::Deg2Rad(s1.Size * 180.f)) * s1.Alpha));
-			}
-			DrawLine(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(P2.x), static_cast<int>(P2.y), GetColor(0, 0, 0), static_cast<int>(s1.Size * 2));
-		}
-		if (!IsTriMonoMode) {
-			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
-		}
-	}
-	void Draw() const {
-		for (int loop = 0; loop < static_cast<int>(m_SmokePoint.size()); ++loop) {
-			auto& s1 = m_SmokePoint.at(static_cast<size_t>(loop));
-			auto& s2 = m_SmokePoint.at(static_cast<size_t>((loop + 1) % static_cast<int>(m_SmokePoint.size())));
-			if (s1.Size == 0.f || s1.Size > 3.f) { continue; }
-			if (!IsTriMonoMode) {
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * std::sin(Mathf::Deg2Rad(s1.Size * 180.f)) * s1.Alpha));
-			}
-			Mathf::Vector3 P1 = GetDisplayPoint(s1.Pos.x - CamPos.x, s1.Pos.y - CamPos.y, s1.Pos.z - CamPos.z);
-			Mathf::Vector3 P2 = GetDisplayPoint(s2.Pos.x - CamPos.x, s2.Pos.y - CamPos.y, s2.Pos.z - CamPos.z);
-			DrawLine(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(P2.x), static_cast<int>(P2.y), GetColor(255, 255, 255), static_cast<int>(s1.Size * 10));
-		}
-		if (!IsTriMonoMode) {
-			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
-		}
-	}
+	void Update(const Mathf::Vector3& Pos, float Per);
+	void DrawShadow() const;
+	void Draw() const;
 };
 
 
 class EffectControl {
 private:
-	int m_Screen = 0;
-	int m_Screen2 = 0;
+	GraphHandle m_Screen;
+	GraphHandle m_Screen2;
 	std::array<EffectPositionData, 64> m_Position;
 	int m_Pos = 0;
 public:
@@ -231,15 +146,15 @@ public:
 	void Init() {
 		//Sonic
 		//Death
-		m_Screen = MakeScreen(640, 640, TRUE);
-		SetDrawScreen(m_Screen);
+		m_Screen.SetHandle(MakeScreen(640, 640, TRUE));
+		SetDrawScreen(m_Screen.GetHandle());
 		ClearDrawScreen();
 		{
 			DrawCircle(640 / 2, 640 / 2, 640 / 2, GetColor(255, 255, 255), FALSE, 15);
 		}
 		//Hit
-		m_Screen2 = MakeScreen(640, 640, TRUE);
-		SetDrawScreen(m_Screen2);
+		m_Screen2.SetHandle(MakeScreen(640, 640, TRUE));
+		SetDrawScreen(m_Screen2.GetHandle());
 		ClearDrawScreen();
 		{
 			DrawCircleAA(640.f / 2, 640.f / 2, 640.f / 2, 5, GetColor(255, 255, 255), FALSE, 50);
@@ -252,7 +167,7 @@ public:
 	void Update() {
 		for (auto& s : m_Position) {
 			if (!s.IsActive()) { continue; }
-			s.Size += FrameWork::Instance()->GetDeltaTime();
+			s.Update();
 		}
 	}
 	void DrawShadow() const {
@@ -267,9 +182,9 @@ public:
 			s.Draw();
 		}
 	}
-	void Dispose() const {
-		DeleteGraph(m_Screen);
-		DeleteGraph(m_Screen2);
+	void Dispose() {
+		m_Screen.ReleaseGraph();
+		m_Screen2.ReleaseGraph();
 	}
 };
 
@@ -304,17 +219,7 @@ public:
 		m_Damage = Damage;
 		m_Wave = 0.f;
 	}
-	void Update() {
-		m_RePos = m_Pos;
-		m_Pos += (m_BaseVec + m_AddVec) * FrameWork::Instance()->GetDeltaTime();
-		m_Time += FrameWork::Instance()->GetDeltaTime();
-		if (m_Pos.z < 0.f) {
-			if (m_Wave == 0.f) {
-				m_WavePoint = m_Pos;
-			}
-			m_Wave += FrameWork::Instance()->GetDeltaTime();
-		}
-	}
+	void Update();
 
 	void DrawShadow() const {
 		if (m_Wave > 0.f) { return; }
@@ -325,28 +230,7 @@ public:
 		DrawCircle(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(m_Size / 2 - 1), GetColor(0, 0, 0), TRUE);
 		DrawCircle(static_cast<int>(P2.x), static_cast<int>(P2.y), static_cast<int>(m_Size / 2 - 1), GetColor(0, 0, 0), TRUE);
 	}
-	void Draw() const {
-		if (m_Wave > 0.f) {
-			if (!IsTriMonoMode) {
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f / m_Wave));
-			}
-
-			Mathf::Vector3 P1 = GetDisplayPoint(m_WavePoint.x - CamPos.x, m_WavePoint.y - CamPos.y, 0.f - CamPos.z);
-			DrawCircle(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(m_Wave * 30.f), GetColor(255, 255, 255), FALSE);
-
-			if (!IsTriMonoMode) {
-				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
-			}
-		}
-		else {
-			Mathf::Vector3 PP = m_Pos - m_AddVec.Nomalize() * 0.003f * m_Size;
-			Mathf::Vector3 P1 = GetDisplayPoint(m_Pos.x - CamPos.x, m_Pos.y - CamPos.y, m_Pos.z - CamPos.z);
-			Mathf::Vector3 P2 = GetDisplayPoint(PP.x - CamPos.x, PP.y - CamPos.y, PP.z - CamPos.z);
-			DrawLine(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(P2.x), static_cast<int>(P2.y), GetColor(255, 255, 255), static_cast<int>(m_Size));
-			DrawCircle(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(m_Size / 2 - 1), GetColor(255, 255, 255), TRUE);
-			DrawCircle(static_cast<int>(P2.x), static_cast<int>(P2.y), static_cast<int>(m_Size / 2 - 1), GetColor(255, 255, 255), TRUE);
-		}
-	}
+	void Draw() const;
 };
 
 class Character {
@@ -358,8 +242,8 @@ class Character {
 	float m_Rad = 0.f;
 	float m_GunRad = 0.f;
 	std::array<Smoke, 2> m_Smoke{};
-	std::array<int, 4> m_GraphHandle{};
-	int m_SubHandle{};
+	std::array<GraphHandle, 4> m_GraphHandle{};
+	GraphHandle m_SubHandle{};
 	float time = 0.f;
 	int m_GraphAnim = 0;
 
@@ -427,11 +311,11 @@ public:
 		SetPos(Pos);
 		m_GunPosOffset = Ofs;
 
-		m_GraphHandle.at(0) = LoadGraph(("data/" + Name + "/0.bmp").c_str(), TRUE);
-		m_GraphHandle.at(1) = LoadGraph(("data/" + Name + "/1.bmp").c_str(), TRUE);
-		m_GraphHandle.at(2) = LoadGraph(("data/" + Name + "/2.bmp").c_str(), TRUE);
-		m_GraphHandle.at(3) = LoadGraph(("data/" + Name + "/1.bmp").c_str(), TRUE);
-		m_SubHandle = LoadGraph(("data/" + Name + "/gun.bmp").c_str(), TRUE);
+		m_GraphHandle.at(0).SetHandle(LoadGraph(("data/" + Name + "/0.bmp").c_str(), TRUE));
+		m_GraphHandle.at(1).SetHandle(LoadGraph(("data/" + Name + "/1.bmp").c_str(), TRUE));
+		m_GraphHandle.at(2).SetHandle(LoadGraph(("data/" + Name + "/2.bmp").c_str(), TRUE));
+		m_GraphHandle.at(3).SetHandle(LoadGraph(("data/" + Name + "/1.bmp").c_str(), TRUE));
+		m_SubHandle.SetHandle(LoadGraph(("data/" + Name + "/gun.bmp").c_str(), TRUE));
 
 		for (auto& s : ShotInterval) {
 			s = 0.f;
@@ -440,110 +324,17 @@ public:
 			b.DisActive();
 		}
 	}
-	void Update() {
-		m_RePos = m_Pos;
-		if (m_Pos.z > 0.f) {
+	void Update();
 
-			m_Pos += m_Vec * FrameWork::Instance()->GetDeltaTime();
-
-		}
-		if (!IsAlive()) {
-			m_Pos.z -= 10.f * FrameWork::Instance()->GetDeltaTime();
-		}
-		m_GunPos = m_Pos - m_Vec.Nomalize() * m_GunPosOffset;
-
-		m_Rad = std::atan2f(m_Vec.x, m_Vec.y);
-
-		Mathf::Vector3 Offset = Mathf::Vector3(-0.03f * -std::sin(-m_Rad), -0.03f * std::cos(-m_Rad), 0.f);
-
-		float Per = 0.02f * 1.f / m_Vec.y;
-		m_Smoke.at(0).Update(m_Pos + Offset + Mathf::Vector3(-Per * std::cos(-m_Rad), -Per * std::sin(-m_Rad), 0.f), IsAlive() ? 1.f : 0.f);
-		m_Smoke.at(1).Update(m_Pos + Offset + Mathf::Vector3(Per * std::cos(-m_Rad), Per * std::sin(-m_Rad), 0.f), IsAlive() ? 1.f : 0.f);
-
-		for (auto& s : ShotInterval) {
-			s = Mathf::Max(s - FrameWork::Instance()->GetDeltaTime(), 0.f);
-		}
-		m_DamageTime = Mathf::Max(m_DamageTime - FrameWork::Instance()->GetDeltaTime(), 0.f);
-		m_RespawnTime = Mathf::Max(m_RespawnTime - FrameWork::Instance()->GetDeltaTime(), 0.f);
-		time += FrameWork::Instance()->GetDeltaTime();
-		float timeRate = (1.f / m_Vec.Length()) * 0.07f;
-		if (time > timeRate) {
-			time -= timeRate;
-			++m_GraphAnim %= static_cast<int>(m_GraphHandle.size());
-		}
-
-		for (auto& b : m_Bullet) {
-			if (b.IsActive()) {
-				b.Update();
-			}
-		}
-	}
-
-	void DrawShadow() const {
-		if (!IsAlive()) {
-			if (m_Pos.z < 0.f) { return; }
-		}
-		for (auto& s : m_Smoke) {
-			s.DrawShadow();
-		}
-
-		for (auto& b : m_Bullet) {
-			if (b.IsActive()) {
-				b.DrawShadow();
-			}
-		}
-
-		if (!IsAlive()) {
-			if (!IsTriMonoMode) {
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * 2.f * m_Pos.z / 20.f));
-			}
-		}
-
-
-		Mathf::Vector3 P1 = GetDisplayPoint(m_Pos.x - CamPos.x, m_Pos.y - CamPos.y, 0.f - CamPos.z);
-		SetDrawBright(0, 0, 0);
-		DrawRotaGraph(static_cast<int>(P1.x), static_cast<int>(P1.y), 1.0, static_cast<double>(m_Rad * 1.5f), m_GraphHandle.at(m_GraphAnim), TRUE);
-		SetDrawBright(255, 255, 255);
-
-		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
-	}
-	void Draw() const {
-		for (auto& s : m_Smoke) {
-			s.Draw();
-		}
-
-		for (auto& b : m_Bullet) {
-			if (b.IsActive()) {
-				b.Draw();
-			}
-		}
-
-		if (!IsAlive()) {
-			if (!IsTriMonoMode) {
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * 2.f * m_Pos.z / 20.f));
-			}
-		}
-
-		if (CanDamage() || (static_cast<int>(m_DamageTime * 100) % 10 < 5)) {
-			SetDrawBright(255, 255 * m_HitPoint / MaxHP, 255 * m_HitPoint / MaxHP);
-
-			Mathf::Vector3 P2 = GetDisplayPoint(m_GunPos.x - CamPos.x, m_GunPos.y - CamPos.y, m_GunPos.z - CamPos.z);
-			DrawRotaGraph(static_cast<int>(P2.x), static_cast<int>(P2.y), 1.0, static_cast<double>(m_GunRad + Mathf::Deg2Rad(-30.f)), m_SubHandle, TRUE);
-
-			Mathf::Vector3 P1 = GetDisplayPoint(m_Pos.x - CamPos.x, m_Pos.y - CamPos.y, m_Pos.z - CamPos.z);
-			DrawRotaGraph(static_cast<int>(P1.x), static_cast<int>(P1.y), 1.0, static_cast<double>(m_Rad * 1.5f), m_GraphHandle.at(m_GraphAnim), TRUE);
-			SetDrawBright(255, 255, 255);
-		}
-
-		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
-	}
+	void DrawShadow() const;
+	void Draw() const;
 
 	void Dispose() {
-		DeleteGraph(m_GraphHandle.at(0));
-		DeleteGraph(m_GraphHandle.at(1));
-		DeleteGraph(m_GraphHandle.at(2));
-		DeleteGraph(m_GraphHandle.at(3));
-		DeleteGraph(m_SubHandle);
+		m_GraphHandle.at(0).ReleaseGraph();
+		m_GraphHandle.at(1).ReleaseGraph();
+		m_GraphHandle.at(2).ReleaseGraph();
+		m_GraphHandle.at(3).ReleaseGraph();
+		m_SubHandle.ReleaseGraph();
 	}
 };
 
@@ -571,23 +362,23 @@ public:
 	float m_BoostMeterRand = 0.f;
 	float m_BoostInterval = 0.f;
 
-	int m_FinImage = 0;
+	GraphHandle m_FinImage;
 
-	int m_gauge = 0;
-	int m_meter = 0;
-	int m_Font = 0;
-	int m_FontBig = 0;
-	int m_FontResult = 0;
+	GraphHandle m_gauge;
+	GraphHandle m_meter;
+	FontHandle m_Font;
+	FontHandle m_FontBig;
+	FontHandle m_FontResult;
 
-	int m_BGM = 0;
-	std::array<int, 10> m_ShotSE{};
+	SoundHandle m_BGM;
+	std::array<SoundHandle, 10> m_ShotSE{};
 	int m_ShotSENow = 0;
-	std::array<int, 10> m_DamageSE{};
+	std::array<SoundHandle, 10> m_DamageSE{};
 	int m_DamageSENow = 0;
-	std::array<int, 10> m_DeathSE{};
+	std::array<SoundHandle, 10> m_DeathSE{};
 	int m_DeathSENow = 0;
 
-	int m_ScoreSE{};
+	SoundHandle m_ScoreSE{};
 
 	Mathf::Vector3 CamPosBuf;
 
@@ -597,15 +388,7 @@ public:
 protected:
 	void InitSub();
 	void UpdateSub();
-	void DrawSub() {
-		DrawMain();
-		if (m_MainTimer >= -3.5f) {
-			DrawUI();
-		}
-		else {
-			DrawResult();
-		}
-	}
+	void DrawSub();
 	void DisposeSub();
 private:
 	void DrawMain();

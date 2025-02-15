@@ -6,3 +6,7 @@
 
 #include "FrameWork.hpp"
 #include "InputControl.hpp"
+
+#include "GraphHandle.hpp"
+
+#include "Scene/SceneController.hpp"

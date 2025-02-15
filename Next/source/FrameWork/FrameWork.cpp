@@ -31,11 +31,25 @@ void FrameWork::Init()
 	SetSysCommandOffFlag(TRUE);
 	SetAlwaysRunFlag(FALSE);
 	MicroSecondOnLoopStartFrame = GetNowHiPerformanceCount();
-
+	//
+	InputControl::Create();
+	//
 	BackScreen = MakeScreen(m_ScreenWidth, m_ScreenHeight, FALSE);
+	//
+	_SceneController = new SceneController;
+	_SceneController->Init();
 }
-bool FrameWork::Flip()
+bool FrameWork::Update()
 {
+	InputControl::Instance()->Update();
+	//
+	_SceneController->Update();
+	//•`‰æ
+	SetDrawScreen(BackScreen);
+	ClearDrawScreen();
+	{
+		_SceneController->Draw();
+	}
 	//•`‰æ
 	SetDrawScreen(DX_SCREEN_BACK);
 	ClearDrawScreen();
@@ -71,5 +85,8 @@ bool FrameWork::Flip()
 }
 void FrameWork::Dispose()
 {
+	_SceneController->Dispose();
+	InputControl::Release();
+	delete _SceneController;
 	DxLib_End();
 }

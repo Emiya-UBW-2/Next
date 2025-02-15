@@ -10,6 +10,9 @@
     <Filter Include="source\FrameWork">
       <UniqueIdentifier>{28e7ef27-4e1e-415c-825d-5f38bc76989a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\FrameWork\Scene">
+      <UniqueIdentifier>{ca49b26e-eed3-49a9-80e2-d55f5093d12a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\main.cpp">
@@ -21,12 +24,6 @@
     <ClCompile Include="source\Scene\MainScene.cpp">
       <Filter>source\Sceme</Filter>
     </ClCompile>
-    <ClCompile Include="source\Scene\BaseScene.cpp">
-      <Filter>source\Sceme</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Scene\SceneController.cpp">
-      <Filter>source\Sceme</Filter>
-    </ClCompile>
     <ClCompile Include="source\FrameWork\FrameWork.cpp">
       <Filter>source\FrameWork</Filter>
     </ClCompile>
@@ -36,18 +33,18 @@
     <ClCompile Include="source\FrameWork\InputControl.cpp">
       <Filter>source\FrameWork</Filter>
     </ClCompile>
+    <ClCompile Include="source\FrameWork\Scene\SceneController.cpp">
+      <Filter>source\FrameWork\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="source\FrameWork\GraphHandle.cpp">
+      <Filter>source\FrameWork</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Scene\TitleScene.hpp">
       <Filter>source\Sceme</Filter>
     </ClInclude>
     <ClInclude Include="source\Scene\MainScene.hpp">
-      <Filter>source\Sceme</Filter>
-    </ClInclude>
-    <ClInclude Include="source\Scene\BaseScene.hpp">
-      <Filter>source\Sceme</Filter>
-    </ClInclude>
-    <ClInclude Include="source\Scene\SceneController.hpp">
       <Filter>source\Sceme</Filter>
     </ClInclude>
     <ClInclude Include="source\FrameWork\Algorithm.hpp">
@@ -63,6 +60,12 @@
       <Filter>source\FrameWork</Filter>
     </ClInclude>
     <ClInclude Include="source\FrameWork\InputControl.hpp">
+      <Filter>source\FrameWork</Filter>
+    </ClInclude>
+    <ClInclude Include="source\FrameWork\Scene\SceneController.hpp">
+      <Filter>source\FrameWork\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="source\FrameWork\GraphHandle.hpp">
       <Filter>source\FrameWork</Filter>
     </ClInclude>
   </ItemGroup>

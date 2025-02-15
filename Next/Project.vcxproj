@@ -157,22 +157,22 @@
   <ItemGroup>
     <ClCompile Include="source\FrameWork\Algorithm.cpp" />
     <ClCompile Include="source\FrameWork\FrameWork.cpp" />
+    <ClCompile Include="source\FrameWork\GraphHandle.cpp" />
     <ClCompile Include="source\FrameWork\InputControl.cpp" />
+    <ClCompile Include="source\FrameWork\Scene\SceneController.cpp" />
     <ClCompile Include="source\main.cpp" />
-    <ClCompile Include="source\Scene\BaseScene.cpp" />
     <ClCompile Include="source\Scene\MainScene.cpp" />
-    <ClCompile Include="source\Scene\SceneController.cpp" />
     <ClCompile Include="source\Scene\TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\FrameWork\Algorithm.hpp" />
     <ClInclude Include="source\FrameWork\Define.hpp" />
     <ClInclude Include="source\FrameWork\FrameWork.hpp" />
+    <ClInclude Include="source\FrameWork\GraphHandle.hpp" />
     <ClInclude Include="source\FrameWork\InputControl.hpp" />
     <ClInclude Include="source\FrameWork\json.hpp" />
-    <ClInclude Include="source\Scene\BaseScene.hpp" />
+    <ClInclude Include="source\FrameWork\Scene\SceneController.hpp" />
     <ClInclude Include="source\Scene\MainScene.hpp" />
-    <ClInclude Include="source\Scene\SceneController.hpp" />
     <ClInclude Include="source\Scene\TitleScene.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

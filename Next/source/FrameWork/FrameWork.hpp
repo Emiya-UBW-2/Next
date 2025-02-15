@@ -4,6 +4,8 @@
 
 extern bool IsTriMonoMode;
 
+class SceneController;
+
 class FrameWork {
 private:
 	static const FrameWork* m_Singleton;
@@ -45,6 +47,8 @@ private:
 
 	LONGLONG MicroSecondOnLoopStartFrame = 0;
 	LONGLONG MicroSecondDeltaTime = 1000 * 1000 / 60;
+
+	SceneController* _SceneController{ nullptr };
 private:
 	bool isVsync = true;
 public:
@@ -61,7 +65,7 @@ public:
 	const float GetDeltaTime() const { return (float)(MicroSecondDeltaTime) / 1000.f / 1000.f; }
 public:
 	void Init();
-	bool Flip();
+	bool Update();
 	void Dispose();
 };
 
