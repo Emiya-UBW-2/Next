@@ -46,19 +46,42 @@ private:
 	InputControl(InputControl&&) = delete;
 	InputControl& operator=(InputControl&&) = delete;
 private:
+	//
 	Switch m_MenuEnter;
 	Switch m_LMEnter;
-	int m_MouseX;
-	int m_MouseY;
+	int m_MouseX{};
+	int m_MouseY{};
+	//
+	Switch m_WKey;
+	Switch m_AKey;
+	Switch m_SKey;
+	Switch m_DKey;
+	Switch m_MainShotKey;
+	Switch m_SubShotKey;
 public:
 	const Switch& GetMenuEnter() const { return m_MenuEnter; }
 	const Switch& GetLMEnter() const { return m_LMEnter; }
 	const int GetMouseX() const { return m_MouseX; }
 	const int GetMouseY() const { return m_MouseY; }
+	//
+	const Switch& GetWKey() const { return m_WKey; }
+	const Switch& GetAKey() const { return m_AKey; }
+	const Switch& GetSKey() const { return m_SKey; }
+	const Switch& GetDKey() const { return m_DKey; }
+	const Switch& GetMainShotKey() const { return m_MainShotKey; }
+	const Switch& GetSubShotKey() const { return m_SubShotKey; }
 public:
 	void Init() {
 		m_MenuEnter.Init();
 		m_LMEnter.Init();
+		m_MouseX = 0;
+		m_MouseY = 0;
+		m_WKey.Init();
+		m_AKey.Init();
+		m_SKey.Init();
+		m_DKey.Init();
+		m_MainShotKey.Init();
+		m_SubShotKey.Init();
 	}
 	void Update();
 };

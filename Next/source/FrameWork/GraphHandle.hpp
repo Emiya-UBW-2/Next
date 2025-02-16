@@ -19,10 +19,10 @@ public:
 class GraphHandle : public ResourceHandle {
 	ResourceHandle::ResourceHandle;
 public:
-	void Create(int SizeX, int SizeY, int UseAlphaChannel = FALSE) {
+	void Create(int SizeX, int SizeY, bool UseAlphaChannel = false) {
 		this->SetHandle(MakeScreen(SizeX, SizeY, UseAlphaChannel));
 	}
-	void LoadGraph(const TCHAR* FileName, int NotUse3DFlag = FALSE) {
+	void LoadGraph(const TCHAR* FileName, bool NotUse3DFlag = false) {
 		this->SetHandle(DxLib::LoadGraph(FileName, NotUse3DFlag));
 	}
 	void ReleaseGraph() {
@@ -34,7 +34,7 @@ public:
 class FontHandle : public ResourceHandle {
 	ResourceHandle::ResourceHandle;
 public:
-	void Create(const TCHAR* FontName, int Size, int Thick, int FontType = -1, int CharSet = -1, int EdgeSize = -1, int Italic = FALSE, int Handle = -1) {
+	void Create(const TCHAR* FontName, int Size, int Thick, int FontType = -1, int CharSet = -1, int EdgeSize = -1, bool Italic = false, int Handle = -1) {
 		this->SetHandle(CreateFontToHandle(FontName, Size, Thick, FontType, CharSet, EdgeSize, Italic, Handle));
 	}
 	void ReleaseFont() {

@@ -6,24 +6,62 @@
 #include <array>
 #include <string>
 
-extern Mathf::Vector3 CamPos;
+class MainCamera {
+private:
+	static const MainCamera* m_Singleton;
+public:
+	static void Create(void) noexcept {
+		m_Singleton = new MainCamera();
+	}
+	static void Release(void) noexcept {
+		delete m_Singleton;
+	}
+	static MainCamera* Instance(void) noexcept {
+		if (m_Singleton == nullptr) {
+			MessageBox(NULL, "Failed MainCamera Instance Create", "", MB_OK);
+			exit(-1);
+		}
+		// if (m_Singleton == nullptr) { m_Singleton = new MainCamera(); }
+		return (MainCamera*)m_Singleton;
+	}
+private:
+	MainCamera() {
+	}
+	~MainCamera() {
+	}
+private:
+	MainCamera(const MainCamera&) = delete;
+	MainCamera& operator=(const MainCamera&) = delete;
+	MainCamera(MainCamera&&) = delete;
+	MainCamera& operator=(MainCamera&&) = delete;
+private:
+	Mathf::Vector3 CamPos;
+public:
+	Mathf::Vector3 GetDisplayPoint(float X, float Y, float Z) const {
+		X = X - CamPos.x;
+		Y = Y - CamPos.y;
+		Z = Z - CamPos.z;
+		float Rad1 = Mathf::Deg2Rad(-30.f + 90.f);
+		float Rad2 = Mathf::Deg2Rad(-30.f);
+
+		Mathf::Vector3 Ret;
+
+		float Xrate = Mathf::Lerp(0.25f, 1.f, X);
+
+		Ret.x = -200.f + std::cos(Rad1) * (1200.f * X) + std::cos(Rad2) * (Y * Xrate * 1000.f);
+		Ret.y = -200.f + std::sin(Rad1) * (1200.f * X) + std::sin(Rad2) * (Y * Xrate * 1000.f) - Z * 10.f;
+		Ret.z = 0.f;
+
+		return Ret;
+	}
+	Mathf::Vector3 GetDisplayPoint(const Mathf::Vector3& Pos) const { return GetDisplayPoint(Pos.x, Pos.y, Pos.z); }
+public:
+	const Mathf::Vector3& GetCamPos() const { return CamPos; }
+	void SetCamPos(const Mathf::Vector3& Pos) { CamPos = Pos; }
+};
 
 constexpr int MaxHP = 100;
 
-static Mathf::Vector3 GetDisplayPoint(float X, float Y, float Z) {
-	float Rad1 = Mathf::Deg2Rad(-30.f + 90.f);
-	float Rad2 = Mathf::Deg2Rad(-30.f);
-
-	Mathf::Vector3 Ret;
-
-	float Xrate = Mathf::Lerp(0.25f, 1.f, X);
-
-	Ret.x = -200.f + std::cos(Rad1) * (1200.f * X) + std::cos(Rad2) * (Y * Xrate * 1000.f);
-	Ret.y = -200.f + std::sin(Rad1) * (1200.f * X) + std::sin(Rad2) * (Y * Xrate * 1000.f) - Z * 10.f;
-	Ret.z = 0.f;
-
-	return Ret;
-}
 
 enum class EnumEffect {
 	None,
@@ -146,14 +184,14 @@ public:
 	void Init() {
 		//Sonic
 		//Death
-		m_Screen.Create(640, 640, TRUE);
+		m_Screen.Create(640, 640, true);
 		SetDrawScreen(m_Screen.GetHandle());
 		ClearDrawScreen();
 		{
 			DrawCircle(640 / 2, 640 / 2, 640 / 2, GetColor(255, 255, 255), FALSE, 15);
 		}
 		//Hit
-		m_Screen2.Create(640, 640, TRUE);
+		m_Screen2.Create(640, 640, true);
 		SetDrawScreen(m_Screen2.GetHandle());
 		ClearDrawScreen();
 		{
@@ -221,15 +259,7 @@ public:
 	}
 	void Update();
 
-	void DrawShadow() const {
-		if (m_Wave > 0.f) { return; }
-		Mathf::Vector3 PP = m_Pos - m_AddVec.Nomalize() * 0.003f * m_Size;
-		Mathf::Vector3 P1 = GetDisplayPoint(m_Pos.x - CamPos.x, m_Pos.y - CamPos.y, 0.f - CamPos.z);
-		Mathf::Vector3 P2 = GetDisplayPoint(PP.x - CamPos.x, PP.y - CamPos.y, 0.f - CamPos.z);
-		DrawLine(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(P2.x), static_cast<int>(P2.y), GetColor(0, 0, 0), static_cast<int>(m_Size));
-		DrawCircle(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(m_Size / 2 - 1), GetColor(0, 0, 0), TRUE);
-		DrawCircle(static_cast<int>(P2.x), static_cast<int>(P2.y), static_cast<int>(m_Size / 2 - 1), GetColor(0, 0, 0), TRUE);
-	}
+	void DrawShadow() const;
 	void Draw() const;
 };
 
@@ -311,11 +341,11 @@ public:
 		SetPos(Pos);
 		m_GunPosOffset = Ofs;
 
-		m_GraphHandle.at(0).LoadGraph(("data/" + Name + "/0.bmp").c_str(), TRUE);
-		m_GraphHandle.at(1).LoadGraph(("data/" + Name + "/1.bmp").c_str(), TRUE);
-		m_GraphHandle.at(2).LoadGraph(("data/" + Name + "/2.bmp").c_str(), TRUE);
-		m_GraphHandle.at(3).LoadGraph(("data/" + Name + "/1.bmp").c_str(), TRUE);
-		m_SubHandle.LoadGraph(("data/" + Name + "/gun.bmp").c_str(), TRUE);
+		m_GraphHandle.at(0).LoadGraph(("data/" + Name + "/0.bmp").c_str(), true);
+		m_GraphHandle.at(1).LoadGraph(("data/" + Name + "/1.bmp").c_str(), true);
+		m_GraphHandle.at(2).LoadGraph(("data/" + Name + "/2.bmp").c_str(), true);
+		m_GraphHandle.at(3).LoadGraph(("data/" + Name + "/1.bmp").c_str(), true);
+		m_SubHandle.LoadGraph(("data/" + Name + "/gun.bmp").c_str(), true);
 
 		for (auto& s : ShotInterval) {
 			s = 0.f;
@@ -353,7 +383,6 @@ public:
 	float m_TotalTimer = 60.f * 2.f;
 
 	float m_SonicTimer = 0.f;
-	bool prevUpKey = false;
 
 	std::array<float, 100> m_BlockPos{};
 
