@@ -27,30 +27,27 @@ void MainGame::InitSub() {
 		m_BlockPos.at(loop) = static_cast<float>(GetRand(200) - 100) / 100.f;
 	}
 
-	m_gauge.SetHandle(LoadGraph("data/UI/boostgauge.bmp", TRUE));
-	m_meter.SetHandle(LoadGraph("data/UI/boostmeter.bmp", TRUE));
-	m_FinImage.SetHandle(LoadGraph("data/UI/Fin.png", TRUE));
+	m_gauge.LoadGraph("data/UI/boostgauge.bmp", TRUE);
+	m_meter.LoadGraph("data/UI/boostmeter.bmp", TRUE);
+	m_FinImage.LoadGraph("data/UI/Fin.png", TRUE);
 
-	m_Font.SetHandle(CreateFontToHandle("Agency FB", 12, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1));
-	m_FontBig.SetHandle(CreateFontToHandle("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1));
-	m_FontResult.SetHandle(CreateFontToHandle("BIZ UDゴシック", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1));
+	m_Font.Create("Agency FB", 12, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1);
+	m_FontBig.Create("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1);
+	m_FontResult.Create("BIZ UDゴシック", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1);
 
 
-	SetCreateSoundDataType(DX_SOUNDDATATYPE_MEMNOPRESS);
 	for (auto& s : m_ShotSE) {
-		s.SetHandle(LoadSoundMem("data/Audio/Shot.wav"));
+		s.Create("data/Audio/Shot.wav");
 	}
 	for (auto& s : m_DamageSE) {
-		s.SetHandle(LoadSoundMem("data/Audio/Damage.wav"));
+		s.Create("data/Audio/Damage.wav");
 	}
 	for (auto& s : m_DeathSE) {
-		s.SetHandle(LoadSoundMem("data/Audio/Death.wav"));
+		s.Create("data/Audio/Death.wav");
 	}
-	m_ScoreSE.SetHandle(LoadSoundMem("data/Audio/Score.wav"));
+	m_ScoreSE.Create("data/Audio/Score.wav");
 
-	SetCreateSoundDataType(DX_SOUNDDATATYPE_FILE);
-	m_BGM.SetHandle(LoadSoundMem("data/Audio/BGM.wav"));
-	SetCreateSoundDataType(DX_SOUNDDATATYPE_MEMNOPRESS);
+	m_BGM.Create("data/Audio/BGM.wav", DX_SOUNDDATATYPE_FILE);
 
 	PlaySoundMem(m_BGM.GetHandle(), DX_PLAYTYPE_BACK);
 

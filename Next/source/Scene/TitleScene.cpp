@@ -1,9 +1,9 @@
 #include "TitleScene.hpp"
 
 void TitleScene::InitSub() {
-	m_FontBig.SetHandle(CreateFontToHandle("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1));
-	m_Title.SetHandle(LoadGraph("data/UI/Title.png"));
-	m_TitleImage.SetHandle(LoadGraph("data/UI/titleImage.bmp"));
+	m_FontBig.Create("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1);
+	m_Title.LoadGraph("data/UI/Title.png");
+	m_TitleImage.LoadGraph("data/UI/titleImage.bmp");
 
 	BaseScene::SetNextSceneID(static_cast<SceneID>(EnumSceneID::Main));
 }

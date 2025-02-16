@@ -146,14 +146,14 @@ public:
 	void Init() {
 		//Sonic
 		//Death
-		m_Screen.SetHandle(MakeScreen(640, 640, TRUE));
+		m_Screen.Create(640, 640, TRUE);
 		SetDrawScreen(m_Screen.GetHandle());
 		ClearDrawScreen();
 		{
 			DrawCircle(640 / 2, 640 / 2, 640 / 2, GetColor(255, 255, 255), FALSE, 15);
 		}
 		//Hit
-		m_Screen2.SetHandle(MakeScreen(640, 640, TRUE));
+		m_Screen2.Create(640, 640, TRUE);
 		SetDrawScreen(m_Screen2.GetHandle());
 		ClearDrawScreen();
 		{
@@ -311,11 +311,11 @@ public:
 		SetPos(Pos);
 		m_GunPosOffset = Ofs;
 
-		m_GraphHandle.at(0).SetHandle(LoadGraph(("data/" + Name + "/0.bmp").c_str(), TRUE));
-		m_GraphHandle.at(1).SetHandle(LoadGraph(("data/" + Name + "/1.bmp").c_str(), TRUE));
-		m_GraphHandle.at(2).SetHandle(LoadGraph(("data/" + Name + "/2.bmp").c_str(), TRUE));
-		m_GraphHandle.at(3).SetHandle(LoadGraph(("data/" + Name + "/1.bmp").c_str(), TRUE));
-		m_SubHandle.SetHandle(LoadGraph(("data/" + Name + "/gun.bmp").c_str(), TRUE));
+		m_GraphHandle.at(0).LoadGraph(("data/" + Name + "/0.bmp").c_str(), TRUE);
+		m_GraphHandle.at(1).LoadGraph(("data/" + Name + "/1.bmp").c_str(), TRUE);
+		m_GraphHandle.at(2).LoadGraph(("data/" + Name + "/2.bmp").c_str(), TRUE);
+		m_GraphHandle.at(3).LoadGraph(("data/" + Name + "/1.bmp").c_str(), TRUE);
+		m_SubHandle.LoadGraph(("data/" + Name + "/gun.bmp").c_str(), TRUE);
 
 		for (auto& s : ShotInterval) {
 			s = 0.f;

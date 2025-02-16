@@ -19,6 +19,12 @@ public:
 class GraphHandle : public ResourceHandle {
 	ResourceHandle::ResourceHandle;
 public:
+	void Create(int SizeX, int SizeY, int UseAlphaChannel = FALSE) {
+		this->SetHandle(MakeScreen(SizeX, SizeY, UseAlphaChannel));
+	}
+	void LoadGraph(const TCHAR* FileName, int NotUse3DFlag = FALSE) {
+		this->SetHandle(DxLib::LoadGraph(FileName, NotUse3DFlag));
+	}
 	void ReleaseGraph() {
 		DeleteGraph(this->GetHandle());
 		this->SetInvalid();
@@ -28,6 +34,9 @@ public:
 class FontHandle : public ResourceHandle {
 	ResourceHandle::ResourceHandle;
 public:
+	void Create(const TCHAR* FontName, int Size, int Thick, int FontType = -1, int CharSet = -1, int EdgeSize = -1, int Italic = FALSE, int Handle = -1) {
+		this->SetHandle(CreateFontToHandle(FontName, Size, Thick, FontType, CharSet, EdgeSize, Italic, Handle));
+	}
 	void ReleaseFont() {
 		DeleteFontToHandle(this->GetHandle());
 		this->SetInvalid();
@@ -37,6 +46,11 @@ public:
 class SoundHandle : public ResourceHandle {
 	ResourceHandle::ResourceHandle;
 public:
+	void Create(const TCHAR* FileName, int SoundType = DX_SOUNDDATATYPE_MEMNOPRESS, int BufferNum = 3, int UnionHandle = -1) {
+		SetCreateSoundDataType(SoundType);
+		this->SetHandle(LoadSoundMem(FileName));
+		SetCreateSoundDataType(DX_SOUNDDATATYPE_MEMNOPRESS);
+	}
 	void ReleaseSound() {
 		DeleteSoundMem(this->GetHandle());
 		this->SetInvalid();
