@@ -13,6 +13,9 @@
     <Filter Include="source\FrameWork\Scene">
       <UniqueIdentifier>{ca49b26e-eed3-49a9-80e2-d55f5093d12a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\Sceme\MainScene">
+      <UniqueIdentifier>{272206df-1b6f-4889-824a-dd1d66eeb765}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\main.cpp">
@@ -38,6 +41,21 @@
     </ClCompile>
     <ClCompile Include="source\FrameWork\GraphHandle.cpp">
       <Filter>source\FrameWork</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Scene\MainScene\Effect.cpp">
+      <Filter>source\Sceme\MainScene</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Scene\MainScene\Camera.cpp">
+      <Filter>source\Sceme\MainScene</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Scene\MainScene\Bullet.cpp">
+      <Filter>source\Sceme\MainScene</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Scene\MainScene\SoundControl.cpp">
+      <Filter>source\Sceme\MainScene</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Scene\MainScene\Character.cpp">
+      <Filter>source\Sceme\MainScene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -67,6 +85,21 @@
     </ClInclude>
     <ClInclude Include="source\FrameWork\GraphHandle.hpp">
       <Filter>source\FrameWork</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Scene\MainScene\Effect.hpp">
+      <Filter>source\Sceme\MainScene</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Scene\MainScene\Camera.hpp">
+      <Filter>source\Sceme\MainScene</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Scene\MainScene\Bullet.hpp">
+      <Filter>source\Sceme\MainScene</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Scene\MainScene\SoundControl.hpp">
+      <Filter>source\Sceme\MainScene</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Scene\MainScene\Character.hpp">
+      <Filter>source\Sceme\MainScene</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
