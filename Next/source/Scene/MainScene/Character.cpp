@@ -19,6 +19,36 @@ bool Character::SetBullet(int ID, const Mathf::Vector3& Pos, const Mathf::Vector
 	}
 	return false;
 }
+void Character::SetDamage(int Damage) {
+	if (Damage > 0 || Damage == -MaxHP) {
+		m_DamageTime = 1.f;
+	}
+	m_HitPoint = static_cast<int>(Mathf::Clamp(static_cast<float>(m_HitPoint - Damage), 0.f, static_cast<float>(MaxHP)));
+	if (m_HitPoint == 0) {
+		m_RespawnTime = 3.f;
+	}
+}
+void Character::Spawn(const Mathf::Vector3& Pos) {
+	m_Pos = Pos;
+	m_RePos = m_Pos;
+
+	m_Vec.x = 0.f;
+	m_Vec.y = 1.f;
+	m_Vec.z = 0.f;
+
+	m_Rad = 0.f;
+
+	{
+		Mathf::Vector3 Offset = Mathf::Vector3(-0.03f * -std::sin(-m_Rad), -0.03f * std::cos(-m_Rad), 0.f);
+		float Per = 0.02f * 1.f / m_Vec.y;
+		Mathf::Vector3 Pos0 = m_Pos + Offset + Mathf::Vector3(-Per * std::cos(-m_Rad), -Per * std::sin(-m_Rad), 0.f);
+		Mathf::Vector3 Pos1 = m_Pos + Offset + Mathf::Vector3(Per * std::cos(-m_Rad), Per * std::sin(-m_Rad), 0.f);
+		SmokeVector.at(0) = Pos0;
+		SmokeVector.at(1) = Pos1;
+	}
+	m_BoostTimer = 1.f;
+	m_BoostActive = true;
+}
 void Character::SetLRVec(bool IsLeft, bool IsRight) {
 	Mathf::Vector3 Vec = this->GetVec();
 	if (IsRight) {
@@ -31,6 +61,26 @@ void Character::SetLRVec(bool IsLeft, bool IsRight) {
 		Mathf::Easing(&Vec.x, 0.f, 0.95f);
 	}
 	this->SetVec(Vec);
+}
+
+void Character::Init(const Mathf::Vector3& Pos, std::string Name, float Ofs) {
+	Spawn(Pos);
+	m_GunPosOffset = Ofs;
+
+	m_GraphHandle.at(0).LoadGraph(("data/" + Name + "/0.bmp").c_str(), true);
+	m_GraphHandle.at(1).LoadGraph(("data/" + Name + "/1.bmp").c_str(), true);
+	m_GraphHandle.at(2).LoadGraph(("data/" + Name + "/2.bmp").c_str(), true);
+	m_GraphHandle.at(3).LoadGraph(("data/" + Name + "/1.bmp").c_str(), true);
+	m_SubHandle.LoadGraph(("data/" + Name + "/gun.bmp").c_str(), true);
+
+	for (auto& s : ShotInterval) {
+		s = 0.f;
+	}
+	for (auto& b : m_Bullet) {
+		b.DisActive();
+	}
+	m_BoostTimer = 1.f;
+	m_BoostActive = true;
 }
 void Character::Update() {
 	m_RePos = m_Pos;
@@ -151,4 +201,11 @@ void Character::Draw() const {
 	}
 
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+}
+void Character::Dispose() {
+	m_GraphHandle.at(0).ReleaseGraph();
+	m_GraphHandle.at(1).ReleaseGraph();
+	m_GraphHandle.at(2).ReleaseGraph();
+	m_GraphHandle.at(3).ReleaseGraph();
+	m_SubHandle.ReleaseGraph();
 }

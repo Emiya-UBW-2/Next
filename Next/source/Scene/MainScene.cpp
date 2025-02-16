@@ -222,7 +222,7 @@ void MainGame::UpdateSub() {
 			e.SetDamage(-MaxHP);
 			Mathf::Vector3 Pos = MainCamera::Instance()->GetCamPos() + Mathf::Vector3(0.f, -1.f, 0.f);
 			Pos.z = 20.f;
-			e.SetPos(Pos);
+			e.Spawn(Pos);
 			if (&e == &PlayerChara) {
 				m_RespawnScore++;
 			}
