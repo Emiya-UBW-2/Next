@@ -2,8 +2,6 @@
 
 #include "Define.hpp"
 
-extern bool IsTriMonoMode;
-
 class SceneController;
 
 class FrameWork {

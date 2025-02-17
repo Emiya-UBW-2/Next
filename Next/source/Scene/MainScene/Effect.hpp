@@ -84,14 +84,14 @@ public:
 		SetDrawScreen(m_Screen.GetHandle());
 		ClearDrawScreen();
 		{
-			DrawCircle(640 / 2, 640 / 2, 640 / 2, GetColor(255, 255, 255), FALSE, 15);
+			DrawCircle(640 / 2, 640 / 2, 640 / 2, ColorPalette::White, FALSE, 15);
 		}
 		//Hit
 		m_Screen2.Create(640, 640, true);
 		SetDrawScreen(m_Screen2.GetHandle());
 		ClearDrawScreen();
 		{
-			DrawCircleAA(640.f / 2, 640.f / 2, 640.f / 2, 5, GetColor(255, 255, 255), FALSE, 50);
+			DrawCircleAA(640.f / 2, 640.f / 2, 640.f / 2, 5, ColorPalette::White, FALSE, 50);
 		}
 		//
 		for (auto& s : m_Position) {

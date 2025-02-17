@@ -13,28 +13,20 @@ void TitleScene::UpdateSub() {
 		BaseScene::SetSceneEnd();
 	}
 	m_Timer += FrameWork::Instance()->GetDeltaTime();
-
-	IsHitTriMono = false;
-	if (InputControl::Instance()->GetMouseY() + 16 >= (FrameWork::Instance()->GetScreenHeight() - 32)) {
-		IsHitTriMono = true;
-		if (InputControl::Instance()->GetLMEnter().IsTrigger()) {
-			IsTriMonoMode ^= 1;
-		}
-	}
 }
 
 void TitleScene::DrawSub() {
 	int YposBase = FrameWork::Instance()->GetScreenHeight() * 2 / 3;
-	DrawBox(0, YposBase, FrameWork::Instance()->GetScreenWidth(), FrameWork::Instance()->GetScreenHeight(), GetColor(255, 0, 0), TRUE);
+	DrawBox(0, YposBase, FrameWork::Instance()->GetScreenWidth(), FrameWork::Instance()->GetScreenHeight(), ColorPalette::Red, TRUE);
 
 	for (int loop = 0; loop < 5; loop++) {
 		float per = std::sin(Mathf::Deg2Rad(90 * (m_Timer + (float)loop / 5 - (int)(m_Timer + (float)loop / 5))));
 		int Ypos = YposBase + static_cast<int>(per * (float)(FrameWork::Instance()->GetScreenHeight() * 3 / 4 + 50));
-		DrawBox(0, Ypos - static_cast<int>(50.f * per), FrameWork::Instance()->GetScreenWidth(), Ypos, (IsTriMonoMode) ? GetColor(0, 0, 0) : GetColor(192, 0, 0), TRUE);
+		DrawBox(0, Ypos - static_cast<int>(50.f * per), FrameWork::Instance()->GetScreenWidth(), Ypos, ColorPalette::Red075, TRUE);
 	}
 
 
-	DrawBox(0, 0, FrameWork::Instance()->GetScreenWidth(), YposBase, (IsTriMonoMode) ? GetColor(255, 255, 255) : GetColor(192, 192, 192), TRUE);
+	DrawBox(0, 0, FrameWork::Instance()->GetScreenWidth(), YposBase, ColorPalette::Gray025, TRUE);
 
 	DrawGraph(0, static_cast<int>(50 + 50.f * std::sin(Mathf::Deg2Rad(m_Timer * 0.3f * 180.f))), m_TitleImage.GetHandle(), TRUE);
 
@@ -45,11 +37,8 @@ void TitleScene::DrawSub() {
 	if ((static_cast<int>(m_Timer * 10) % 10 < 5)) {
 		const char* Str = "Press Space To Start";
 		int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), m_FontBig.GetHandle());
-		DrawFormatString2ToHandle(FrameWork::Instance()->GetScreenWidth() / 2 - Width / 2, FrameWork::Instance()->GetScreenHeight() * 3 / 4, GetColor(255, 255, 255), GetColor(0, 0, 0), m_FontBig.GetHandle(), Str);
+		DrawFormatString2ToHandle(FrameWork::Instance()->GetScreenWidth() / 2 - Width / 2, FrameWork::Instance()->GetScreenHeight() * 3 / 4, ColorPalette::White, ColorPalette::Black, m_FontBig.GetHandle(), Str);
 	}
-
-	DrawFormatString2ToHandle(64, FrameWork::Instance()->GetScreenHeight() - 32, IsHitTriMono ? GetColor(255, 0, 0) : GetColor(255, 255, 255), GetColor(0, 0, 0), m_FontBig.GetHandle(), "3色モード : %s", (IsTriMonoMode) ? "厳密" : "カジュアル");
-
 }
 
 void TitleScene::DisposeSub() {

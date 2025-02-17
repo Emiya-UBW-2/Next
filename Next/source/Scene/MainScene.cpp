@@ -82,7 +82,7 @@ void MainGame::UpdateSub() {
 						}
 					}
 
-					e.SetLRVec(!IsRight, IsRight);
+					e.SetLRVec(IsLeft, IsRight);
 					Mathf::Vector3 Vec = e.GetVec();
 					if (IsSlow) {
 						Vec.y = Mathf::Clamp(Vec.y - 1.f * FrameWork::Instance()->GetDeltaTime(), 0.85f, 1.5f);
@@ -101,7 +101,7 @@ void MainGame::UpdateSub() {
 						}
 					}
 
-					Mathf::Vector3 MP1(static_cast<float>(InputControl::Instance()->GetMouseX() + 16), static_cast<float>(InputControl::Instance()->GetMouseY() + 16), 0.f);
+					Mathf::Vector3 MP1(static_cast<float>(InputControl::Instance()->GetMouseX()), static_cast<float>(InputControl::Instance()->GetMouseY()), 0.f);
 
 					Mathf::Vector3 PG = e.GetGunPos();
 					Mathf::Vector3 P1 = MainCamera::Instance()->GetDisplayPoint(PG);
@@ -305,7 +305,7 @@ void MainGame::DisposeSub() {
 	m_BGM.ReleaseSound();
 }
 void MainGame::DrawMain() {
-	DrawBox(0, 0, FrameWork::Instance()->GetScreenWidth(), FrameWork::Instance()->GetScreenHeight(), (IsTriMonoMode) ? GetColor(255, 0, 0) : GetColor(192, 0, 0), TRUE);
+	DrawBox(0, 0, FrameWork::Instance()->GetScreenWidth(), FrameWork::Instance()->GetScreenHeight(), ColorPalette::Red075, TRUE);
 
 	//
 	for (int loop = -5; loop < 20; ++loop) {
@@ -314,7 +314,7 @@ void MainGame::DrawMain() {
 		Mathf::Vector3 P1 = MainCamera::Instance()->GetDisplayPoint(MainCamera::Instance()->GetCamPos().x, timeTemp, 0.f);
 		Mathf::Vector3 P2 = MainCamera::Instance()->GetDisplayPoint(MainCamera::Instance()->GetCamPos().x + 2.f, timeTemp, 0.f);
 		Mathf::Vector3 P3 = MainCamera::Instance()->GetDisplayPoint(MainCamera::Instance()->GetCamPos().x + 2.f, timeTemp + 0.1f, 0.f);
-		DrawTriangle(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(P2.x), static_cast<int>(P2.y), static_cast<int>(P3.x), static_cast<int>(P3.y), GetColor(0, 0, 0), TRUE);
+		DrawTriangle(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(P2.x), static_cast<int>(P2.y), static_cast<int>(P3.x), static_cast<int>(P3.y), ColorPalette::Black, TRUE);
 	}
 
 	//
@@ -324,7 +324,7 @@ void MainGame::DrawMain() {
 		Mathf::Vector3 P1 = MainCamera::Instance()->GetDisplayPoint(MainCamera::Instance()->GetCamPos().x, timeTemp, 0.f);
 		Mathf::Vector3 P2 = MainCamera::Instance()->GetDisplayPoint(MainCamera::Instance()->GetCamPos().x + 2.f, timeTemp, 0.f);
 		Mathf::Vector3 P3 = MainCamera::Instance()->GetDisplayPoint(MainCamera::Instance()->GetCamPos().x + 2.f, timeTemp + 0.1f, 0.f);
-		DrawTriangle(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(P2.x), static_cast<int>(P2.y), static_cast<int>(P3.x), static_cast<int>(P3.y), GetColor(255, 0, 0), TRUE);
+		DrawTriangle(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(P2.x), static_cast<int>(P2.y), static_cast<int>(P3.x), static_cast<int>(P3.y), ColorPalette::Red, TRUE);
 	}
 
 	for (auto& e : m_Characters) {
@@ -344,7 +344,7 @@ void MainGame::DrawUI() {
 	if (!IsInGame()) { return; }
 
 	if (IsMainGame()) {
-		DrawFormatString2ToHandle(32, 32, GetColor(255, 255, 255), GetColor(0, 0, 0), m_FontBig.GetHandle(), "%d:%02d.%02d", static_cast<int>(m_MainTimer / 60.f), static_cast<int>(m_MainTimer) % 60, static_cast<int>(m_MainTimer * 100) % 60);
+		DrawFormatString2ToHandle(32, 32, ColorPalette::White, ColorPalette::Black, m_FontBig.GetHandle(), "%d:%02d.%02d", static_cast<int>(m_MainTimer / 60.f), static_cast<int>(m_MainTimer) % 60, static_cast<int>(m_MainTimer * 100) % 60);
 	}
 
 	if (!PlayerChara.IsAlive()) { return; }
@@ -354,20 +354,20 @@ void MainGame::DrawUI() {
 		int y1 = FrameWork::Instance()->GetScreenHeight() / 2 - 256 / 2;
 		int x2 = x1 + 16;
 		int y2 = y1 + 256;
-		DrawBox(x1, static_cast<int>(y2 - (y2 - y1) * m_HitPointRe / MaxHP), x2, y2, GetColor(255, 0, 0), TRUE);
-		DrawBox(x1, static_cast<int>(y2 - (y2 - y1) * PlayerChara.GetHP() / MaxHP), x2, y2, GetColor(255, 255, 255), TRUE);
-		DrawBox(x1, y1, x2, y2, GetColor(0, 0, 0), FALSE);
-		DrawBox(x1 + 1, y1 + 1, x2 - 1, y2 - 1, GetColor(0, 0, 0), FALSE);
+		DrawBox(x1, static_cast<int>(y2 - (y2 - y1) * m_HitPointRe / MaxHP), x2, y2, ColorPalette::Red, TRUE);
+		DrawBox(x1, static_cast<int>(y2 - (y2 - y1) * PlayerChara.GetHP() / MaxHP), x2, y2, ColorPalette::White, TRUE);
+		DrawBox(x1, y1, x2, y2, ColorPalette::Black, FALSE);
+		DrawBox(x1 + 1, y1 + 1, x2 - 1, y2 - 1, ColorPalette::Black, FALSE);
 
-		DrawFormatString2ToHandle(x1, y2, GetColor(255, 0, 0), GetColor(0, 0, 0), m_Font.GetHandle(), "HP");
+		DrawFormatString2ToHandle(x1, y2, ColorPalette::Red, ColorPalette::Black, m_Font.GetHandle(), "HP");
 	}
 
 	DrawRotaGraph(960 - 32, 720 - 32, 1.0, 0.0, m_gauge.GetHandle(), TRUE);
 	DrawRotaGraph(960 - 32, 720 - 32, 1.0, static_cast<double>(Mathf::Deg2Rad((m_BoostMeterRand - 1.f) * 90.f)), m_meter.GetHandle(), TRUE);
 	if (!PlayerChara.m_BoostActive && (static_cast<int>(m_MainTimer * 100) % 10 < 5)) {
-		DrawFormatString2ToHandle(960 - 32 - 128 + 32, 720 - 32 - 128 + 64, GetColor(255, 0, 0), GetColor(0, 0, 0), m_Font.GetHandle(), "OVER HEAT!");
+		DrawFormatString2ToHandle(960 - 32 - 128 + 32, 720 - 32 - 128 + 64, ColorPalette::Red, ColorPalette::Black, m_Font.GetHandle(), "OVER HEAT!");
 	}
-	DrawFormatString2ToHandle(32, FrameWork::Instance()->GetScreenHeight() - 32, GetColor(255, 255, 255), GetColor(0, 0, 0), m_Font.GetHandle(), "AD : 旋回　W : ブースト S : 減速 スペース : 前方射撃 左クリック : 旋回機銃射撃");
+	DrawFormatString2ToHandle(32, FrameWork::Instance()->GetScreenHeight() - 32, ColorPalette::White, ColorPalette::Black, m_Font.GetHandle(), "AD : 旋回　W : ブースト S : 減速 スペース : 前方射撃 左クリック : 旋回機銃射撃");
 }
 void MainGame::InitResult()
 {
@@ -460,18 +460,18 @@ void MainGame::UpdateResult() {
 }
 void MainGame::DrawResult()
 {
-	DrawBox(0, 0, FrameWork::Instance()->GetScreenWidth(), FrameWork::Instance()->GetScreenHeight(), GetColor(0, 0, 0), TRUE);
+	DrawBox(0, 0, FrameWork::Instance()->GetScreenWidth(), FrameWork::Instance()->GetScreenHeight(), ColorPalette::Black, TRUE);
 	DrawGraph(FrameWork::Instance()->GetScreenWidth() - 128 - 32, FrameWork::Instance()->GetScreenHeight() - 64 - 32, m_FinImage.GetHandle(), FALSE);
 
 	int num = 0;
 	if (m_ResultClear >= num) {
-		DrawFormatString2ToHandle(64 + static_cast<int>(m_ResultAnim[num]), 64 + num * 32, GetColor(255, 255, 255), GetColor(0, 0, 0), m_FontResult.GetHandle(), "Respawn Count : %02d", static_cast<int>(m_Respawn)); num++;
+		DrawFormatString2ToHandle(64 + static_cast<int>(m_ResultAnim[num]), 64 + num * 32, ColorPalette::White, ColorPalette::Black, m_FontResult.GetHandle(), "Respawn Count : %02d", static_cast<int>(m_Respawn)); num++;
 	}
 	if (m_ResultClear >= num) {
-		DrawFormatString2ToHandle(64 + static_cast<int>(m_ResultAnim[num]), 64 + num * 32, GetColor(255, 255, 255), GetColor(0, 0, 0), m_FontResult.GetHandle(), "Hit Ratio : %02d%%", static_cast<int>(m_HitRatio)); num++;
+		DrawFormatString2ToHandle(64 + static_cast<int>(m_ResultAnim[num]), 64 + num * 32, ColorPalette::White, ColorPalette::Black, m_FontResult.GetHandle(), "Hit Ratio : %02d%%", static_cast<int>(m_HitRatio)); num++;
 	}
 	if (m_ResultClear >= num) {
-		DrawFormatString2ToHandle(64 + static_cast<int>(m_ResultAnim[num]), 64 + num * 32, GetColor(255, 255, 255), GetColor(0, 0, 0), m_FontResult.GetHandle(), "Kill : %02d", static_cast<int>(m_Kill)); num++;
+		DrawFormatString2ToHandle(64 + static_cast<int>(m_ResultAnim[num]), 64 + num * 32, ColorPalette::White, ColorPalette::Black, m_FontResult.GetHandle(), "Kill : %02d", static_cast<int>(m_Kill)); num++;
 	}
 	num++;
 	if (m_ResultClear >= num) {
@@ -489,13 +489,13 @@ void MainGame::DrawResult()
 		else {
 			Result = "C";
 		}
-		DrawFormatString2ToHandle(64 + static_cast<int>(m_ResultAnim[num]), 64 + num * 32, GetColor(255, 255, 255), GetColor(0, 0, 0), m_FontResult.GetHandle(), "Rank : %s", Result.c_str()); num++;
+		DrawFormatString2ToHandle(64 + static_cast<int>(m_ResultAnim[num]), 64 + num * 32, ColorPalette::White, ColorPalette::Black, m_FontResult.GetHandle(), "Rank : %s", Result.c_str()); num++;
 	}
 
 	if (m_ResultClear == 4 && (m_ResultTimer > 0.5f + 1.f) && (static_cast<int>(m_ResultTimer * 10) % 10 < 5)) {
 		const char* Str = "Space :Return Title";
 		int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), m_FontBig.GetHandle());
-		DrawFormatString2ToHandle(FrameWork::Instance()->GetScreenWidth() / 2 - Width / 2, FrameWork::Instance()->GetScreenHeight() * 3 / 4, GetColor(255, 255, 255), GetColor(0, 0, 0), m_FontBig.GetHandle(), Str);
+		DrawFormatString2ToHandle(FrameWork::Instance()->GetScreenWidth() / 2 - Width / 2, FrameWork::Instance()->GetScreenHeight() * 3 / 4, ColorPalette::White, ColorPalette::Black, m_FontBig.GetHandle(), Str);
 	}
 
 }

@@ -163,9 +163,7 @@ void Character::DrawShadow() const {
 	}
 
 	if (!IsAlive()) {
-		if (!IsTriMonoMode) {
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * 2.f * m_Pos.z / 20.f));
-		}
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * 2.f * m_Pos.z / 20.f));
 	}
 
 
@@ -184,9 +182,7 @@ void Character::Draw() const {
 	}
 
 	if (!IsAlive()) {
-		if (!IsTriMonoMode) {
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * 2.f * m_Pos.z / 20.f));
-		}
 	}
 
 	if (CanDamage() || (static_cast<int>(m_DamageTime * 100) % 10 < 5)) {

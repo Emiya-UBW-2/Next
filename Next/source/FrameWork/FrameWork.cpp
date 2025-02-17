@@ -1,8 +1,5 @@
 #include "FrameWork.hpp"
 
-
-bool IsTriMonoMode = false;
-
 const FrameWork* FrameWork::m_Singleton = nullptr;
 
 void FrameWork::Init()
@@ -54,7 +51,7 @@ bool FrameWork::Update()
 	SetDrawScreen(DX_SCREEN_BACK);
 	ClearDrawScreen();
 	{
-		DrawBox(0, 0, GetWindowWidth(), GetWindowHeight(), GetColor(32, 32, 32), TRUE);
+		DrawBox(0, 0, GetWindowWidth(), GetWindowHeight(), ColorPalette::Gray085, TRUE);
 
 		int Width = GetWindowHeight() * m_ScreenWidth / m_ScreenHeight;
 		DrawExtendGraph(GetWindowWidth() / 2 - Width / 2, 0, GetWindowWidth() / 2 + Width / 2, GetWindowHeight(), BackScreen, FALSE);

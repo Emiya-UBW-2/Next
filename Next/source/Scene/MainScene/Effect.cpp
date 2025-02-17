@@ -62,15 +62,11 @@ void EffectControl::EffectPositionData::DrawShadow() const {
 	switch ((EnumEffect)EffectType) {
 	case EnumEffect::Smoke:
 	{
-		if (!IsTriMonoMode) {
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * std::sin(Mathf::Deg2Rad(this->Size * 180.f))));
-		}
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * std::sin(Mathf::Deg2Rad(this->Size * 180.f))));
 		Mathf::Vector3 P1 = MainCamera::Instance()->GetDisplayPoint(this->Pos.x, this->Pos.y, 0.f);
 		Mathf::Vector3 P2 = MainCamera::Instance()->GetDisplayPoint(this->PrevPos.x, this->PrevPos.y, 0.f);
-		DrawLine(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(P2.x), static_cast<int>(P2.y), GetColor(0, 0, 0), static_cast<int>(this->Size * 2));
-		if (!IsTriMonoMode) {
-			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
-		}
+		DrawLine(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(P2.x), static_cast<int>(P2.y), ColorPalette::Black, static_cast<int>(this->Size * 2));
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 	}
 	break;
 	case EnumEffect::Sonic:
@@ -87,53 +83,37 @@ void EffectControl::EffectPositionData::Draw() const {
 	switch ((EnumEffect)EffectType) {
 	case EnumEffect::Smoke:
 	{
-		if (!IsTriMonoMode) {
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * std::sin(Mathf::Deg2Rad(this->Size * 180.f))));
-		}
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * std::sin(Mathf::Deg2Rad(this->Size * 180.f))));
 		Mathf::Vector3 P1 = MainCamera::Instance()->GetDisplayPoint(this->Pos);
 		Mathf::Vector3 P2 = MainCamera::Instance()->GetDisplayPoint(this->PrevPos);
-		DrawLine(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(P2.x), static_cast<int>(P2.y), GetColor(255, 255, 255), static_cast<int>(this->Size * 10));
-		if (!IsTriMonoMode) {
-			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
-		}
+		DrawLine(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(P2.x), static_cast<int>(P2.y), ColorPalette::White, static_cast<int>(this->Size * 10));
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 	}
 	break;
 	case EnumEffect::Sonic:
 	{
-		if (!IsTriMonoMode) {
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(32.f / this->Size));
-		}
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(32.f / this->Size));
 		Mathf::Vector3 P1 = MainCamera::Instance()->GetDisplayPoint(this->Pos);
 		DrawRotaGraph3(static_cast<int>(P1.x), static_cast<int>(P1.y), 640 / 2, 640 / 2, double(this->Size), double(this->Size / 2), double(Mathf::Deg2Rad(30)), m_Screen.GetHandle(), TRUE);
-		if (!IsTriMonoMode) {
-			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
-		}
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 	}
 	break;
 	case EnumEffect::Death:
 	{
-		if (!IsTriMonoMode) {
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(32.f / this->Size));
-		}
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(32.f / this->Size));
 		Mathf::Vector3 P1 = MainCamera::Instance()->GetDisplayPoint(this->Pos);
 		DrawRotaGraph3(static_cast<int>(P1.x), static_cast<int>(P1.y), 640 / 2, 640 / 2, double(this->Size), double(this->Size * 0.8f), double(Mathf::Deg2Rad(30)), m_Screen.GetHandle(), TRUE);
-		if (!IsTriMonoMode) {
-			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
-		}
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 	}
 	break;
 	case EnumEffect::Hit:
 	{
 		float alpha = std::sin(Mathf::Deg2Rad(this->Size / 0.5f * 180.f));
 		float scale = this->Size * 0.15f / 0.5f;// std::sin(Mathf::Deg2Rad(this->Size / 0.5f * 180.f)) * 0.25f;
-		if (!IsTriMonoMode) {
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * alpha));
-		}
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * alpha));
 		Mathf::Vector3 P1 = MainCamera::Instance()->GetDisplayPoint(this->Pos);
 		DrawRotaGraph3(static_cast<int>(P1.x), static_cast<int>(P1.y), 640 / 2, 640 / 2, double(scale), double(scale), double(this->Rad + Mathf::Deg2Rad(30 + this->Rad * this->Size * 3.f * 180.f)), m_Screen2.GetHandle(), TRUE);
-		if (!IsTriMonoMode) {
-			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
-		}
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 	}
 	break;
 	default:

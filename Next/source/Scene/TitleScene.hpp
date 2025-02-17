@@ -9,7 +9,6 @@ private:
 	GraphHandle m_TitleImage;
 	FontHandle m_FontBig;
 	float m_Timer = 0.f;
-	bool IsHitTriMono = false;
 protected:
 	void InitSub() override;
 	void UpdateSub() override;
