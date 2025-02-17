@@ -2,12 +2,16 @@
 
 #include "MainScene/Camera.hpp"
 #include "MainScene/Effect.hpp"
-#include "MainScene/SoundControl.hpp"
 //
 void MainGame::InitSub() {
 	MainCamera::Create();
 	EffectControl::Create();
-	SoundControl::Create();
+
+	SoundPool::Create();
+	SoundPool::Instance()->Add(10, "data/Audio/Shot.wav");
+	SoundPool::Instance()->Add(10, "data/Audio/Damage.wav");
+	SoundPool::Instance()->Add(10, "data/Audio/Death.wav");
+
 	for (auto& e : m_Characters) {
 		int index = static_cast<int>(&e - &m_Characters.front());
 		Mathf::Vector3 Pos(static_cast<float>(GetRand(index + 1)) * 0.1f, static_cast<float>(index) * 0.5f, 20.f);
@@ -194,10 +198,10 @@ void MainGame::UpdateSub() {
 							if (e2.CanDamage()) {
 								e2.SetDamage(b.GetDamage());
 								if (e2.IsAlive()) {
-									SoundControl::Instance()->SetSE((int)EnumSE::Damage);
+									SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, "data/Audio/Damage.wav");
 								}
 								else {
-									SoundControl::Instance()->SetSE((int)EnumSE::Death);
+									SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, "data/Audio/Death.wav");
 								}
 								if (&e == &PlayerChara) {
 									m_HitScore++;
@@ -291,7 +295,7 @@ void MainGame::DisposeSub() {
 		e.Dispose();
 	}
 	EffectControl::Release();
-	SoundControl::Release();
+	SoundPool::Release();
 	//
 	m_gauge.ReleaseGraph();
 	m_meter.ReleaseGraph();

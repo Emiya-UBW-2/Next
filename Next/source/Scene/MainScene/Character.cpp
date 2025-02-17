@@ -2,7 +2,6 @@
 
 #include "Camera.hpp"
 #include "Effect.hpp"
-#include "SoundControl.hpp"
 
 bool Character::SetBullet(int ID, const Mathf::Vector3& Pos, const Mathf::Vector3& Vec) {
 	if (ShotInterval.at(ID) == 0.f) {
@@ -12,7 +11,7 @@ bool Character::SetBullet(int ID, const Mathf::Vector3& Pos, const Mathf::Vector
 			if (!b.IsActive()) {
 				b.Init(Pos, m_Vec, Vec, 10.f, (ID == 0) ? 100 : 34);
 				ShotInterval.at(ID) = 0.25f;
-				SoundControl::Instance()->SetSE((int)EnumSE::Shot);
+				SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, "data/Audio/Shot.wav");
 				return true;
 			}
 		}
@@ -141,7 +140,7 @@ void Character::Update() {
 				if (this->m_DeathEffectFlag == false) {
 					this->m_DeathEffectFlag = true;
 					EffectControl::Instance()->SetEffect((int)EnumEffect::Death, this->GetPosition() + this->GetVec().Nomalize() * 0.1f, this->GetPosition());
-					SoundControl::Instance()->SetSE((int)EnumSE::Death);
+					SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, "data/Audio/Death.wav");
 				}
 			}
 		}

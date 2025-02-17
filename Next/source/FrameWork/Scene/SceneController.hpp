@@ -44,28 +44,11 @@ public:
 class SceneController {
 	BaseScene* m_pScene = nullptr;
 private:
-	void Active(SceneID ID);
-	void DisActive() {
-		if (m_pScene) {
-			m_pScene->Dispose();
-			delete m_pScene;
-			m_pScene = nullptr;
-		}
-	}
+	void Active(BaseScene* pScene);
+	void DisActive();
 public:
-	void Init() {
-		Active(static_cast<SceneID>(EnumSceneID::Title));
-	}
-	void Update() {
-		if (m_pScene) {
-			m_pScene->Update();
-			if (m_pScene->IsEnd()) {
-				SceneID NextSceneID = m_pScene->GetNextSceneID();
-				DisActive();
-				Active(NextSceneID);
-			}
-		}
-	}
+	void Init();
+	void Update();
 	void Draw() {
 		if (m_pScene) {
 			m_pScene->Draw();

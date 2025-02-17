@@ -7,7 +7,9 @@
 #include "FrameWork.hpp"
 #include "InputControl.hpp"
 
-#include "GraphHandle.hpp"
+#include "GraphControl.hpp"
+#include "FontControl.hpp"
+#include "SoundControl.hpp"
 
 #include "Scene/SceneController.hpp"
 

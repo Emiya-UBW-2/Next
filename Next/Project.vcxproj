@@ -156,33 +156,37 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="source\FrameWork\Algorithm.cpp" />
+    <ClCompile Include="source\FrameWork\FontControl.cpp" />
     <ClCompile Include="source\FrameWork\FrameWork.cpp" />
-    <ClCompile Include="source\FrameWork\GraphHandle.cpp" />
+    <ClCompile Include="source\FrameWork\GraphControl.cpp" />
     <ClCompile Include="source\FrameWork\InputControl.cpp" />
+    <ClCompile Include="source\FrameWork\ResourceHandle.cpp" />
     <ClCompile Include="source\FrameWork\Scene\SceneController.cpp" />
+    <ClCompile Include="source\FrameWork\SoundControl.cpp" />
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\Scene\MainScene.cpp" />
     <ClCompile Include="source\Scene\MainScene\Bullet.cpp" />
     <ClCompile Include="source\Scene\MainScene\Camera.cpp" />
     <ClCompile Include="source\Scene\MainScene\Character.cpp" />
     <ClCompile Include="source\Scene\MainScene\Effect.cpp" />
-    <ClCompile Include="source\Scene\MainScene\SoundControl.cpp" />
     <ClCompile Include="source\Scene\TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\FrameWork\Algorithm.hpp" />
     <ClInclude Include="source\FrameWork\Define.hpp" />
+    <ClInclude Include="source\FrameWork\FontControl.hpp" />
     <ClInclude Include="source\FrameWork\FrameWork.hpp" />
-    <ClInclude Include="source\FrameWork\GraphHandle.hpp" />
+    <ClInclude Include="source\FrameWork\GraphControl.hpp" />
     <ClInclude Include="source\FrameWork\InputControl.hpp" />
     <ClInclude Include="source\FrameWork\json.hpp" />
+    <ClInclude Include="source\FrameWork\ResourceHandle.hpp" />
     <ClInclude Include="source\FrameWork\Scene\SceneController.hpp" />
+    <ClInclude Include="source\FrameWork\SoundControl.hpp" />
     <ClInclude Include="source\Scene\MainScene.hpp" />
     <ClInclude Include="source\Scene\MainScene\Bullet.hpp" />
     <ClInclude Include="source\Scene\MainScene\Camera.hpp" />
     <ClInclude Include="source\Scene\MainScene\Character.hpp" />
     <ClInclude Include="source\Scene\MainScene\Effect.hpp" />
-    <ClInclude Include="source\Scene\MainScene\SoundControl.hpp" />
     <ClInclude Include="source\Scene\TitleScene.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

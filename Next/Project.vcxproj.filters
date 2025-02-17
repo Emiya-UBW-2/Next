@@ -39,7 +39,7 @@
     <ClCompile Include="source\FrameWork\Scene\SceneController.cpp">
       <Filter>source\FrameWork\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="source\FrameWork\GraphHandle.cpp">
+    <ClCompile Include="source\FrameWork\GraphControl.cpp">
       <Filter>source\FrameWork</Filter>
     </ClCompile>
     <ClCompile Include="source\Scene\MainScene\Effect.cpp">
@@ -51,11 +51,17 @@
     <ClCompile Include="source\Scene\MainScene\Bullet.cpp">
       <Filter>source\Sceme\MainScene</Filter>
     </ClCompile>
-    <ClCompile Include="source\Scene\MainScene\SoundControl.cpp">
-      <Filter>source\Sceme\MainScene</Filter>
-    </ClCompile>
     <ClCompile Include="source\Scene\MainScene\Character.cpp">
       <Filter>source\Sceme\MainScene</Filter>
+    </ClCompile>
+    <ClCompile Include="source\FrameWork\ResourceHandle.cpp">
+      <Filter>source\FrameWork</Filter>
+    </ClCompile>
+    <ClCompile Include="source\FrameWork\SoundControl.cpp">
+      <Filter>source\FrameWork</Filter>
+    </ClCompile>
+    <ClCompile Include="source\FrameWork\FontControl.cpp">
+      <Filter>source\FrameWork</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -83,7 +89,7 @@
     <ClInclude Include="source\FrameWork\Scene\SceneController.hpp">
       <Filter>source\FrameWork\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="source\FrameWork\GraphHandle.hpp">
+    <ClInclude Include="source\FrameWork\GraphControl.hpp">
       <Filter>source\FrameWork</Filter>
     </ClInclude>
     <ClInclude Include="source\Scene\MainScene\Effect.hpp">
@@ -95,11 +101,17 @@
     <ClInclude Include="source\Scene\MainScene\Bullet.hpp">
       <Filter>source\Sceme\MainScene</Filter>
     </ClInclude>
-    <ClInclude Include="source\Scene\MainScene\SoundControl.hpp">
-      <Filter>source\Sceme\MainScene</Filter>
-    </ClInclude>
     <ClInclude Include="source\Scene\MainScene\Character.hpp">
       <Filter>source\Sceme\MainScene</Filter>
+    </ClInclude>
+    <ClInclude Include="source\FrameWork\ResourceHandle.hpp">
+      <Filter>source\FrameWork</Filter>
+    </ClInclude>
+    <ClInclude Include="source\FrameWork\SoundControl.hpp">
+      <Filter>source\FrameWork</Filter>
+    </ClInclude>
+    <ClInclude Include="source\FrameWork\FontControl.hpp">
+      <Filter>source\FrameWork</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
