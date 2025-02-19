@@ -7,7 +7,6 @@ void MainGame::InitSub() {
 	MainCamera::Create();
 	EffectControl::Create();
 
-	SoundPool::Create();
 	SoundPool::Instance()->Add(10, "data/Audio/Shot.wav");
 	SoundPool::Instance()->Add(10, "data/Audio/Damage.wav");
 	SoundPool::Instance()->Add(10, "data/Audio/Death.wav");
@@ -292,7 +291,6 @@ void MainGame::DisposeSub() {
 		e.Dispose();
 	}
 	EffectControl::Release();
-	SoundPool::Release();
 	//
 	m_gauge.ReleaseGraph();
 	m_meter.ReleaseGraph();

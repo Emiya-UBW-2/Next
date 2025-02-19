@@ -57,8 +57,8 @@ private:
 		int m_BufferNum{};
 		int m_UnionHandle{};
 	public:
-		bool IsSameSound(const TCHAR* FileName, int SoundType = DX_SOUNDDATATYPE_MEMNOPRESS, int BufferNum = 3, int UnionHandle = -1) {
-			return (m_FileName == FileName) && (m_SoundType == SoundType) && (m_BufferNum == BufferNum) && (m_UnionHandle = UnionHandle);
+		bool IsSameSound(const TCHAR* FileName, int SoundType = DX_SOUNDDATATYPE_MEMNOPRESS, int BufferNum = 3, int UnionHandle = -1) const {
+			return (m_FileName == FileName) && (m_SoundType == SoundType) && (m_BufferNum == BufferNum) && (m_UnionHandle == UnionHandle);
 		}
 	};
 private:

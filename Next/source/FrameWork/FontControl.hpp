@@ -50,15 +50,15 @@ private:
 		FontHandle m_FontHandle{};
 
 		std::string m_FontName{};
-		int m_Size;
-		int m_Thick;
+		int m_Size = 0;
+		int m_Thick = 0;
 		int m_FontType = -1;
 		int m_CharSet = -1;
 		int m_EdgeSize = -1;
 		bool m_Italic = false;
 		int m_Handle = -1;
 	public:
-		bool IsSameFont(const TCHAR* FontName, int Size, int Thick, int FontType = -1, int CharSet = -1, int EdgeSize = -1, bool Italic = false, int Handle = -1) {
+		bool IsSameFont(const TCHAR* FontName, int Size, int Thick, int FontType = -1, int CharSet = -1, int EdgeSize = -1, bool Italic = false, int Handle = -1) const {
 			return (m_FontName == FontName) &&
 			(m_Size == Size) &&
 			(m_Thick == Thick) &&

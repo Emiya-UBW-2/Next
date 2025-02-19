@@ -1,11 +1,6 @@
 #include "TitleScene.hpp"
 
 void TitleScene::InitSub() {
-	FontPool::Create();
-	FontPool::Instance()->Add("Agency FB", 12, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1);
-	FontPool::Instance()->Add("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1);
-	FontPool::Instance()->Add("BIZ UDÉSÉVÉbÉN", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1);
-	
 	m_Title.LoadGraph("data/UI/Title.png");
 	m_TitleImage.LoadGraph("data/UI/titleImage.bmp");
 
