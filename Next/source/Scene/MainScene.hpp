@@ -16,9 +16,6 @@ public:
 	GraphHandle m_FinImage;
 	GraphHandle m_gauge;
 	GraphHandle m_meter;
-	FontHandle m_Font;
-	FontHandle m_FontBig;
-	FontHandle m_FontResult;
 
 	float m_BoostMeterRand{};
 

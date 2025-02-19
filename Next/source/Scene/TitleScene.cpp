@@ -1,7 +1,11 @@
 #include "TitleScene.hpp"
 
 void TitleScene::InitSub() {
-	m_FontBig.Create("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1);
+	FontPool::Create();
+	FontPool::Instance()->Add("Agency FB", 12, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1);
+	FontPool::Instance()->Add("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1);
+	FontPool::Instance()->Add("BIZ UDÉSÉVÉbÉN", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1);
+	
 	m_Title.LoadGraph("data/UI/Title.png");
 	m_TitleImage.LoadGraph("data/UI/titleImage.bmp");
 
@@ -36,13 +40,12 @@ void TitleScene::DrawSub() {
 
 	if ((static_cast<int>(m_Timer * 10) % 10 < 5)) {
 		const char* Str = "Press Space To Start";
-		int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), m_FontBig.GetHandle());
-		DrawFormatString2ToHandle(FrameWork::Instance()->GetScreenWidth() / 2 - Width / 2, FrameWork::Instance()->GetScreenHeight() * 3 / 4, ColorPalette::White, ColorPalette::Black, m_FontBig.GetHandle(), Str);
+		int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle());
+		DrawFormatString2ToHandle(FrameWork::Instance()->GetScreenWidth() / 2 - Width / 2, FrameWork::Instance()->GetScreenHeight() * 3 / 4, ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), Str);
 	}
 }
 
 void TitleScene::DisposeSub() {
-	m_FontBig.ReleaseFont();
 	m_Title.ReleaseGraph();
 	m_TitleImage.ReleaseGraph();
 }

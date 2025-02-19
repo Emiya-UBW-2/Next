@@ -7,7 +7,6 @@ class TitleScene : public BaseScene {
 private:
 	GraphHandle m_Title;
 	GraphHandle m_TitleImage;
-	FontHandle m_FontBig;
 	float m_Timer = 0.f;
 protected:
 	void InitSub() override;

@@ -33,9 +33,6 @@ void MainGame::InitSub() {
 	m_gauge.LoadGraph("data/UI/boostgauge.bmp", true);
 	m_meter.LoadGraph("data/UI/boostmeter.bmp", true);
 	m_FinImage.LoadGraph("data/UI/Fin.png", true);
-	m_Font.Create("Agency FB", 12, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1);
-	m_FontBig.Create("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1);
-	m_FontResult.Create("BIZ UDゴシック", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1);
 	//
 	m_ScoreSE.Create("data/Audio/Score.wav");
 	m_BGM.Create("data/Audio/BGM.wav", DX_SOUNDDATATYPE_FILE);
@@ -301,10 +298,6 @@ void MainGame::DisposeSub() {
 	m_meter.ReleaseGraph();
 	m_FinImage.ReleaseGraph();
 	//
-	m_Font.ReleaseFont();
-	m_FontBig.ReleaseFont();
-	m_FontResult.ReleaseFont();
-	//
 	m_ScoreSE.ReleaseSound();
 	m_BGM.ReleaseSound();
 }
@@ -348,7 +341,7 @@ void MainGame::DrawUI() {
 	if (!IsInGame()) { return; }
 
 	if (IsMainGame()) {
-		DrawFormatString2ToHandle(32, 32, ColorPalette::White, ColorPalette::Black, m_FontBig.GetHandle(), "%d:%02d.%02d", static_cast<int>(m_MainTimer / 60.f), static_cast<int>(m_MainTimer) % 60, static_cast<int>(m_MainTimer * 100) % 60);
+		DrawFormatString2ToHandle(32, 32, ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "%d:%02d.%02d", static_cast<int>(m_MainTimer / 60.f), static_cast<int>(m_MainTimer) % 60, static_cast<int>(m_MainTimer * 100) % 60);
 	}
 
 	if (!PlayerChara.IsAlive()) { return; }
@@ -363,15 +356,15 @@ void MainGame::DrawUI() {
 		DrawBox(x1, y1, x2, y2, ColorPalette::Black, FALSE);
 		DrawBox(x1 + 1, y1 + 1, x2 - 1, y2 - 1, ColorPalette::Black, FALSE);
 
-		DrawFormatString2ToHandle(x1, y2, ColorPalette::Red, ColorPalette::Black, m_Font.GetHandle(), "HP");
+		DrawFormatString2ToHandle(x1, y2, ColorPalette::Red, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 12, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "HP");
 	}
 
 	DrawRotaGraph(960 - 32, 720 - 32, 1.0, 0.0, m_gauge.GetHandle(), TRUE);
 	DrawRotaGraph(960 - 32, 720 - 32, 1.0, static_cast<double>(Mathf::Deg2Rad((m_BoostMeterRand - 1.f) * 90.f)), m_meter.GetHandle(), TRUE);
 	if (!PlayerChara.m_BoostActive && (static_cast<int>(m_MainTimer * 100) % 10 < 5)) {
-		DrawFormatString2ToHandle(960 - 32 - 128 + 32, 720 - 32 - 128 + 64, ColorPalette::Red, ColorPalette::Black, m_Font.GetHandle(), "OVER HEAT!");
+		DrawFormatString2ToHandle(960 - 32 - 128 + 32, 720 - 32 - 128 + 64, ColorPalette::Red, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 12, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "OVER HEAT!");
 	}
-	DrawFormatString2ToHandle(32, FrameWork::Instance()->GetScreenHeight() - 32, ColorPalette::White, ColorPalette::Black, m_Font.GetHandle(), "AD : 旋回　W : ブースト S : 減速 スペース : 前方射撃 左クリック : 旋回機銃射撃");
+	DrawFormatString2ToHandle(32, FrameWork::Instance()->GetScreenHeight() - 32, ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 12, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "AD : 旋回　W : ブースト S : 減速 スペース : 前方射撃 左クリック : 旋回機銃射撃");
 }
 void MainGame::InitResult()
 {
@@ -469,13 +462,13 @@ void MainGame::DrawResult()
 
 	int num = 0;
 	if (m_ResultClear >= num) {
-		DrawFormatString2ToHandle(64 + static_cast<int>(m_ResultAnim[num]), 64 + num * 32, ColorPalette::White, ColorPalette::Black, m_FontResult.GetHandle(), "Respawn Count : %02d", static_cast<int>(m_Respawn)); num++;
+		DrawFormatString2ToHandle(64 + static_cast<int>(m_ResultAnim[num]), 64 + num * 32, ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("BIZ UDゴシック", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "Respawn Count : %02d", static_cast<int>(m_Respawn)); num++;
 	}
 	if (m_ResultClear >= num) {
-		DrawFormatString2ToHandle(64 + static_cast<int>(m_ResultAnim[num]), 64 + num * 32, ColorPalette::White, ColorPalette::Black, m_FontResult.GetHandle(), "Hit Ratio : %02d%%", static_cast<int>(m_HitRatio)); num++;
+		DrawFormatString2ToHandle(64 + static_cast<int>(m_ResultAnim[num]), 64 + num * 32, ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("BIZ UDゴシック", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "Hit Ratio : %02d%%", static_cast<int>(m_HitRatio)); num++;
 	}
 	if (m_ResultClear >= num) {
-		DrawFormatString2ToHandle(64 + static_cast<int>(m_ResultAnim[num]), 64 + num * 32, ColorPalette::White, ColorPalette::Black, m_FontResult.GetHandle(), "Kill : %02d", static_cast<int>(m_Kill)); num++;
+		DrawFormatString2ToHandle(64 + static_cast<int>(m_ResultAnim[num]), 64 + num * 32, ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("BIZ UDゴシック", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "Kill : %02d", static_cast<int>(m_Kill)); num++;
 	}
 	num++;
 	if (m_ResultClear >= num) {
@@ -493,13 +486,13 @@ void MainGame::DrawResult()
 		else {
 			Result = "C";
 		}
-		DrawFormatString2ToHandle(64 + static_cast<int>(m_ResultAnim[num]), 64 + num * 32, ColorPalette::White, ColorPalette::Black, m_FontResult.GetHandle(), "Rank : %s", Result.c_str()); num++;
+		DrawFormatString2ToHandle(64 + static_cast<int>(m_ResultAnim[num]), 64 + num * 32, ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("BIZ UDゴシック", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "Rank : %s", Result.c_str()); num++;
 	}
 
 	if (m_ResultClear == 4 && (m_ResultTimer > 0.5f + 1.f) && (static_cast<int>(m_ResultTimer * 10) % 10 < 5)) {
 		const char* Str = "Space :Return Title";
-		int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), m_FontBig.GetHandle());
-		DrawFormatString2ToHandle(FrameWork::Instance()->GetScreenWidth() / 2 - Width / 2, FrameWork::Instance()->GetScreenHeight() * 3 / 4, ColorPalette::White, ColorPalette::Black, m_FontBig.GetHandle(), Str);
+		int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle());
+		DrawFormatString2ToHandle(FrameWork::Instance()->GetScreenWidth() / 2 - Width / 2, FrameWork::Instance()->GetScreenHeight() * 3 / 4, ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), Str);
 	}
 
 }
