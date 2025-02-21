@@ -19,9 +19,6 @@ public:
 
 	float m_BoostMeterRand{};
 
-	SoundHandle m_BGM;
-	SoundHandle m_ScoreSE{};
-
 	Mathf::Vector3 CamPosBuf;
 
 	float m_CureCoolTime = 0.f;

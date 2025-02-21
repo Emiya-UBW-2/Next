@@ -7,9 +7,11 @@ void MainGame::InitSub() {
 	MainCamera::Create();
 	EffectControl::Create();
 
-	SoundPool::Instance()->Add(10, "data/Audio/Shot.wav");
-	SoundPool::Instance()->Add(10, "data/Audio/Damage.wav");
-	SoundPool::Instance()->Add(10, "data/Audio/Death.wav");
+	SoundPool::Instance()->Add(10, SoundType::SE, "data/Audio/Shot.wav");
+	SoundPool::Instance()->Add(10, SoundType::SE, "data/Audio/Damage.wav");
+	SoundPool::Instance()->Add(10, SoundType::SE, "data/Audio/Death.wav");
+	SoundPool::Instance()->Add(1, SoundType::SE, "data/Audio/Score.wav");
+	SoundPool::Instance()->Add(1, SoundType::BGM, "data/Audio/BGM.wav", DX_SOUNDDATATYPE_FILE);
 
 	for (auto& e : m_Characters) {
 		int index = static_cast<int>(&e - &m_Characters.front());
@@ -33,10 +35,7 @@ void MainGame::InitSub() {
 	m_meter.LoadGraph("data/UI/boostmeter.bmp", true);
 	m_FinImage.LoadGraph("data/UI/Fin.png", true);
 	//
-	m_ScoreSE.Create("data/Audio/Score.wav");
-	m_BGM.Create("data/Audio/BGM.wav", DX_SOUNDDATATYPE_FILE);
-	//
-	PlaySoundMem(m_BGM.GetHandle(), DX_PLAYTYPE_BACK);
+	SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, SoundType::BGM, "data/Audio/BGM.wav");
 	m_MainTimer = m_TotalTimer + 2.f;
 	InitResult();
 	BaseScene::SetNextSceneID(static_cast<SceneID>(EnumSceneID::Title));
@@ -48,7 +47,7 @@ void MainGame::UpdateSub() {
 	}
 	auto& PlayerChara = m_Characters.back();
 	for (auto& e : m_Characters) {
-		if (IsMainGame()){
+		if (IsMainGame()) {
 			if ((&e == &PlayerChara)) {
 				//自機
 				if (e.IsAlive()) {
@@ -194,10 +193,10 @@ void MainGame::UpdateSub() {
 							if (e2.CanDamage()) {
 								e2.SetDamage(b.GetDamage());
 								if (e2.IsAlive()) {
-									SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, "data/Audio/Damage.wav");
+									SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, SoundType::SE, "data/Audio/Damage.wav");
 								}
 								else {
-									SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, "data/Audio/Death.wav");
+									SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, SoundType::SE, "data/Audio/Death.wav");
 								}
 								if (&e == &PlayerChara) {
 									m_HitScore++;
@@ -286,6 +285,8 @@ void MainGame::DrawSub() {
 	}
 }
 void MainGame::DisposeSub() {
+	SoundPool::Instance()->Del(SoundType::BGM, "data/Audio/BGM.wav", DX_SOUNDDATATYPE_FILE);
+
 	MainCamera::Release();
 	for (auto& e : m_Characters) {
 		e.Dispose();
@@ -295,42 +296,37 @@ void MainGame::DisposeSub() {
 	m_gauge.ReleaseGraph();
 	m_meter.ReleaseGraph();
 	m_FinImage.ReleaseGraph();
-	//
-	m_ScoreSE.ReleaseSound();
-	m_BGM.ReleaseSound();
 }
 void MainGame::DrawMain() {
+	//背景
 	DrawBox(0, 0, FrameWork::Instance()->GetScreenWidth(), FrameWork::Instance()->GetScreenHeight(), ColorPalette::Red075, TRUE);
-
-	//
 	for (int loop = -5; loop < 20; ++loop) {
-		float timeTemp = static_cast<float>(loop + (int)(MainCamera::Instance()->GetCamPos().y) * 3.f) / 3.f;
+		{
+			float timeTemp = static_cast<float>(loop + (int)(MainCamera::Instance()->GetCamPos().y) * 3.f) / 3.f;
 
-		Mathf::Vector3 P1 = MainCamera::Instance()->GetDisplayPoint(MainCamera::Instance()->GetCamPos().x, timeTemp, 0.f);
-		Mathf::Vector3 P2 = MainCamera::Instance()->GetDisplayPoint(MainCamera::Instance()->GetCamPos().x + 2.f, timeTemp, 0.f);
-		Mathf::Vector3 P3 = MainCamera::Instance()->GetDisplayPoint(MainCamera::Instance()->GetCamPos().x + 2.f, timeTemp + 0.1f, 0.f);
-		DrawTriangle(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(P2.x), static_cast<int>(P2.y), static_cast<int>(P3.x), static_cast<int>(P3.y), ColorPalette::Black, TRUE);
+			Mathf::Vector3 P1 = MainCamera::Instance()->GetDisplayPoint(MainCamera::Instance()->GetCamPos().x, timeTemp, 0.f);
+			Mathf::Vector3 P2 = MainCamera::Instance()->GetDisplayPoint(MainCamera::Instance()->GetCamPos().x + 2.f, timeTemp, 0.f);
+			Mathf::Vector3 P3 = MainCamera::Instance()->GetDisplayPoint(MainCamera::Instance()->GetCamPos().x + 2.f, timeTemp + 0.1f, 0.f);
+			DrawTriangle(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(P2.x), static_cast<int>(P2.y), static_cast<int>(P3.x), static_cast<int>(P3.y), ColorPalette::Black, TRUE);
+		}
+		{
+			float timeTemp = (static_cast<float>(loop + (int)(MainCamera::Instance()->GetCamPos().y) * 3.f) + 0.5f) / 3.f;
+
+			Mathf::Vector3 P1 = MainCamera::Instance()->GetDisplayPoint(MainCamera::Instance()->GetCamPos().x, timeTemp, 0.f);
+			Mathf::Vector3 P2 = MainCamera::Instance()->GetDisplayPoint(MainCamera::Instance()->GetCamPos().x + 2.f, timeTemp, 0.f);
+			Mathf::Vector3 P3 = MainCamera::Instance()->GetDisplayPoint(MainCamera::Instance()->GetCamPos().x + 2.f, timeTemp + 0.1f, 0.f);
+			DrawTriangle(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(P2.x), static_cast<int>(P2.y), static_cast<int>(P3.x), static_cast<int>(P3.y), ColorPalette::Red, TRUE);
+		}
 	}
-
-	//
-	for (int loop = -5; loop < 20; ++loop) {
-		float timeTemp = (static_cast<float>(loop + (int)(MainCamera::Instance()->GetCamPos().y) * 3.f) + 0.5f) / 3.f;
-
-		Mathf::Vector3 P1 = MainCamera::Instance()->GetDisplayPoint(MainCamera::Instance()->GetCamPos().x, timeTemp, 0.f);
-		Mathf::Vector3 P2 = MainCamera::Instance()->GetDisplayPoint(MainCamera::Instance()->GetCamPos().x + 2.f, timeTemp, 0.f);
-		Mathf::Vector3 P3 = MainCamera::Instance()->GetDisplayPoint(MainCamera::Instance()->GetCamPos().x + 2.f, timeTemp + 0.1f, 0.f);
-		DrawTriangle(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<int>(P2.x), static_cast<int>(P2.y), static_cast<int>(P3.x), static_cast<int>(P3.y), ColorPalette::Red, TRUE);
-	}
-
+	//影描画
 	for (auto& e : m_Characters) {
 		e.DrawShadow();
 	}
-
-
+	EffectControl::Instance()->DrawShadow();
+	//オブジェクト描画
 	for (auto& e : m_Characters) {
 		e.Draw();
 	}
-
 	EffectControl::Instance()->Draw();
 }
 void MainGame::DrawUI() {
@@ -381,7 +377,7 @@ void MainGame::InitResult()
 }
 void MainGame::UpdateResult() {
 	if (m_ResultClear == -1) {
-		PlaySoundMem(m_ScoreSE.GetHandle(), DX_PLAYTYPE_LOOP);
+		SoundPool::Instance()->Play(DX_PLAYTYPE_LOOP, TRUE, SoundType::SE, "data/Audio/Score.wav");
 		m_ResultClear++;
 	}
 	if (m_ResultClear == 0) {
@@ -389,12 +385,12 @@ void MainGame::UpdateResult() {
 		if (std::abs(m_Respawn - static_cast<float>(m_RespawnScore)) < 1.f) {
 			m_Respawn = static_cast<float>(m_RespawnScore);
 			if (m_ResultTimer == 0.f) {
-				StopSoundMem(m_ScoreSE.GetHandle());
+				SoundPool::Instance()->StopAll(SoundType::SE, "data/Audio/Score.wav");
 			}
 			m_ResultTimer += FrameWork::Instance()->GetDeltaTime();
 			if (m_ResultTimer > 0.5f) {
 				m_ResultTimer = 0.f;
-				PlaySoundMem(m_ScoreSE.GetHandle(), DX_PLAYTYPE_LOOP);
+				SoundPool::Instance()->Play(DX_PLAYTYPE_LOOP, TRUE, SoundType::SE, "data/Audio/Score.wav");
 				m_ResultClear++;
 			}
 		}
@@ -405,12 +401,12 @@ void MainGame::UpdateResult() {
 		if (std::abs(m_HitRatio - HitRatio) < 1.f) {
 			m_HitRatio = HitRatio;
 			if (m_ResultTimer == 0.f) {
-				StopSoundMem(m_ScoreSE.GetHandle());
+				SoundPool::Instance()->StopAll(SoundType::SE, "data/Audio/Score.wav");
 			}
 			m_ResultTimer += FrameWork::Instance()->GetDeltaTime();
 			if (m_ResultTimer > 0.5f) {
 				m_ResultTimer = 0.f;
-				PlaySoundMem(m_ScoreSE.GetHandle(), DX_PLAYTYPE_LOOP);
+				SoundPool::Instance()->Play(DX_PLAYTYPE_LOOP, TRUE, SoundType::SE, "data/Audio/Score.wav");
 				m_ResultClear++;
 			}
 		}
@@ -420,25 +416,25 @@ void MainGame::UpdateResult() {
 		if (std::abs(m_Kill - static_cast<float>(m_KillScore)) < 1.f) {
 			m_Kill = static_cast<float>(m_KillScore);
 			if (m_ResultTimer == 0.f) {
-				StopSoundMem(m_ScoreSE.GetHandle());
+				SoundPool::Instance()->StopAll(SoundType::SE, "data/Audio/Score.wav");
 			}
 			m_ResultTimer += FrameWork::Instance()->GetDeltaTime();
 			if (m_ResultTimer > 0.5f) {
 				m_ResultTimer = 0.f;
-				PlaySoundMem(m_ScoreSE.GetHandle(), DX_PLAYTYPE_LOOP);
+				SoundPool::Instance()->Play(DX_PLAYTYPE_LOOP, TRUE, SoundType::SE, "data/Audio/Score.wav");
 				m_ResultClear++;
 			}
 		}
 	}
 	if (m_ResultClear >= 3) {
 		if (m_ResultTimer == 0.f) {
-			StopSoundMem(m_ScoreSE.GetHandle());
+			SoundPool::Instance()->StopAll(SoundType::SE, "data/Audio/Score.wav");
 		}
 		m_ResultTimer += FrameWork::Instance()->GetDeltaTime();
 	}
 	if (m_ResultClear == 3) {
 		if (m_ResultTimer > 0.5f) {
-			//PlaySoundMem(m_ScoreSE, DX_PLAYTYPE_LOOP);
+			//SoundPool::Instance()->Play(DX_PLAYTYPE_LOOP, TRUE, SoundType::SE, "data/Audio/Score.wav");
 			m_ResultClear = 4;
 		}
 	}
@@ -458,15 +454,17 @@ void MainGame::DrawResult()
 	DrawBox(0, 0, FrameWork::Instance()->GetScreenWidth(), FrameWork::Instance()->GetScreenHeight(), ColorPalette::Black, TRUE);
 	DrawGraph(FrameWork::Instance()->GetScreenWidth() - 128 - 32, FrameWork::Instance()->GetScreenHeight() - 64 - 32, m_FinImage.GetHandle(), FALSE);
 
+	const FontHandle* pFont = FontPool::Instance()->Get("BIZ UDゴシック", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1);
+
 	int num = 0;
 	if (m_ResultClear >= num) {
-		DrawFormatString2ToHandle(64 + static_cast<int>(m_ResultAnim[num]), 64 + num * 32, ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("BIZ UDゴシック", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "Respawn Count : %02d", static_cast<int>(m_Respawn)); num++;
+		DrawFormatString2ToHandle(64 + static_cast<int>(m_ResultAnim[num]), 64 + num * 32, ColorPalette::White, ColorPalette::Black, pFont->GetHandle(), "Respawn Count : %02d", static_cast<int>(m_Respawn)); num++;
 	}
 	if (m_ResultClear >= num) {
-		DrawFormatString2ToHandle(64 + static_cast<int>(m_ResultAnim[num]), 64 + num * 32, ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("BIZ UDゴシック", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "Hit Ratio : %02d%%", static_cast<int>(m_HitRatio)); num++;
+		DrawFormatString2ToHandle(64 + static_cast<int>(m_ResultAnim[num]), 64 + num * 32, ColorPalette::White, ColorPalette::Black, pFont->GetHandle(), "Hit Ratio : %02d%%", static_cast<int>(m_HitRatio)); num++;
 	}
 	if (m_ResultClear >= num) {
-		DrawFormatString2ToHandle(64 + static_cast<int>(m_ResultAnim[num]), 64 + num * 32, ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("BIZ UDゴシック", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "Kill : %02d", static_cast<int>(m_Kill)); num++;
+		DrawFormatString2ToHandle(64 + static_cast<int>(m_ResultAnim[num]), 64 + num * 32, ColorPalette::White, ColorPalette::Black, pFont->GetHandle(), "Kill : %02d", static_cast<int>(m_Kill)); num++;
 	}
 	num++;
 	if (m_ResultClear >= num) {
@@ -484,7 +482,7 @@ void MainGame::DrawResult()
 		else {
 			Result = "C";
 		}
-		DrawFormatString2ToHandle(64 + static_cast<int>(m_ResultAnim[num]), 64 + num * 32, ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("BIZ UDゴシック", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "Rank : %s", Result.c_str()); num++;
+		DrawFormatString2ToHandle(64 + static_cast<int>(m_ResultAnim[num]), 64 + num * 32, ColorPalette::White, ColorPalette::Black, pFont->GetHandle(), "Rank : %s", Result.c_str()); num++;
 	}
 
 	if (m_ResultClear == 4 && (m_ResultTimer > 0.5f + 1.f) && (static_cast<int>(m_ResultTimer * 10) % 10 < 5)) {

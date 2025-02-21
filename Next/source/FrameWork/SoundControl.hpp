@@ -19,6 +19,11 @@ public:
 	}
 };
 
+enum class SoundType {
+	BGM,
+	SE,
+};
+
 class SoundPool {
 private:
 	static const SoundPool* m_Singleton;
@@ -50,6 +55,7 @@ private:
 	SoundPool& operator=(SoundPool&&) = delete;
 private:
 	struct SoundOnce {
+		SoundType m_Type;
 		std::vector<SoundHandle> m_Handle{};
 		int m_Now{};
 		std::string m_FileName{};
@@ -57,16 +63,16 @@ private:
 		int m_BufferNum{};
 		int m_UnionHandle{};
 	public:
-		bool IsSameSound(const TCHAR* FileName, int SoundType = DX_SOUNDDATATYPE_MEMNOPRESS, int BufferNum = 3, int UnionHandle = -1) const {
-			return (m_FileName == FileName) && (m_SoundType == SoundType) && (m_BufferNum == BufferNum) && (m_UnionHandle == UnionHandle);
+		bool IsSameSound(SoundType Type, const TCHAR* FileName, int SoundType = DX_SOUNDDATATYPE_MEMNOPRESS, int BufferNum = 3, int UnionHandle = -1) const {
+			return (m_Type == Type) && (m_FileName == FileName) && (m_SoundType == SoundType) && (m_BufferNum == BufferNum) && (m_UnionHandle == UnionHandle);
 		}
 	};
 private:
 	std::vector<SoundOnce> m_Once;
 private:
-	SoundOnce* Get(const TCHAR* FileName, int SoundType = DX_SOUNDDATATYPE_MEMNOPRESS, int BufferNum = 3, int UnionHandle = -1) {
+	SoundOnce* Get(SoundType Type, const TCHAR* FileName, int SoundType = DX_SOUNDDATATYPE_MEMNOPRESS, int BufferNum = 3, int UnionHandle = -1) {
 		for (auto& o : m_Once) {
-			if (o.IsSameSound(FileName, SoundType, BufferNum, UnionHandle)) {
+			if (o.IsSameSound(Type, FileName, SoundType, BufferNum, UnionHandle)) {
 				return &o;
 			}
 		}
@@ -82,8 +88,8 @@ private:
 		m_Once.clear();
 	}
 public:
-	void Add(int SoundNum, const TCHAR* FileName, int SoundType = DX_SOUNDDATATYPE_MEMNOPRESS, int BufferNum = 3, int UnionHandle = -1) {
-		if (Get(FileName, SoundType, BufferNum, UnionHandle)) {
+	void Add(int SoundNum, SoundType Type, const TCHAR* FileName, int SoundType = DX_SOUNDDATATYPE_MEMNOPRESS, int BufferNum = 3, int UnionHandle = -1) {
+		if (Get(Type, FileName, SoundType, BufferNum, UnionHandle)) {
 			return;
 		}
 		m_Once.emplace_back();
@@ -97,11 +103,32 @@ public:
 		m_Once.back().m_BufferNum = BufferNum;
 		m_Once.back().m_UnionHandle = UnionHandle;
 	}
-	void Play(int PlayType, int TopPositionFlag, const TCHAR* FileName, int SoundType = DX_SOUNDDATATYPE_MEMNOPRESS, int BufferNum = 3, int UnionHandle = -1) {
-		SoundOnce* Ptr = Get(FileName, SoundType, BufferNum, UnionHandle);
+	void Play(int PlayType, int TopPositionFlag, SoundType Type, const TCHAR* FileName, int SoundType = DX_SOUNDDATATYPE_MEMNOPRESS, int BufferNum = 3, int UnionHandle = -1) {
+		SoundOnce* Ptr = Get(Type, FileName, SoundType, BufferNum, UnionHandle);
 		if (Ptr) {
 			PlaySoundMem(Ptr->m_Handle.at(Ptr->m_Now).GetHandle(), PlayType, TopPositionFlag);
 			++Ptr->m_Now %= static_cast<int>(Ptr->m_Handle.size());
+		}
+	}
+	void StopAll(SoundType Type, const TCHAR* FileName, int SoundType = DX_SOUNDDATATYPE_MEMNOPRESS, int BufferNum = 3, int UnionHandle = -1) {
+		SoundOnce* Ptr = Get(Type, FileName, SoundType, BufferNum, UnionHandle);
+		if (Ptr) {
+			for (auto& h : Ptr->m_Handle) {
+				StopSoundMem(h.GetHandle());
+			}
+		}
+	}
+	void Del(SoundType Type, const TCHAR* FileName, int SoundType = DX_SOUNDDATATYPE_MEMNOPRESS, int BufferNum = 3, int UnionHandle = -1) {
+		for (auto& o : m_Once) {
+			if (o.IsSameSound(Type, FileName, SoundType, BufferNum, UnionHandle)) {
+				for (auto& h : o.m_Handle) {
+					StopSoundMem(h.GetHandle());
+					h.ReleaseSound();
+				}
+				o.m_Handle.clear();
+				m_Once.erase(m_Once.begin() + (&o-&m_Once.front()));
+				break;
+			}
 		}
 	}
 };

@@ -15,24 +15,22 @@ void TitleScene::UpdateSub() {
 }
 
 void TitleScene::DrawSub() {
+	//îwåiï`âÊ
 	int YposBase = FrameWork::Instance()->GetScreenHeight() * 2 / 3;
 	DrawBox(0, YposBase, FrameWork::Instance()->GetScreenWidth(), FrameWork::Instance()->GetScreenHeight(), ColorPalette::Red, TRUE);
-
 	for (int loop = 0; loop < 5; loop++) {
 		float per = std::sin(Mathf::Deg2Rad(90 * (m_Timer + (float)loop / 5 - (int)(m_Timer + (float)loop / 5))));
 		int Ypos = YposBase + static_cast<int>(per * (float)(FrameWork::Instance()->GetScreenHeight() * 3 / 4 + 50));
 		DrawBox(0, Ypos - static_cast<int>(50.f * per), FrameWork::Instance()->GetScreenWidth(), Ypos, ColorPalette::Red075, TRUE);
 	}
-
-
 	DrawBox(0, 0, FrameWork::Instance()->GetScreenWidth(), YposBase, ColorPalette::Gray025, TRUE);
-
+	//îÚçsã@âÊëúï`âÊ
 	DrawGraph(0, static_cast<int>(50 + 50.f * std::sin(Mathf::Deg2Rad(m_Timer * 0.3f * 180.f))), m_TitleImage.GetHandle(), TRUE);
-
+	//É^ÉCÉgÉãï∂éö
 	SetDrawBlendMode(DX_BLENDMODE_MUL, 255);
 	DrawGraph(FrameWork::Instance()->GetScreenWidth() / 2 - 768 / 2, 64, m_Title.GetHandle(), TRUE);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
-
+	//Press Space To Start
 	if ((static_cast<int>(m_Timer * 10) % 10 < 5)) {
 		const char* Str = "Press Space To Start";
 		int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle());
