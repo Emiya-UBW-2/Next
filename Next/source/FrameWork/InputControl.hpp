@@ -47,6 +47,7 @@ private:
 	InputControl& operator=(InputControl&&) = delete;
 private:
 	//
+	Switch m_PauseEnter;
 	Switch m_MenuEnter;
 	Switch m_LMEnter;
 	int m_MouseX{};
@@ -59,6 +60,7 @@ private:
 	Switch m_MainShotKey;
 	Switch m_SubShotKey;
 public:
+	const Switch& GetPauseEnter() const { return m_PauseEnter; }
 	const Switch& GetMenuEnter() const { return m_MenuEnter; }
 	const Switch& GetLMEnter() const { return m_LMEnter; }
 	const int GetMouseX() const { return m_MouseX; }
@@ -72,6 +74,7 @@ public:
 	const Switch& GetSubShotKey() const { return m_SubShotKey; }
 public:
 	void Init() {
+		m_PauseEnter.Init();
 		m_MenuEnter.Init();
 		m_LMEnter.Init();
 		m_MouseX = 0;

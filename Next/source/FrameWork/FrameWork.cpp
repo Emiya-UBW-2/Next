@@ -36,13 +36,26 @@ void FrameWork::Init()
 	//
 	_SceneController = new SceneController;
 	_SceneController->Init();
+
+	m_IsPauseActive = false;
 }
 bool FrameWork::Update()
 {
 	InputControl::Instance()->Update();
-	FadeControl::Instance()->Update();
-	//
-	_SceneController->Update();
+	bool isUpdate = true;
+	if (m_IsPauseEnable) {
+		if (InputControl::Instance()->GetPauseEnter().IsTrigger()) {
+			m_IsPauseActive ^= 1;
+		}
+		isUpdate = !m_IsPauseActive;
+	}
+	else {
+		m_IsPauseActive = false;
+	}
+	if (isUpdate) {
+		FadeControl::Instance()->Update();
+		_SceneController->Update();
+	}
 	//•`‰æ
 	SetDrawScreen(BackScreen);
 	ClearDrawScreen();

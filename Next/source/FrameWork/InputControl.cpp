@@ -3,6 +3,7 @@
 const InputControl* InputControl::m_Singleton = nullptr;
 
 void InputControl::Update() {
+	m_PauseEnter.Update(CheckHitKey(KEY_INPUT_TAB));
 	m_MenuEnter.Update(CheckHitKey(KEY_INPUT_SPACE));
 	m_LMEnter.Update((GetMouseInput() & MOUSE_INPUT_LEFT) != 0);
 	//マウス座標を取得しておく

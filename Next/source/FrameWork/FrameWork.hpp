@@ -47,6 +47,9 @@ private:
 	LONGLONG MicroSecondDeltaTime = 1000 * 1000 / 60;
 
 	SceneController* _SceneController{ nullptr };
+
+	bool m_IsPauseEnable{ true };
+	bool m_IsPauseActive{ false };
 private:
 	bool isVsync = true;
 public:
@@ -61,6 +64,8 @@ public:
 	const LONGLONG GetNowTimeStart() const { return GetNowHiPerformanceCount() - MicroSecondOnLoopStartFrame; }
 	//デルタタイムを秒で取る
 	const float GetDeltaTime() const { return (float)(MicroSecondDeltaTime) / 1000.f / 1000.f; }
+
+	void SetPauseEnable(bool value) { m_IsPauseEnable = value; }
 public:
 	void Init();
 	bool Update();

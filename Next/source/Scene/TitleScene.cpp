@@ -11,6 +11,7 @@ void TitleScene::InitSub() {
 }
 
 void TitleScene::UpdateSub() {
+	FrameWork::Instance()->SetPauseEnable(false);
 	m_Timer += FrameWork::Instance()->GetDeltaTime();
 	if (!IsGoingNextScene) {
 		if (!FadeControl::Instance()->IsFading()) {

@@ -35,7 +35,7 @@ void MainGame::InitSub() {
 	m_meter.LoadGraph("data/UI/boostmeter.bmp", true);
 	m_FinImage.LoadGraph("data/UI/Fin.png", true);
 	//
-	SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, SoundType::BGM, "data/Audio/BGM.wav");
+	SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, FALSE, SoundType::BGM, "data/Audio/BGM.wav");
 	m_MainTimer = m_TotalTimer + 2.f;
 	InitResult();
 	BaseScene::SetNextSceneID(static_cast<SceneID>(EnumSceneID::Title));
@@ -44,6 +44,7 @@ void MainGame::InitSub() {
 	IsGoingNextScene = false;
 }
 void MainGame::UpdateSub() {
+	FrameWork::Instance()->SetPauseEnable(IsMainGame());
 	if (IsResultActive()) {
 		UpdateResult();
 		return;
