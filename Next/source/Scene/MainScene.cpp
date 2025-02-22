@@ -2,6 +2,7 @@
 
 #include "MainScene/Camera.hpp"
 #include "MainScene/Effect.hpp"
+#include "TitleScene.hpp"
 //
 void MainGame::InitSub() {
 	MainCamera::Create();
@@ -38,7 +39,6 @@ void MainGame::InitSub() {
 	SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, FALSE, SoundType::BGM, "data/Audio/BGM.wav");
 	m_MainTimer = m_TotalTimer + 2.f;
 	InitResult();
-	BaseScene::SetNextSceneID(static_cast<SceneID>(EnumSceneID::Title));
 
 	FadeControl::Instance()->SetFadeOut(ColorPalette::Black, 1.f);
 	IsGoingNextScene = false;
@@ -300,6 +300,10 @@ void MainGame::DisposeSub() {
 	m_gauge.ReleaseGraph();
 	m_meter.ReleaseGraph();
 	m_FinImage.ReleaseGraph();
+}
+std::unique_ptr<BaseScene> MainGame::MakeNextScene()
+{
+	return std::make_unique<TitleScene>();
 }
 void MainGame::DrawMain() {
 	//îwåi

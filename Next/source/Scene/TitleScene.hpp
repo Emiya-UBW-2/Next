@@ -14,5 +14,7 @@ protected:
 	void UpdateSub() override;
 	void DrawSub() override;
 	void DisposeSub() override;
+
+	std::unique_ptr<BaseScene> MakeNextScene() override;
 };
 

@@ -2,19 +2,17 @@
 
 #include "DxLib.h"
 
-//qiita.com/TwilightUncle/items/aadc9f60f857e1ab7031より
+//qiita.com/TwilightUncle/items/aadc9f60f857e1ab7031より　文字列をテンプレートに入れる
 // "Ce"はconstexprのつもり
 template <int Size>
 struct CeString
 {
-	static constexpr int length = Size - 1;
-
 	// 文字列リテラルより推論を行うためのコンストラクタ
 	constexpr CeString(const char(&s_literal)[Size])
 	{
 		for (int i = 0; i < Size; i++) buf[i] = s_literal[i];
 		// 文字列リテラル以外が渡されても文字列としての体裁を保つため、一応最終要素には終端文字を入れておく
-		buf[length] = '\0';
+		buf[Size - 1] = '\0';
 	}
 
 	// 文字列格納領域

@@ -1,16 +1,12 @@
 #pragma once
 
+#include "../Define.hpp"
+#include <memory>
+
 typedef int SceneID;
-
-enum class EnumSceneID {
-	Title,
-	Main,
-};
-
 
 class BaseScene {
 	bool m_IsEnd = false;
-	SceneID m_NextSceneID = -1;
 public:
 	BaseScene() {}
 	~BaseScene() {}
@@ -21,7 +17,6 @@ protected:
 	virtual void DisposeSub() = 0;
 protected:
 	void SetSceneEnd() { m_IsEnd = true; }
-	void SetNextSceneID(SceneID value) { m_NextSceneID = value; }
 public:
 	void Init() {
 		m_IsEnd = false;
@@ -37,18 +32,45 @@ public:
 		DisposeSub();
 	}
 	bool IsEnd()const { return m_IsEnd; }
-	SceneID GetNextSceneID() const { return m_NextSceneID; }
+	virtual std::unique_ptr<BaseScene> MakeNextScene() = 0;
 };
 
-
-class SceneController {
-	BaseScene* m_pScene = nullptr;
+class SceneController : public SingletonBase<SceneController, "SceneController"> {
 private:
-	void Active(BaseScene* pScene);
-	void DisActive();
+	friend class SingletonBase<SceneController, "SceneController">;
+private:
+	SceneController() {}
+	virtual ~SceneController() {
+		Dispose();
+	}
+private:
+	std::unique_ptr<BaseScene> m_pScene = nullptr;
+private:
+	void DisActive() {
+		if (m_pScene) {
+			m_pScene->Dispose();
+			m_pScene.release();
+			m_pScene = nullptr;
+		}
+	}
 public:
-	void Init();
-	void Update();
+	void Active(std::unique_ptr<BaseScene>& pScene) {
+		if (!m_pScene) {
+			m_pScene = std::move(pScene);
+			m_pScene->Init();
+		}
+	}
+	void Update() {
+		if (m_pScene) {
+			m_pScene->Update();
+			if (m_pScene->IsEnd()) {
+				std::unique_ptr<BaseScene> NextSceneID = m_pScene->MakeNextScene();
+				DisActive();
+
+				Active(NextSceneID);
+			}
+		}
+	}
 	void Draw() {
 		if (m_pScene) {
 			m_pScene->Draw();

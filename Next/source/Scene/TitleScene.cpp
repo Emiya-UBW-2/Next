@@ -1,10 +1,9 @@
 #include "TitleScene.hpp"
+#include "MainScene.hpp"
 
 void TitleScene::InitSub() {
 	m_Title.LoadGraph("data/UI/Title.png");
 	m_TitleImage.LoadGraph("data/UI/titleImage.bmp");
-
-	BaseScene::SetNextSceneID(static_cast<SceneID>(EnumSceneID::Main));
 
 	FadeControl::Instance()->SetFadeOut(ColorPalette::Black, 1.f);
 	IsGoingNextScene = false;
@@ -55,4 +54,9 @@ void TitleScene::DrawSub() {
 void TitleScene::DisposeSub() {
 	m_Title.ReleaseGraph();
 	m_TitleImage.ReleaseGraph();
+}
+
+std::unique_ptr<BaseScene> TitleScene::MakeNextScene()
+{
+	return std::make_unique<MainGame>();
 }

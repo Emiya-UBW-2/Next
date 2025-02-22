@@ -26,10 +26,12 @@ public:
 	float m_DamageCoolTime = 0.f;
 	float m_HitPointRe = 0.f;
 protected:
-	void InitSub();
-	void UpdateSub();
-	void DrawSub();
-	void DisposeSub();
+	void InitSub() override;
+	void UpdateSub() override;
+	void DrawSub() override;
+	void DisposeSub() override;
+
+	std::unique_ptr<BaseScene> MakeNextScene() override;
 private:
 	void DrawMain();
 	void DrawUI();

@@ -34,8 +34,7 @@ void FrameWork::Init()
 	//
 	BackScreen = MakeScreen(m_ScreenWidth, m_ScreenHeight, FALSE);
 	//
-	_SceneController = new SceneController;
-	_SceneController->Init();
+	SceneController::Create();
 
 	m_IsPauseActive = false;
 }
@@ -54,13 +53,13 @@ bool FrameWork::Update()
 	}
 	if (isUpdate) {
 		FadeControl::Instance()->Update();
-		_SceneController->Update();
+		SceneController::Instance()->Update();
 	}
 	//•`‰æ
 	SetDrawScreen(BackScreen);
 	ClearDrawScreen();
 	{
-		_SceneController->Draw();
+		SceneController::Instance()->Draw();
 		FadeControl::Instance()->Draw();
 	}
 	//•`‰æ
@@ -98,9 +97,8 @@ bool FrameWork::Update()
 }
 void FrameWork::Dispose()
 {
-	_SceneController->Dispose();
+	SceneController::Release();
 	InputControl::Release();
 	FadeControl::Release();
-	delete _SceneController;
 	DxLib_End();
 }
