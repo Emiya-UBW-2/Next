@@ -16,30 +16,14 @@ public:
 	}
 }; 
 
-class InputControl {
+class InputControl : public SingletonBase<InputControl,"InputControl"> {
 private:
-	static const InputControl* m_Singleton;
-public:
-	static void Create(void) noexcept {
-		m_Singleton = new InputControl();
-	}
-	static void Release(void) noexcept {
-		delete m_Singleton;
-	}
-	static InputControl* Instance(void) noexcept {
-		if (m_Singleton == nullptr) {
-			MessageBox(NULL, "Failed InputControl Instance Create", "", MB_OK);
-			exit(-1);
-		}
-		// if (m_Singleton == nullptr) { m_Singleton = new InputControl(); }
-		return (InputControl*)m_Singleton;
-	}
+	friend class SingletonBase<InputControl, "InputControl">;
 private:
 	InputControl() {
 		Init();
 	}
-	~InputControl() {
-	}
+	virtual ~InputControl() {}
 private:
 	InputControl(const InputControl&) = delete;
 	InputControl& operator=(const InputControl&) = delete;

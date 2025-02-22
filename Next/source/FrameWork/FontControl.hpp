@@ -1,6 +1,7 @@
 #pragma once
-#include "ResourceHandle.hpp"
-#include "DxLib.h"
+
+#include "Define.hpp"
+
 #include <string>
 #include <vector>
 
@@ -16,28 +17,12 @@ public:
 	}
 };
 
-class FontPool {
+class FontPool : public SingletonBase<FontPool, "FontPool"> {
 private:
-	static const FontPool* m_Singleton;
-public:
-	static void Create(void) noexcept {
-		m_Singleton = new FontPool();
-	}
-	static void Release(void) noexcept {
-		delete m_Singleton;
-	}
-	static FontPool* Instance(void) noexcept {
-		if (m_Singleton == nullptr) {
-			MessageBox(NULL, "Failed FontPool Instance Create", "", MB_OK);
-			exit(-1);
-		}
-		// if (m_Singleton == nullptr) { m_Singleton = new FontPool(); }
-		return (FontPool*)m_Singleton;
-	}
+	friend class SingletonBase<FontPool, "FontPool">;
 private:
-	FontPool() {
-	}
-	~FontPool() {
+	FontPool() {}
+	virtual ~FontPool() {
 		Dispose();
 	}
 private:

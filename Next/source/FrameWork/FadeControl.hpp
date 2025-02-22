@@ -1,30 +1,14 @@
 #pragma once
-#include "DxLib.h"
+#include "Define.hpp"
 
-class FadeControl {
+class FadeControl : public SingletonBase<FadeControl, "FadeControl"> {
 private:
-	static const FadeControl* m_Singleton;
-public:
-	static void Create(void) noexcept {
-		m_Singleton = new FadeControl();
-	}
-	static void Release(void) noexcept {
-		delete m_Singleton;
-	}
-	static FadeControl* Instance(void) noexcept {
-		if (m_Singleton == nullptr) {
-			MessageBox(NULL, "Failed FadeControl Instance Create", "", MB_OK);
-			exit(-1);
-		}
-		// if (m_Singleton == nullptr) { m_Singleton = new FadeControl(); }
-		return (FadeControl*)m_Singleton;
-	}
+	friend class SingletonBase<FadeControl, "FadeControl">;
 private:
 	FadeControl() {
 		Init();
 	}
-	~FadeControl() {
-	}
+	virtual ~FadeControl() {}
 private:
 	FadeControl(const FadeControl&) = delete;
 	FadeControl& operator=(const FadeControl&) = delete;

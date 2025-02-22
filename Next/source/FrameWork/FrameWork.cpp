@@ -1,6 +1,6 @@
 #include "FrameWork.hpp"
 
-const FrameWork* FrameWork::m_Singleton = nullptr;
+const FrameWork* SingletonBase<FrameWork, "FrameWork">::m_Singleton = nullptr;
 
 void FrameWork::Init()
 {

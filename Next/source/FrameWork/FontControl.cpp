@@ -1,3 +1,3 @@
 #include "FontControl.hpp"
 
-const FontPool* FontPool::m_Singleton = nullptr;
+const FontPool* SingletonBase<FontPool, "FontPool">::m_Singleton = nullptr;

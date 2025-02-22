@@ -1,7 +1,7 @@
 #pragma once
-#include "ResourceHandle.hpp"
-#include "Algorithm.hpp"
-#include "DxLib.h"
+
+#include "Define.hpp"
+
 #include <string>
 #include <vector>
 
@@ -24,28 +24,12 @@ enum class SoundType {
 	SE,
 };
 
-class SoundPool {
+class SoundPool : public SingletonBase<SoundPool, "SoundPool"> {
 private:
-	static const SoundPool* m_Singleton;
-public:
-	static void Create(void) noexcept {
-		m_Singleton = new SoundPool();
-	}
-	static void Release(void) noexcept {
-		delete m_Singleton;
-	}
-	static SoundPool* Instance(void) noexcept {
-		if (m_Singleton == nullptr) {
-			MessageBox(NULL, "Failed SoundPool Instance Create", "", MB_OK);
-			exit(-1);
-		}
-		// if (m_Singleton == nullptr) { m_Singleton = new SoundPool(); }
-		return (SoundPool*)m_Singleton;
-	}
+	friend class SingletonBase<SoundPool, "SoundPool">;
 private:
-	SoundPool() {
-	}
-	~SoundPool() {
+	SoundPool() {}
+	virtual ~SoundPool() {
 		Dispose();
 	}
 private:

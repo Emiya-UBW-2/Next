@@ -1,6 +1,6 @@
 #include "InputControl.hpp"
 
-const InputControl* InputControl::m_Singleton = nullptr;
+const InputControl* SingletonBase<InputControl, "InputControl">::m_Singleton = nullptr;
 
 void InputControl::Update() {
 	m_PauseEnter.Update(CheckHitKey(KEY_INPUT_TAB));

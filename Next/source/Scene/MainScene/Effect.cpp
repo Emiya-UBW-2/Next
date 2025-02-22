@@ -2,7 +2,7 @@
 
 #include "Camera.hpp"
 
-const EffectControl* EffectControl::m_Singleton = nullptr;
+const EffectControl* SingletonBase<EffectControl, "EffectControl">::m_Singleton = nullptr;
 //
 bool EffectControl::EffectPositionData::IsActive() const {
 	switch ((EnumEffect)EffectType) {

@@ -1,3 +1,3 @@
 #include "Camera.hpp"
 
-const MainCamera* MainCamera::m_Singleton = nullptr;
+const MainCamera* SingletonBase<MainCamera, "MainCamera">::m_Singleton = nullptr;

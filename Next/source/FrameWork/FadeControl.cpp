@@ -1,7 +1,7 @@
 #include "FadeControl.hpp"
 #include "Define.hpp"
 
-const FadeControl* FadeControl::m_Singleton = nullptr;
+const FadeControl* SingletonBase<FadeControl, "FadeControl">::m_Singleton = nullptr;
 
 void FadeControl::Update() {
 	m_FadeTimer = Mathf::Clamp(m_FadeTimer + FrameWork::Instance()->GetDeltaTime(), 0.f, m_FadeTimeMax);

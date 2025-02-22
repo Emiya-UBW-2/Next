@@ -4,29 +4,14 @@
 
 class SceneController;
 
-class FrameWork {
+class FrameWork : public SingletonBase<FrameWork, "FrameWork"> {
 private:
-	static const FrameWork* m_Singleton;
-public:
-	static void Create(void) noexcept {
-		m_Singleton = new FrameWork();
-	}
-	static void Release(void) noexcept {
-		delete m_Singleton;
-	}
-	static FrameWork* Instance(void) noexcept {
-		if (m_Singleton == nullptr) {
-			MessageBox(NULL, "Failed FrameWork Instance Create", "", MB_OK);
-			exit(-1);
-		}
-		// if (m_Singleton == nullptr) { m_Singleton = new FrameWork(); }
-		return (FrameWork*)m_Singleton;
-	}
+	friend class SingletonBase<FrameWork, "FrameWork">;
 private:
 	FrameWork() {
 		Init();
 	}
-	~FrameWork() {
+	virtual ~FrameWork() {
 		Dispose();
 	}
 private:

@@ -2,6 +2,8 @@
 
 #include "DxLib.h"
 
+#include "Singleton.hpp"
+
 #include "Algorithm.hpp"
 
 #include "FrameWork.hpp"
@@ -23,3 +25,4 @@ namespace ColorPalette {
 	inline unsigned int Red = GetColor(255, 0, 0);
 	inline unsigned int Red075 = GetColor(192, 0, 0);
 }
+

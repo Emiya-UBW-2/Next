@@ -2,29 +2,12 @@
 
 #include "../../FrameWork/Define.hpp"
 
-class MainCamera {
+class MainCamera : public SingletonBase<MainCamera, "MainCamera"> {
 private:
-	static const MainCamera* m_Singleton;
-public:
-	static void Create(void) noexcept {
-		m_Singleton = new MainCamera();
-	}
-	static void Release(void) noexcept {
-		delete m_Singleton;
-	}
-	static MainCamera* Instance(void) noexcept {
-		if (m_Singleton == nullptr) {
-			MessageBox(NULL, "Failed MainCamera Instance Create", "", MB_OK);
-			exit(-1);
-		}
-		// if (m_Singleton == nullptr) { m_Singleton = new MainCamera(); }
-		return (MainCamera*)m_Singleton;
-	}
+	friend class SingletonBase<MainCamera, "MainCamera">;
 private:
-	MainCamera() {
-	}
-	~MainCamera() {
-	}
+	MainCamera() {}
+	virtual ~MainCamera() {}
 private:
 	MainCamera(const MainCamera&) = delete;
 	MainCamera& operator=(const MainCamera&) = delete;

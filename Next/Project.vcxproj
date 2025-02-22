@@ -163,6 +163,7 @@
     <ClCompile Include="source\FrameWork\InputControl.cpp" />
     <ClCompile Include="source\FrameWork\ResourceHandle.cpp" />
     <ClCompile Include="source\FrameWork\Scene\SceneController.cpp" />
+    <ClCompile Include="source\FrameWork\Singleton.cpp" />
     <ClCompile Include="source\FrameWork\SoundControl.cpp" />
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\Scene\MainScene.cpp" />
@@ -183,6 +184,7 @@
     <ClInclude Include="source\FrameWork\json.hpp" />
     <ClInclude Include="source\FrameWork\ResourceHandle.hpp" />
     <ClInclude Include="source\FrameWork\Scene\SceneController.hpp" />
+    <ClInclude Include="source\FrameWork\Singleton.hpp" />
     <ClInclude Include="source\FrameWork\SoundControl.hpp" />
     <ClInclude Include="source\Scene\MainScene.hpp" />
     <ClInclude Include="source\Scene\MainScene\Bullet.hpp" />
