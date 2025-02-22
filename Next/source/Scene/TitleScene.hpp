@@ -8,6 +8,7 @@ private:
 	GraphHandle m_Title;
 	GraphHandle m_TitleImage;
 	float m_Timer = 0.f;
+	bool IsGoingNextScene = false;
 protected:
 	void InitSub() override;
 	void UpdateSub() override;

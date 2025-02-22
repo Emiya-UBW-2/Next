@@ -39,6 +39,8 @@ void MainGame::InitSub() {
 	m_MainTimer = m_TotalTimer + 2.f;
 	InitResult();
 	BaseScene::SetNextSceneID(static_cast<SceneID>(EnumSceneID::Title));
+
+	FadeControl::Instance()->SetFadeOut(ColorPalette::Black);
 }
 void MainGame::UpdateSub() {
 	if (IsResultActive()) {

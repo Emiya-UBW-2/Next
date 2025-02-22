@@ -10,6 +10,7 @@
 #include "GraphControl.hpp"
 #include "FontControl.hpp"
 #include "SoundControl.hpp"
+#include "FadeControl.hpp"
 
 #include "Scene/SceneController.hpp"
 

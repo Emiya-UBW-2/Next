@@ -156,6 +156,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="source\FrameWork\Algorithm.cpp" />
+    <ClCompile Include="source\FrameWork\FadeControl.cpp" />
     <ClCompile Include="source\FrameWork\FontControl.cpp" />
     <ClCompile Include="source\FrameWork\FrameWork.cpp" />
     <ClCompile Include="source\FrameWork\GraphControl.cpp" />
@@ -174,6 +175,7 @@
   <ItemGroup>
     <ClInclude Include="source\FrameWork\Algorithm.hpp" />
     <ClInclude Include="source\FrameWork\Define.hpp" />
+    <ClInclude Include="source\FrameWork\FadeControl.hpp" />
     <ClInclude Include="source\FrameWork\FontControl.hpp" />
     <ClInclude Include="source\FrameWork\FrameWork.hpp" />
     <ClInclude Include="source\FrameWork\GraphControl.hpp" />

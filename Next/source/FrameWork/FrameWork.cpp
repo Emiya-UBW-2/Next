@@ -30,6 +30,7 @@ void FrameWork::Init()
 	MicroSecondOnLoopStartFrame = GetNowHiPerformanceCount();
 	//
 	InputControl::Create();
+	FadeControl::Create();
 	//
 	BackScreen = MakeScreen(m_ScreenWidth, m_ScreenHeight, FALSE);
 	//
@@ -39,6 +40,7 @@ void FrameWork::Init()
 bool FrameWork::Update()
 {
 	InputControl::Instance()->Update();
+	FadeControl::Instance()->Update();
 	//
 	_SceneController->Update();
 	//•`‰æ
@@ -46,6 +48,7 @@ bool FrameWork::Update()
 	ClearDrawScreen();
 	{
 		_SceneController->Draw();
+		FadeControl::Instance()->Draw();
 	}
 	//•`‰æ
 	SetDrawScreen(DX_SCREEN_BACK);
@@ -84,6 +87,7 @@ void FrameWork::Dispose()
 {
 	_SceneController->Dispose();
 	InputControl::Release();
+	FadeControl::Release();
 	delete _SceneController;
 	DxLib_End();
 }

@@ -2,7 +2,7 @@
 
 #include "Algorithm.hpp"
 
-#include "FrameWork.hpp"
+#include "Define.hpp"
 
 #include <algorithm>
 

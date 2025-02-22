@@ -5,13 +5,26 @@ void TitleScene::InitSub() {
 	m_TitleImage.LoadGraph("data/UI/titleImage.bmp");
 
 	BaseScene::SetNextSceneID(static_cast<SceneID>(EnumSceneID::Main));
+
+	FadeControl::Instance()->SetFadeOut(ColorPalette::Black);
+	IsGoingNextScene = false;
 }
 
 void TitleScene::UpdateSub() {
-	if (InputControl::Instance()->GetMenuEnter().IsTrigger()) {
-		BaseScene::SetSceneEnd();
-	}
 	m_Timer += FrameWork::Instance()->GetDeltaTime();
+	if (!IsGoingNextScene) {
+		if (!FadeControl::Instance()->IsFading()) {
+			if (InputControl::Instance()->GetMenuEnter().IsTrigger()) {
+				FadeControl::Instance()->SetFadeIn(ColorPalette::Black);
+				IsGoingNextScene = true;
+			}
+		}
+	}
+	else {
+		if (!FadeControl::Instance()->IsFading()) {
+			BaseScene::SetSceneEnd();
+		}
+	}
 }
 
 void TitleScene::DrawSub() {
