@@ -33,26 +33,29 @@ private:
 private:
 	float m_FadeTimer = 0.f;
 	bool m_IsFadeIn{ true };
+	float m_FadeTimeMax = 1.f;
 	unsigned int m_Color{};
 public:
-	void SetFadeIn(unsigned int Color) {
+	void SetFadeIn(unsigned int Color, float FadeTime) {
 		m_FadeTimer = 0.f;
+		m_FadeTimeMax = FadeTime;
 		m_IsFadeIn = true;
 		m_Color = Color;
 	}
-	void SetFadeOut(unsigned int Color) {
+	void SetFadeOut(unsigned int Color, float FadeTime) {
 		m_FadeTimer = 0.f;
+		m_FadeTimeMax = FadeTime;
 		m_IsFadeIn = false;
 		m_Color = Color;
 	}
-	bool IsFading() {
-		return (0 < m_FadeTimer && m_FadeTimer < 1.f);
+	bool IsFading() const {
+		return (0 < m_FadeTimer && m_FadeTimer < m_FadeTimeMax);
 	}
 public:
 	void Init() {
-		m_FadeTimer = 1.f;
+		m_FadeTimer = m_FadeTimeMax = 1.f;
 		m_IsFadeIn = true;
 	}
 	void Update();
-	void Draw();
+	void Draw() const;
 };

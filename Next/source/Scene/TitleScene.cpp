@@ -6,7 +6,7 @@ void TitleScene::InitSub() {
 
 	BaseScene::SetNextSceneID(static_cast<SceneID>(EnumSceneID::Main));
 
-	FadeControl::Instance()->SetFadeOut(ColorPalette::Black);
+	FadeControl::Instance()->SetFadeOut(ColorPalette::Black, 1.f);
 	IsGoingNextScene = false;
 }
 
@@ -15,7 +15,7 @@ void TitleScene::UpdateSub() {
 	if (!IsGoingNextScene) {
 		if (!FadeControl::Instance()->IsFading()) {
 			if (InputControl::Instance()->GetMenuEnter().IsTrigger()) {
-				FadeControl::Instance()->SetFadeIn(ColorPalette::Black);
+				FadeControl::Instance()->SetFadeIn(ColorPalette::Black, 1.f);
 				IsGoingNextScene = true;
 			}
 		}

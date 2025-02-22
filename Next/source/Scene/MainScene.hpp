@@ -12,6 +12,7 @@ public:
 
 	float m_MainTimer = 0.f;
 	const float m_TotalTimer = 60.f * 2.f;
+	bool IsGoingNextScene = false;
 
 	GraphHandle m_FinImage;
 	GraphHandle m_gauge;

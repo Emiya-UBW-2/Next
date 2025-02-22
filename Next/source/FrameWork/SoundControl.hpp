@@ -55,7 +55,7 @@ private:
 	SoundPool& operator=(SoundPool&&) = delete;
 private:
 	struct SoundOnce {
-		SoundType m_Type;
+		SoundType m_Type{};
 		std::vector<SoundHandle> m_Handle{};
 		int m_Now{};
 		std::string m_FileName{};

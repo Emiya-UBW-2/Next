@@ -40,7 +40,8 @@ void MainGame::InitSub() {
 	InitResult();
 	BaseScene::SetNextSceneID(static_cast<SceneID>(EnumSceneID::Title));
 
-	FadeControl::Instance()->SetFadeOut(ColorPalette::Black);
+	FadeControl::Instance()->SetFadeOut(ColorPalette::Black, 1.f);
+	IsGoingNextScene = false;
 }
 void MainGame::UpdateSub() {
 	if (IsResultActive()) {
@@ -440,8 +441,16 @@ void MainGame::UpdateResult() {
 			m_ResultClear = 4;
 		}
 	}
-	if (m_ResultClear == 4 && InputControl::Instance()->GetMenuEnter().IsTrigger()) {
-		BaseScene::SetSceneEnd();
+	if (!IsGoingNextScene) {
+		if (m_ResultClear == 4 && InputControl::Instance()->GetMenuEnter().IsTrigger()) {
+			FadeControl::Instance()->SetFadeIn(ColorPalette::White, 1.f);
+			IsGoingNextScene = true;
+		}
+	}
+	else {
+		if (!FadeControl::Instance()->IsFading()) {
+			BaseScene::SetSceneEnd();
+		}
 	}
 
 
