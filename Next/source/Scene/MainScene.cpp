@@ -284,7 +284,10 @@ void MainGame::UpdateSub() {
 void MainGame::DrawSub() {
 	DrawMain();
 	if (!IsResultActive()) {
-		DrawUI();
+		if (!FrameWork::Instance()->GetIsPauseActive()) {
+			DrawUI();
+		}
+		DrawPauseUI();
 	}
 	else {
 		DrawResult();
@@ -343,7 +346,6 @@ void MainGame::DrawMain() {
 	EffectControl::Instance()->Draw();
 }
 void MainGame::DrawUI() {
-	if (FrameWork::Instance()->GetIsPauseActive()) { return; }
 	auto& PlayerChara = m_Characters.back();
 
 	if (!IsInGame()) { return; }
@@ -373,6 +375,15 @@ void MainGame::DrawUI() {
 		DrawFormatString2ToHandle(960 - 32 - 128 + 32, 720 - 32 - 128 + 64, ColorPalette::Red, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 12, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "OVER HEAT!");
 	}
 	DrawFormatString2ToHandle(32, FrameWork::Instance()->GetScreenHeight() - 32, ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 12, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "AD : 旋回　W : ブースト S : 減速 スペース : 前方射撃 左クリック : 旋回機銃射撃");
+}
+void MainGame::DrawPauseUI() {
+	m_PausePer = Mathf::Clamp(m_PausePer + (FrameWork::Instance()->GetIsPauseActive() ? FrameWork::Instance()->GetFixedDeltaTime() : -FrameWork::Instance()->GetFixedDeltaTime())/0.5f, 0.f, 1.f);
+	int Alpha = static_cast<int>(128 * m_PausePer);
+	if (Alpha > 0) {
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, Alpha);
+		DrawBox(0, 0, FrameWork::Instance()->GetScreenWidth(), FrameWork::Instance()->GetScreenHeight(), ColorPalette::Black, TRUE);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+	}
 }
 void MainGame::InitResult()
 {

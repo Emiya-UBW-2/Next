@@ -37,24 +37,40 @@ void FrameWork::Init()
 	SceneController::Create();
 
 	m_IsPauseActive = false;
+	m_TimeScale = 1.f;
 }
 bool FrameWork::Update()
 {
 	InputControl::Instance()->Update();
-	bool isUpdate = true;
 	if (m_IsPauseEnable) {
 		if (InputControl::Instance()->GetPauseEnter().IsTrigger()) {
 			m_IsPauseActive ^= 1;
+			if (m_IsPauseActive) {
+				m_TimeScalePrev = m_TimeScale;
+				m_TimeScale = 0.0f;
+			}
+			else {
+				if (m_TimeScalePrev.has_value()) {
+					m_TimeScale = m_TimeScalePrev.value();
+					m_TimeScalePrev.reset();
+				}
+				else {//‚Æ‚è‚ ‚¦‚¸1”{‚ÅŠJŽn
+					m_TimeScale = 1.f;
+				}
+			}
 		}
-		isUpdate = !m_IsPauseActive;
 	}
 	else {
 		m_IsPauseActive = false;
+		if (m_TimeScalePrev.has_value()) {
+			m_TimeScale = m_TimeScalePrev.value();
+			m_TimeScalePrev.reset();
+		}
 	}
-	if (isUpdate) {
-		FadeControl::Instance()->Update();
-		SceneController::Instance()->Update();
+	if (m_IsPauseEnable && m_IsPauseActive) {
 	}
+	FadeControl::Instance()->Update();
+	SceneController::Instance()->Update();
 	//•`‰æ
 	SetDrawScreen(BackScreen);
 	ClearDrawScreen();

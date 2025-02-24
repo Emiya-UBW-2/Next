@@ -25,6 +25,8 @@ public:
 	float m_CureCoolTime = 0.f;
 	float m_DamageCoolTime = 0.f;
 	float m_HitPointRe = 0.f;
+
+	float m_PausePer = 0.f;
 protected:
 	void InitSub() override;
 	void UpdateSub() override;
@@ -35,6 +37,7 @@ protected:
 private:
 	void DrawMain();
 	void DrawUI();
+	void DrawPauseUI();
 private:
 	float m_Respawn = 0.f;
 	float m_Kill = 0.f;

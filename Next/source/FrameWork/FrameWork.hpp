@@ -2,6 +2,8 @@
 
 #include "Define.hpp"
 
+#include <optional>
+
 class SceneController;
 
 class FrameWork : public SingletonBase<FrameWork, "FrameWork"> {
@@ -30,7 +32,8 @@ private:
 
 	LONGLONG MicroSecondOnLoopStartFrame = 0;
 	LONGLONG MicroSecondDeltaTime = 1000 * 1000 / 60;
-
+	float		m_TimeScale = 1.f;
+	std::optional<float>		m_TimeScalePrev{};
 	SceneController* _SceneController{ nullptr };
 
 	bool m_IsPauseEnable{ true };
@@ -50,9 +53,16 @@ public:
 	//ループ開始からの経過秒数をマイクロ秒で取る
 	const LONGLONG GetNowTimeStart() const { return GetNowHiPerformanceCount() - MicroSecondOnLoopStartFrame; }
 	//デルタタイムを秒で取る
-	const float GetDeltaTime() const { return (float)(MicroSecondDeltaTime) / 1000.f / 1000.f; }
+	const float GetFixedDeltaTime() const { return (float)(MicroSecondDeltaTime) / 1000.f / 1000.f; }//タイムスケールに関係ない
+	const float GetDeltaTime() const { return GetFixedDeltaTime() * m_TimeScale; }//タイムスケールに関係ある
 
 	void SetPauseEnable(bool value) { m_IsPauseEnable = value; }
+	void SetTimeScale(float value) {
+		if (m_TimeScalePrev.has_value()) {
+			//ポーズ画面中は変更しちゃダメ！
+		}
+		m_TimeScale = value;
+	}
 public:
 	void Init();
 	bool Update();
