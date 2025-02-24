@@ -10,6 +10,7 @@
 constexpr int MaxHP = 100;
 
 class Character {
+	int m_ID{};
 	Mathf::Vector3 m_Vec{};
 	Mathf::Vector3 m_Pos{};
 	Mathf::Vector3 m_GunPos{};
@@ -27,7 +28,6 @@ class Character {
 	int m_HitPoint = MaxHP;
 	float m_RespawnTime{};
 
-	std::array<Bullet, 64> m_Bullet{};
 	std::array<float, 2> ShotInterval{};
 	std::array<Mathf::Vector3, 2> SmokeVector{};
 public:
@@ -39,7 +39,6 @@ public:
 	float m_DeathEffectInterval{};
 	int m_DeathEffectFlag{};
 public:
-	std::array<Bullet, 64>& GetBulletList() { return  m_Bullet; }
 	const Mathf::Vector3& GetVec() const { return  m_Vec; }
 	const Mathf::Vector3& GetRePos() const { return  m_RePos; }
 	const Mathf::Vector3& GetPosition() const { return  m_Pos; }
@@ -50,6 +49,8 @@ public:
 	int GetHP() const { return m_HitPoint; }
 	void SetVec(const Mathf::Vector3& Vec) { m_Vec = Vec; }
 	void SetGunRad(float rad) { m_GunRad = rad; }
+
+	int GetID() const { return m_ID; }
 public:
 	bool SetBullet(int ID, const Mathf::Vector3& Pos, const Mathf::Vector3& Vec);
 	void SetDamage(int Damage);
@@ -57,7 +58,7 @@ public:
 public:
 	void SetLRVec(bool IsLeft, bool IsRight);
 public:
-	void Init(const Mathf::Vector3& Pos, std::string Name, float Ofs);
+	void Init(int ID, const Mathf::Vector3& Pos, std::string Name, float Ofs);
 	void Update();
 	void DrawShadow() const;
 	void Draw() const;

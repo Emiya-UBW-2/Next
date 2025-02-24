@@ -7,14 +7,10 @@ bool Character::SetBullet(int ID, const Mathf::Vector3& Pos, const Mathf::Vector
 	if (ShotInterval.at(ID) == 0.f) {
 		Mathf::Vector3 CaseOffset(static_cast<float>(GetRand(100) - 50) / 100.f * 0.01f, 0.f, 0.f);
 		Mathf::Vector3 CaseSpeed(0.f, 0.f, -10.f);
-		for (auto& b : m_Bullet) {
-			if (!b.IsActive()) {
-				b.Init(Pos, m_Vec, Vec, 10.f, (ID == 0) ? 100 : 34);
-				ShotInterval.at(ID) = 0.25f;
-				SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, SoundType::SE, "data/Audio/Shot.wav");
-				return true;
-			}
-		}
+		BulletControl::Instance()->Set(GetID(), Pos, m_Vec, Vec, 10.f, (ID == 0) ? 100 : 34);
+		ShotInterval.at(ID) = 0.25f;
+		SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, SoundType::SE, "data/Audio/Shot.wav");
+		return true;
 	}
 	return false;
 }
@@ -62,7 +58,8 @@ void Character::SetLRVec(bool IsLeft, bool IsRight) {
 	this->SetVec(Vec);
 }
 
-void Character::Init(const Mathf::Vector3& Pos, std::string Name, float Ofs) {
+void Character::Init(int ID, const Mathf::Vector3& Pos, std::string Name, float Ofs) {
+	m_ID = ID;
 	Spawn(Pos);
 	m_GunPosOffset = Ofs;
 
@@ -74,9 +71,6 @@ void Character::Init(const Mathf::Vector3& Pos, std::string Name, float Ofs) {
 
 	for (auto& s : ShotInterval) {
 		s = 0.f;
-	}
-	for (auto& b : m_Bullet) {
-		b.DisActive();
 	}
 	m_BoostTimer = 1.f;
 	m_BoostActive = true;
@@ -122,11 +116,6 @@ void Character::Update() {
 		++m_GraphAnim %= static_cast<int>(m_GraphHandle.size());
 	}
 
-	for (auto& b : m_Bullet) {
-		if (b.IsActive()) {
-			b.Update();
-		}
-	}
 	//エフェクト
 	{
 		if (!this->IsAlive()) {
@@ -155,12 +144,6 @@ void Character::DrawShadow() const {
 		if (m_Pos.z < 0.f) { return; }
 	}
 
-	for (auto& b : m_Bullet) {
-		if (b.IsActive()) {
-			b.DrawShadow();
-		}
-	}
-
 	if (!IsAlive()) {
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * 2.f * m_Pos.z / 20.f));
 	}
@@ -174,12 +157,6 @@ void Character::DrawShadow() const {
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 }
 void Character::Draw() const {
-	for (auto& b : m_Bullet) {
-		if (b.IsActive()) {
-			b.Draw();
-		}
-	}
-
 	if (!IsAlive()) {
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * 2.f * m_Pos.z / 20.f));
 	}

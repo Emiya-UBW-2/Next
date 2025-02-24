@@ -1,15 +1,46 @@
 #pragma once
 
 #include "../../FrameWork/Define.hpp"
-#include <array>
+#include <vector>
 
 enum class EnumEffect {
-	None,
-
 	Smoke,
 	Sonic,
 	Death,
 	Hit,
+};
+
+class EffectBase {
+protected:
+	Mathf::Vector3 Pos{};
+	Mathf::Vector3 PrevPos{};
+	float Time{};
+	float Alpha{};
+
+	GraphHandle m_Screen;
+	GraphHandle m_Screen2;//TODO
+protected:
+	virtual bool IsActiveSub() const = 0;
+	virtual void SetSub() = 0;
+	virtual void UpdateSub() = 0;
+	virtual void DrawShadowSub() const = 0;
+	virtual void DrawSub() const = 0;
+public:
+	EffectBase() {}
+	virtual ~EffectBase() {}
+public:
+	bool IsActive() const { return IsActiveSub(); }
+	void Init(const Mathf::Vector3& Pos, const Mathf::Vector3& PrevPos, const GraphHandle& Graph1, const GraphHandle& Graph2) {
+		m_Screen = Graph1;
+		m_Screen2 = Graph2;
+		this->PrevPos = PrevPos;
+		this->Pos = Pos;
+		this->Time = 0.f;
+		SetSub();
+	}
+	void Update() { UpdateSub(); }
+	void DrawShadow() const { DrawShadowSub(); }
+	void Draw() const { DrawSub(); }
 };
 
 class EffectControl : public SingletonBase<EffectControl, "EffectControl"> {
@@ -28,39 +59,12 @@ private:
 	EffectControl(EffectControl&&) = delete;
 	EffectControl& operator=(EffectControl&&) = delete;
 private:
-	struct EffectPositionData {
-		int EffectType{};
-		Mathf::Vector3 Pos{};
-		Mathf::Vector3 PrevPos{};
-		float Size{};
-		float Alpha{};
-		float Rad{};
-
-		GraphHandle m_Screen;
-		GraphHandle m_Screen2;//TODO
-	public:
-		bool IsActive() const;
-	public:
-		void Init(const GraphHandle& Graph1, const GraphHandle& Graph2) {
-			Size = 1000.f;
-			m_Screen = Graph1;
-			m_Screen2 = Graph2;
-		}
-		void Set(int Type, const Mathf::Vector3& Pos, const Mathf::Vector3& PrevPos);
-		void Update();
-		void DrawShadow() const;
-		void Draw() const;
-	};
 private:
 	GraphHandle m_Screen;
 	GraphHandle m_Screen2;
-	std::array<EffectPositionData, 900> m_Position;
-	int m_Pos = 0;
+	std::vector<std::unique_ptr<EffectBase>> m_Position;
 public:
-	void SetEffect(int Type, const Mathf::Vector3& Pos, const Mathf::Vector3& PrevPos) {
-		m_Position.at(m_Pos).Set(Type, Pos, PrevPos);
-		++m_Pos %= static_cast<int>(m_Position.size());
-	}
+	void SetEffect(int Type, const Mathf::Vector3& Pos, const Mathf::Vector3& PrevPos);
 public:
 	void Init() {
 		//Sonic
@@ -78,28 +82,32 @@ public:
 		{
 			DrawCircleAA(640.f / 2, 640.f / 2, 640.f / 2, 5, ColorPalette::White, FALSE, 50);
 		}
-		//
-		for (auto& s : m_Position) {
-			s.Init(m_Screen, m_Screen2);
-		}
 	}
 	void Update() {
-		for (auto& s : m_Position) {
-			if (!s.IsActive()) { continue; }
-			s.Update();
+		for (int loop = 0, max = static_cast<int>(m_Position.size()); loop < max; ++loop) {
+			auto& s = m_Position.at(loop);
+			s->Update();
+			if (!s->IsActive()) {
+				std::swap(s, m_Position.back());
+				m_Position.pop_back();
+				--loop;
+				--max;
+			}
 		}
 	}
 	void DrawShadow() const {
 		for (auto& s : m_Position) {
-			if (!s.IsActive()) { continue; }
-			s.DrawShadow();
+			if (!s->IsActive()) { continue; }
+			s->DrawShadow();
 		}
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 	}
 	void Draw() const {
 		for (auto& s : m_Position) {
-			if (!s.IsActive()) { continue; }
-			s.Draw();
+			if (!s->IsActive()) { continue; }
+			s->Draw();
 		}
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 	}
 	void Dispose() {
 		m_Screen.ReleaseGraph();

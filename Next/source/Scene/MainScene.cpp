@@ -7,6 +7,7 @@
 void MainGame::InitSub() {
 	MainCamera::Create();
 	EffectControl::Create();
+	BulletControl::Create();
 
 	SoundPool::Instance()->Add(10, SoundType::SE, "data/Audio/Shot.wav");
 	SoundPool::Instance()->Add(10, SoundType::SE, "data/Audio/Damage.wav");
@@ -19,10 +20,10 @@ void MainGame::InitSub() {
 		Mathf::Vector3 Pos(static_cast<float>(GetRand(index + 1)) * 0.1f, static_cast<float>(index) * 0.5f, 20.f);
 		if (index == (m_Characters.size() - 1)) {
 			Pos.y += 1.5f;
-			e.Init(Pos, "plane", 0.03f);
+			e.Init(index, Pos, "plane", 0.03f);
 		}
 		else {
-			e.Init(Pos, "enemy", 0.01f);
+			e.Init(index, Pos, "enemy", 0.01f);
 		}
 	}
 	//
@@ -52,7 +53,7 @@ void MainGame::UpdateSub() {
 	auto& PlayerChara = m_Characters.back();
 	for (auto& e : m_Characters) {
 		if (IsMainGame()) {
-			if ((&e == &PlayerChara)) {
+			if ((e.GetID() == PlayerChara.GetID())) {
 				//Ž©‹@
 				if (e.IsAlive()) {
 					bool IsBoost = InputControl::Instance()->GetWKey().IsPress() && e.m_BoostActive;
@@ -151,7 +152,7 @@ void MainGame::UpdateSub() {
 					bool IsRight = (ToP.x < 0.f);
 
 					for (auto& e2 : m_Characters) {
-						if (&e != &e2) {
+						if (e.GetID() != e2.GetID()) {
 							Mathf::Vector3 To = e.GetPosition() - e2.GetPosition();
 							if (std::abs(To.x) < 0.05f && std::abs(To.y) < 0.5f) {
 								IsRight = To.x > 0;
@@ -182,56 +183,57 @@ void MainGame::UpdateSub() {
 				}
 			}
 		}
-		//’e”»’è
-		if (IsInGame()) {
-			for (auto& b : e.GetBulletList()) {
-				if (b.IsActive()) {
-					SEGMENT_SEGMENT_RESULT Ret;
-					for (auto& e2 : m_Characters) {
-						if (&e == &e2) { continue; }
-						if (!e2.IsAlive()) { continue; }
-						Mathf::GetSegmenttoSegment(b.GetRePos(), b.GetPosition(), e2.GetRePos(), e2.GetPosition(), &Ret);
-						float len = 0.025f;
-						if (Ret.SegA_SegB_MinDist_Square <= (len * len)) {
-							Mathf::Vector3 Pos(Ret.SegA_MinDist_Pos.x, Ret.SegA_MinDist_Pos.y, Ret.SegA_MinDist_Pos.z);
-							if (e2.CanDamage()) {
-								e2.SetDamage(b.GetDamage());
-								if (e2.IsAlive()) {
-									SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, SoundType::SE, "data/Audio/Damage.wav");
-								}
-								else {
-									SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, SoundType::SE, "data/Audio/Death.wav");
-								}
-								if (&e == &PlayerChara) {
-									m_HitScore++;
-									if (!e2.IsAlive()) {
-										m_KillScore++;
-									}
-								}
-								if (&e2 == &PlayerChara) {
-									m_DamageCoolTime = 1.f;
-								}
-							}
-							b.DisActive();
-							EffectControl::Instance()->SetEffect((int)EnumEffect::Hit, Pos + e2.GetVec().Nomalize() * 0.1f, Pos);
-							break;
-						}
-					}
-				}
-			}
-		}
 		//ƒŠƒXƒ|[ƒ“
 		if (e.CanRespawn() && !e.IsAlive()) {
 			e.SetDamage(-MaxHP);
 			Mathf::Vector3 Pos = MainCamera::Instance()->GetCamPos() + Mathf::Vector3(0.f, -1.f, 0.f);
 			Pos.z = 20.f;
 			e.Spawn(Pos);
-			if (&e == &PlayerChara) {
+			if (e.GetID() == PlayerChara.GetID()) {
 				m_RespawnScore++;
 			}
 		}
 		e.Update();
 	}
+	//’e”»’è
+	if (IsInGame()) {
+		for (auto& b : BulletControl::Instance()->SetBulletList()) {
+			if (b->IsActive()) {
+				for (auto& e2 : m_Characters) {
+					if (b->GetShooterID() == e2.GetID()) { continue; }
+					if (!e2.IsAlive()) { continue; }
+					SEGMENT_SEGMENT_RESULT Ret;
+					Mathf::GetSegmenttoSegment(b->GetRePos(), b->GetPosition(), e2.GetRePos(), e2.GetPosition(), &Ret);
+					float len = 0.025f;
+					if (Ret.SegA_SegB_MinDist_Square <= (len * len)) {
+						Mathf::Vector3 Pos(Ret.SegA_MinDist_Pos.x, Ret.SegA_MinDist_Pos.y, Ret.SegA_MinDist_Pos.z);
+						if (e2.CanDamage()) {
+							e2.SetDamage(b->GetDamage());
+							if (e2.IsAlive()) {
+								SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, SoundType::SE, "data/Audio/Damage.wav");
+							}
+							else {
+								SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, SoundType::SE, "data/Audio/Death.wav");
+							}
+							if (b->GetShooterID() == PlayerChara.GetID()) {
+								m_HitScore++;
+								if (!e2.IsAlive()) {
+									m_KillScore++;
+								}
+							}
+							if (e2.GetID() == PlayerChara.GetID()) {
+								m_DamageCoolTime = 1.f;
+							}
+						}
+						b->DisActive();
+						EffectControl::Instance()->SetEffect((int)EnumEffect::Hit, Pos + e2.GetVec().Nomalize() * 0.1f, Pos);
+						break;
+					}
+				}
+			}
+		}
+	}
+	BulletControl::Instance()->Update();
 	//
 	m_MainTimer -= FrameWork::Instance()->GetDeltaTime();
 	EffectControl::Instance()->Update();
@@ -296,6 +298,7 @@ void MainGame::DisposeSub() {
 		e.Dispose();
 	}
 	EffectControl::Release();
+	BulletControl::Release();
 	//
 	m_gauge.ReleaseGraph();
 	m_meter.ReleaseGraph();
@@ -327,11 +330,13 @@ void MainGame::DrawMain() {
 		}
 	}
 	//‰e•`‰æ
+	BulletControl::Instance()->DrawShadow();
 	for (auto& e : m_Characters) {
 		e.DrawShadow();
 	}
 	EffectControl::Instance()->DrawShadow();
 	//ƒIƒuƒWƒFƒNƒg•`‰æ
+	BulletControl::Instance()->Draw();
 	for (auto& e : m_Characters) {
 		e.Draw();
 	}
