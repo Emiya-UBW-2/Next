@@ -69,7 +69,7 @@ public:
 		int Handles[5]{};
 		LoadDivGraph("data/Effect.png", 5, 5, 1, 128, 128, Handles);
 		m_EffectGraph.resize(5);
-		for (int i = 0, max = m_EffectGraph.size(); i < max; ++i) {
+		for (int i = 0, max = static_cast<int>(m_EffectGraph.size()); i < max; ++i) {
 			m_EffectGraph.at(i).SetHandle(Handles[i]);
 		}
 

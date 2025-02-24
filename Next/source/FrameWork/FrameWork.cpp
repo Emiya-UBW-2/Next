@@ -36,7 +36,7 @@ void FrameWork::Init()
 	//
 	SceneController::Create();
 
-	m_IsPauseActive = false;
+	SetPauseActive(false);
 	m_TimeScale = 1.f;
 }
 bool FrameWork::Update()
@@ -45,29 +45,11 @@ bool FrameWork::Update()
 	if (m_IsPauseEnable) {
 		if (InputControl::Instance()->GetPauseEnter().IsTrigger()) {
 			m_IsPauseActive ^= 1;
-			if (m_IsPauseActive) {
-				m_TimeScalePrev = m_TimeScale;
-				m_TimeScale = 0.0f;
-			}
-			else {
-				if (m_TimeScalePrev.has_value()) {
-					m_TimeScale = m_TimeScalePrev.value();
-					m_TimeScalePrev.reset();
-				}
-				else {//‚Æ‚è‚ ‚¦‚¸1”{‚ÅŠJŽn
-					m_TimeScale = 1.f;
-				}
-			}
+			SetPauseActive(m_IsPauseActive);
 		}
 	}
 	else {
-		m_IsPauseActive = false;
-		if (m_TimeScalePrev.has_value()) {
-			m_TimeScale = m_TimeScalePrev.value();
-			m_TimeScalePrev.reset();
-		}
-	}
-	if (m_IsPauseEnable && m_IsPauseActive) {
+		SetPauseActive(false);
 	}
 	FadeControl::Instance()->Update();
 	SceneController::Instance()->Update();

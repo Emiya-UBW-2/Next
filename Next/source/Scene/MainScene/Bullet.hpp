@@ -19,7 +19,7 @@ public:
 
 	bool IsActive() const { return m_Time < 2.f; }
 	void DisActive() { m_Time = 2.f; }
-	int GetShooterID() { return m_ShooterID; }
+	int GetShooterID() const { return m_ShooterID; }
 public:
 	void Init(int ShooterID, const Mathf::Vector3& Pos, const Mathf::Vector3& BaseVec, const Mathf::Vector3& AddVec, float Size, int Damage) {
 		m_ShooterID = ShooterID;

@@ -27,6 +27,8 @@ public:
 	float m_HitPointRe = 0.f;
 
 	float m_PausePer = 0.f;
+	float m_PauseTimer = 0.f;
+	int m_PauseSelect = 0;
 protected:
 	void InitSub() override;
 	void UpdateSub() override;

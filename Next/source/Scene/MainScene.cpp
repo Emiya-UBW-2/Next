@@ -377,12 +377,53 @@ void MainGame::DrawUI() {
 	DrawFormatString2ToHandle(32, FrameWork::Instance()->GetScreenHeight() - 32, ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 12, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "AD : 旋回　W : ブースト S : 減速 スペース : 前方射撃 左クリック : 旋回機銃射撃");
 }
 void MainGame::DrawPauseUI() {
-	m_PausePer = Mathf::Clamp(m_PausePer + (FrameWork::Instance()->GetIsPauseActive() ? FrameWork::Instance()->GetFixedDeltaTime() : -FrameWork::Instance()->GetFixedDeltaTime())/0.5f, 0.f, 1.f);
+	m_PausePer = Mathf::Clamp(m_PausePer + (FrameWork::Instance()->GetIsPauseActive() ? FrameWork::Instance()->GetFixedDeltaTime() : -FrameWork::Instance()->GetFixedDeltaTime())/0.25f, 0.f, 1.f);
+	if (FrameWork::Instance()->GetIsPauseActive()) {
+		m_PauseTimer += FrameWork::Instance()->GetFixedDeltaTime();
+
+		if (InputControl::Instance()->GetSKey().IsTrigger()) {
+			++m_PauseSelect;
+		}
+		if (InputControl::Instance()->GetWKey().IsTrigger()) {
+			--m_PauseSelect;
+		}
+		if (m_PauseSelect > 3 - 1) { m_PauseSelect = 0; }
+		if (m_PauseSelect < 0) { m_PauseSelect = 3 - 1; }
+		if (InputControl::Instance()->GetMenuEnter().IsTrigger()) {
+			switch (m_PauseSelect) {
+			case 0:
+				BaseScene::SetSceneEnd();
+				break;
+			case 1:
+				break;
+			case 2:
+				FrameWork::Instance()->SetPauseActive(false);
+				break;
+			default:
+				break;
+			}
+		}
+	}
+	else {
+		m_PauseSelect = 0;
+	}
 	int Alpha = static_cast<int>(128 * m_PausePer);
 	if (Alpha > 0) {
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, Alpha);
 		DrawBox(0, 0, FrameWork::Instance()->GetScreenWidth(), FrameWork::Instance()->GetScreenHeight(), ColorPalette::Black, TRUE);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+		
+	}
+	if (FrameWork::Instance()->GetIsPauseActive()){
+		if ((static_cast<int>(m_PauseTimer * 10) % 10 < 5)) {
+			DrawFormatString2ToHandle(32, 32, ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "Pause");
+		}
+
+		DrawFormatString2ToHandle(32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 2, (m_PauseSelect == 0) ? ColorPalette::Red : ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "Return Title");
+		DrawFormatString2ToHandle(32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 1, (m_PauseSelect == 1) ? ColorPalette::Red : ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "Option");
+		DrawFormatString2ToHandle(32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 0, (m_PauseSelect == 2) ? ColorPalette::Red : ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "Return Game");
+
+		DrawFormatString2ToHandle(32, FrameWork::Instance()->GetScreenHeight() - 32, ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 12, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "WS : 選択 スペース : 決定");
 	}
 }
 void MainGame::InitResult()

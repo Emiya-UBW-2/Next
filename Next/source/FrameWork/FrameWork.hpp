@@ -57,6 +57,22 @@ public:
 	const float GetDeltaTime() const { return GetFixedDeltaTime() * m_TimeScale; }//タイムスケールに関係ある
 
 	void SetPauseEnable(bool value) { m_IsPauseEnable = value; }
+	void SetPauseActive(bool value) {
+		m_IsPauseActive = value;
+		if (m_IsPauseActive) {
+			m_TimeScalePrev = m_TimeScale;
+			m_TimeScale = 0.0f;
+		}
+		else {
+			if (m_TimeScalePrev.has_value()) {
+				m_TimeScale = m_TimeScalePrev.value();
+				m_TimeScalePrev.reset();
+			}
+			else {
+				m_TimeScale = 1.f;//とりあえず1倍で開始
+			}
+		}
+	}
 	void SetTimeScale(float value) {
 		if (m_TimeScalePrev.has_value()) {
 			//ポーズ画面中は変更しちゃダメ！
