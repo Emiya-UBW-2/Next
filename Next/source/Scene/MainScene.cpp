@@ -343,6 +343,7 @@ void MainGame::DrawMain() {
 	EffectControl::Instance()->Draw();
 }
 void MainGame::DrawUI() {
+	if (FrameWork::Instance()->GetIsPauseActive()) { return; }
 	auto& PlayerChara = m_Characters.back();
 
 	if (!IsInGame()) { return; }

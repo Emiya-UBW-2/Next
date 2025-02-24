@@ -37,7 +37,7 @@ private:
 	void DrawSub() const override {
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(32.f / this->Time));
 		Mathf::Vector3 P1 = MainCamera::Instance()->GetDisplayPoint(this->Pos);
-		DrawRotaGraph3(static_cast<int>(P1.x), static_cast<int>(P1.y), 640 / 2, 640 / 2, double(this->Time), double(this->Time / 2), double(Mathf::Deg2Rad(30)), m_Screen.GetHandle(), TRUE);
+		DrawRotaGraph3(static_cast<int>(P1.x), static_cast<int>(P1.y), 128 / 2, 128 / 2, double(this->Time * 640 / 128), double(this->Time / 2 * 640 / 128), double(Mathf::Deg2Rad(30)), m_Screen.GetHandle(), TRUE);
 	}
 };
 class EffectDeath : public EffectBase {
@@ -52,7 +52,7 @@ private:
 	void DrawSub() const override {
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(32.f / this->Time));
 		Mathf::Vector3 P1 = MainCamera::Instance()->GetDisplayPoint(this->Pos);
-		DrawRotaGraph3(static_cast<int>(P1.x), static_cast<int>(P1.y), 640 / 2, 640 / 2, double(this->Time), double(this->Time * 0.8f), double(Mathf::Deg2Rad(30)), m_Screen.GetHandle(), TRUE);
+		DrawRotaGraph3(static_cast<int>(P1.x), static_cast<int>(P1.y), 128 / 2, 128 / 2, double(this->Time * 640 / 128), double(this->Time * 0.8f * 640 / 128), double(Mathf::Deg2Rad(30)), m_Screen.GetHandle(), TRUE);
 	}
 };
 class EffectHit : public EffectBase {
@@ -70,29 +70,32 @@ private:
 	void DrawShadowSub() const override {}
 	void DrawSub() const override {
 		float alpha = std::sin(Mathf::Deg2Rad(this->Time / MaxTime * 180.f));
-		float scale = this->Time / MaxTime * 0.15f;
+		float scale = this->Time / MaxTime * 0.15f * 640 / 128;
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * alpha));
 		Mathf::Vector3 P1 = MainCamera::Instance()->GetDisplayPoint(this->Pos);
-		DrawRotaGraph3(static_cast<int>(P1.x), static_cast<int>(P1.y), 640 / 2, 640 / 2, double(scale), double(scale), double(this->Rad), m_Screen2.GetHandle(), TRUE);
+		DrawRotaGraph3(static_cast<int>(P1.x), static_cast<int>(P1.y), 128 / 2, 128 / 2, double(scale), double(scale), double(this->Rad), m_Screen.GetHandle(), TRUE);
 	}
 };
 //
 void EffectControl::SetEffect(int Type, const Mathf::Vector3& Pos, const Mathf::Vector3& PrevPos) {
 	switch ((EnumEffect)Type) {
 	case EnumEffect::Smoke:
-		m_Position.emplace_back(std::make_unique<EffectSmoke>());
+		m_Pool.emplace_back(std::make_unique<EffectSmoke>());
+		m_Pool.back()->Init(Pos, PrevPos, m_EffectGraph.at(1));
 		break;
 	case EnumEffect::Sonic:
-		m_Position.emplace_back(std::make_unique<EffectSonic>());
+		m_Pool.emplace_back(std::make_unique<EffectSonic>());
+		m_Pool.back()->Init(Pos, PrevPos, m_EffectGraph.at(1));
 		break;
 	case EnumEffect::Death:
-		m_Position.emplace_back(std::make_unique<EffectDeath>());
+		m_Pool.emplace_back(std::make_unique<EffectDeath>());
+		m_Pool.back()->Init(Pos, PrevPos, m_EffectGraph.at(1));
 		break;
 	case EnumEffect::Hit:
-		m_Position.emplace_back(std::make_unique<EffectHit>());
+		m_Pool.emplace_back(std::make_unique<EffectHit>());
+		m_Pool.back()->Init(Pos, PrevPos, m_EffectGraph.at(0));
 		break;
 	default:
 		break;
 	}
-	m_Position.back()->Init(Pos, PrevPos, m_Screen, m_Screen2);
 }

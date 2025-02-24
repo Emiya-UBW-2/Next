@@ -18,7 +18,6 @@ protected:
 	float Alpha{};
 
 	GraphHandle m_Screen;
-	GraphHandle m_Screen2;//TODO
 protected:
 	virtual bool IsActiveSub() const = 0;
 	virtual void SetSub() = 0;
@@ -30,9 +29,8 @@ public:
 	virtual ~EffectBase() {}
 public:
 	bool IsActive() const { return IsActiveSub(); }
-	void Init(const Mathf::Vector3& Pos, const Mathf::Vector3& PrevPos, const GraphHandle& Graph1, const GraphHandle& Graph2) {
-		m_Screen = Graph1;
-		m_Screen2 = Graph2;
+	void Init(const Mathf::Vector3& Pos, const Mathf::Vector3& PrevPos, const GraphHandle& Graph) {
+		m_Screen = Graph;
 		this->PrevPos = PrevPos;
 		this->Pos = Pos;
 		this->Time = 0.f;
@@ -60,57 +58,55 @@ private:
 	EffectControl& operator=(EffectControl&&) = delete;
 private:
 private:
-	GraphHandle m_Screen;
-	GraphHandle m_Screen2;
-	std::vector<std::unique_ptr<EffectBase>> m_Position;
+	std::vector<GraphHandle> m_EffectGraph;
+	std::vector<std::unique_ptr<EffectBase>> m_Pool;
 public:
 	void SetEffect(int Type, const Mathf::Vector3& Pos, const Mathf::Vector3& PrevPos);
 public:
 	void Init() {
 		//Sonic
 		//Death
-		m_Screen.Create(640, 640, true);
-		SetDrawScreen(m_Screen.GetHandle());
-		ClearDrawScreen();
-		{
-			DrawCircle(640 / 2, 640 / 2, 640 / 2, ColorPalette::White, FALSE, 15);
+		int Handles[5]{};
+		LoadDivGraph("data/Effect.png", 5, 5, 1, 128, 128, Handles);
+		m_EffectGraph.resize(5);
+		for (int i = 0, max = m_EffectGraph.size(); i < max; ++i) {
+			m_EffectGraph.at(i).SetHandle(Handles[i]);
 		}
-		//Hit
-		m_Screen2.Create(640, 640, true);
-		SetDrawScreen(m_Screen2.GetHandle());
-		ClearDrawScreen();
-		{
-			DrawCircleAA(640.f / 2, 640.f / 2, 640.f / 2, 5, ColorPalette::White, FALSE, 50);
-		}
+
+		m_Pool.reserve(128);
 	}
 	void Update() {
-		for (int loop = 0, max = static_cast<int>(m_Position.size()); loop < max; ++loop) {
-			auto& s = m_Position.at(loop);
+		for (int loop = 0, max = static_cast<int>(m_Pool.size()); loop < max; ++loop) {
+			auto& s = m_Pool.at(loop);
 			s->Update();
 			if (!s->IsActive()) {
-				std::swap(s, m_Position.back());
-				m_Position.pop_back();
+				std::swap(s, m_Pool.back());
+				m_Pool.pop_back();
 				--loop;
 				--max;
 			}
 		}
 	}
 	void DrawShadow() const {
-		for (auto& s : m_Position) {
+		for (auto& s : m_Pool) {
 			if (!s->IsActive()) { continue; }
 			s->DrawShadow();
 		}
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 	}
 	void Draw() const {
-		for (auto& s : m_Position) {
+		for (auto& s : m_Pool) {
 			if (!s->IsActive()) { continue; }
 			s->Draw();
 		}
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 	}
 	void Dispose() {
-		m_Screen.ReleaseGraph();
-		m_Screen2.ReleaseGraph();
+		m_Pool.clear();
+		m_Pool.shrink_to_fit();
+		for (auto& e : m_EffectGraph) {
+			e.ReleaseGraph();
+		}
+		m_EffectGraph.clear();
 	}
 };

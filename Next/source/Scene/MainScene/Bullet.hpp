@@ -54,35 +54,40 @@ private:
 	BulletControl& operator=(BulletControl&&) = delete;
 private:
 private:
-	std::vector<std::unique_ptr<Bullet>> m_Position;
+	std::vector<std::unique_ptr<Bullet>> m_Pool;
 public:
 	void Set(int ShooterID, const Mathf::Vector3& Pos, const Mathf::Vector3& BaseVec, const Mathf::Vector3& AddVec, float Size, int Damage);
-	std::vector<std::unique_ptr<Bullet>>& SetBulletList() { return m_Position; }
+	std::vector<std::unique_ptr<Bullet>>& SetBulletList() { return m_Pool; }
 public:
-	void Init() {}
+	void Init() {
+		m_Pool.reserve(128);
+	}
 	void Update() {
-		for (int loop = 0, max = static_cast<int>(m_Position.size()); loop < max; ++loop) {
-			auto& s = m_Position.at(loop);
+		for (int loop = 0, max = static_cast<int>(m_Pool.size()); loop < max; ++loop) {
+			auto& s = m_Pool.at(loop);
 			s->Update();
 			if (!s->IsActive()) {
-				std::swap(s, m_Position.back());
-				m_Position.pop_back();
+				std::swap(s, m_Pool.back());
+				m_Pool.pop_back();
 				--loop;
 				--max;
 			}
 		}
 	}
 	void DrawShadow() const {
-		for (auto& s : m_Position) {
+		for (auto& s : m_Pool) {
 			if (!s->IsActive()) { continue; }
 			s->DrawShadow();
 		}
 	}
 	void Draw() const {
-		for (auto& s : m_Position) {
+		for (auto& s : m_Pool) {
 			if (!s->IsActive()) { continue; }
 			s->Draw();
 		}
 	}
-	void Dispose() {}
+	void Dispose() {
+		m_Pool.clear();
+		m_Pool.shrink_to_fit();
+	}
 };

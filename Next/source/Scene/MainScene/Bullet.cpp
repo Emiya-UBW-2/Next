@@ -33,6 +33,6 @@ void Bullet::Draw() const {
 const BulletControl* SingletonBase<BulletControl, "BulletControl">::m_Singleton = nullptr;
 
 void BulletControl::Set(int ShooterID, const Mathf::Vector3& Pos, const Mathf::Vector3& BaseVec, const Mathf::Vector3& AddVec, float Size, int Damage) {
-	m_Position.emplace_back(std::make_unique<Bullet>());
-	m_Position.back()->Init(ShooterID, Pos, BaseVec, AddVec, Size, Damage);
+	m_Pool.emplace_back(std::make_unique<Bullet>());
+	m_Pool.back()->Init(ShooterID, Pos, BaseVec, AddVec, Size, Damage);
 }

@@ -44,7 +44,7 @@ void TitleScene::DrawSub() {
 	DrawGraph(FrameWork::Instance()->GetScreenWidth() / 2 - 768 / 2, 64, m_Title.GetHandle(), TRUE);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 	//Press Space To Start
-	if ((static_cast<int>(m_Timer * 10) % 10 < 5)) {
+	if (!FadeControl::Instance()->IsFading() &&  ((static_cast<int>(m_Timer * 10) % 10 < 5))) {
 		const char* Str = "Press Space To Start";
 		int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle());
 		DrawFormatString2ToHandle(FrameWork::Instance()->GetScreenWidth() / 2 - Width / 2, FrameWork::Instance()->GetScreenHeight() * 3 / 4, ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), Str);

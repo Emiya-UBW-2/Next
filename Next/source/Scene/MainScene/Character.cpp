@@ -5,10 +5,8 @@
 
 bool Character::SetBullet(int ID, const Mathf::Vector3& Pos, const Mathf::Vector3& Vec) {
 	if (ShotInterval.at(ID) == 0.f) {
-		Mathf::Vector3 CaseOffset(static_cast<float>(GetRand(100) - 50) / 100.f * 0.01f, 0.f, 0.f);
-		Mathf::Vector3 CaseSpeed(0.f, 0.f, -10.f);
-		BulletControl::Instance()->Set(GetID(), Pos, m_Vec, Vec, 10.f, (ID == 0) ? 100 : 34);
 		ShotInterval.at(ID) = 0.25f;
+		BulletControl::Instance()->Set(GetID(), Pos, m_Vec, Vec, 10.f, (ID == 0) ? 100 : 34);
 		SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, SoundType::SE, "data/Audio/Shot.wav");
 		return true;
 	}
@@ -140,38 +138,31 @@ void Character::Update() {
 	}
 }
 void Character::DrawShadow() const {
-	if (!IsAlive()) {
-		if (m_Pos.z < 0.f) { return; }
+	if (!IsAlive() && (m_Pos.z < 0.f)) {
+		return;
 	}
-
 	if (!IsAlive()) {
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * 2.f * m_Pos.z / 20.f));
 	}
-
-
-	Mathf::Vector3 P1 = MainCamera::Instance()->GetDisplayPoint(m_Pos.x, m_Pos.y, 0.f);
 	SetDrawBright(0, 0, 0);
+	Mathf::Vector3 P1 = MainCamera::Instance()->GetDisplayPoint(m_Pos.x, m_Pos.y, 0.f);
 	DrawRotaGraph(static_cast<int>(P1.x), static_cast<int>(P1.y), 1.0, static_cast<double>(m_Rad * 1.5f), m_GraphHandle.at(m_GraphAnim).GetHandle(), TRUE);
 	SetDrawBright(255, 255, 255);
-
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 }
 void Character::Draw() const {
+	if (!(CanDamage() || (static_cast<int>(m_DamageTime * 100) % 10 < 5))) {
+		return;
+	}
 	if (!IsAlive()) {
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * 2.f * m_Pos.z / 20.f));
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * 2.f * m_Pos.z / 20.f));
 	}
-
-	if (CanDamage() || (static_cast<int>(m_DamageTime * 100) % 10 < 5)) {
-		SetDrawBright(255, 255 * m_HitPoint / MaxHP, 255 * m_HitPoint / MaxHP);
-
-		Mathf::Vector3 P2 = MainCamera::Instance()->GetDisplayPoint(m_GunPos);
-		DrawRotaGraph(static_cast<int>(P2.x), static_cast<int>(P2.y), 1.0, static_cast<double>(m_GunRad + Mathf::Deg2Rad(-30.f)), m_SubHandle.GetHandle(), TRUE);
-
-		Mathf::Vector3 P1 = MainCamera::Instance()->GetDisplayPoint(m_Pos);
-		DrawRotaGraph(static_cast<int>(P1.x), static_cast<int>(P1.y), 1.0, static_cast<double>(m_Rad * 1.5f), m_GraphHandle.at(m_GraphAnim).GetHandle(), TRUE);
-		SetDrawBright(255, 255, 255);
-	}
-
+	SetDrawBright(255, 255 * m_HitPoint / MaxHP, 255 * m_HitPoint / MaxHP);
+	Mathf::Vector3 P2 = MainCamera::Instance()->GetDisplayPoint(m_GunPos);
+	DrawRotaGraph(static_cast<int>(P2.x), static_cast<int>(P2.y), 1.0, static_cast<double>(m_GunRad + Mathf::Deg2Rad(-30.f)), m_SubHandle.GetHandle(), TRUE);
+	Mathf::Vector3 P1 = MainCamera::Instance()->GetDisplayPoint(m_Pos);
+	DrawRotaGraph(static_cast<int>(P1.x), static_cast<int>(P1.y), 1.0, static_cast<double>(m_Rad * 1.5f), m_GraphHandle.at(m_GraphAnim).GetHandle(), TRUE);
+	SetDrawBright(255, 255, 255);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 }
 void Character::Dispose() {

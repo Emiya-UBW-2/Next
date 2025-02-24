@@ -45,6 +45,8 @@ public:
 
 	const int GetBackScreen() const { return BackScreen; }
 
+	const bool GetIsPauseActive() const { return m_IsPauseActive; }
+
 	//ループ開始からの経過秒数をマイクロ秒で取る
 	const LONGLONG GetNowTimeStart() const { return GetNowHiPerformanceCount() - MicroSecondOnLoopStartFrame; }
 	//デルタタイムを秒で取る
