@@ -5,10 +5,14 @@ const FrameWork* SingletonBase<FrameWork, "FrameWork">::m_Singleton = nullptr;
 void FrameWork::Init()
 {
 	SetOutApplicationLogValidFlag(FALSE);
-	SetMainWindowText("TriMono");
+	SetMainWindowText("Starting Game...");
+	SetChangeScreenModeGraphicsSystemResetFlag(FALSE);
 	ChangeWindowMode(TRUE);
 	SetUseDirect3DVersion(DX_DIRECT3D_11);
 	{
+		//デフォルト解像度
+		m_WindowWidth = 1280;
+		m_WindowHeight = 720;
 		// DPI設定
 		int DPI = 96;
 		GetMonitorDpi(NULL, &DPI);
@@ -17,30 +21,48 @@ void FrameWork::Init()
 		}
 		m_WindowWidth = m_WindowWidth * 96 / DPI;
 		m_WindowHeight = m_WindowHeight * 96 / DPI;
+
+		m_FullScreenModeWidth = m_WindowWidth;
+		m_FullScreenModeHeight = m_WindowHeight;
+		m_WindowModeWidth = m_WindowWidth;
+		m_WindowModeHeight = m_WindowHeight;
 	}
 	SetGraphMode(GetWindowWidth(), GetWindowHeight(), 32);		// 解像度
 	SetUseDirectInputFlag(TRUE);
 	SetDirectInputMouseMode(TRUE);
-	SetWindowSizeChangeEnableFlag(FALSE, FALSE);
-	SetUsePixelLighting(TRUE);
-	SetFullSceneAntiAliasingMode(4, 2);
+	//SetWindowSizeChangeEnableFlag(FALSE, FALSE);
 	DxLib_Init();
 	SetSysCommandOffFlag(TRUE);
-	SetAlwaysRunFlag(FALSE);
+	SetAlwaysRunFlag(TRUE);
 	MicroSecondOnLoopStartFrame = GetNowHiPerformanceCount();
-	//
-	InputControl::Create();
-	FadeControl::Create();
 	//
 	BackScreen = MakeScreen(m_ScreenWidth, m_ScreenHeight, FALSE);
 	//
-	SceneController::Create();
-
 	SetPauseActive(false);
-	m_TimeScale = 1.f;
+	SetWindowSetting(WindowSetting::WindowMode);
+	SetMainWindowText("Game");
+	//
+	InputControl::Create();
+	FadeControl::Create();
+	SceneController::Create();
 }
 bool FrameWork::Update()
 {
+	int Width, Height;
+	GetWindowSize(&Width, &Height);
+	if (Width <= 0 || Height <= 0) {
+		//最小化にあたるのでこれ以降はいったんスキップ
+		if (ProcessMessage() != 0) {
+			return false;
+		}
+		return true;
+	}
+	if (m_WindowSetting == WindowSetting::WindowMode) {
+		m_WindowWidth = Width;
+		m_WindowHeight = Height;
+		m_WindowModeWidth = m_WindowWidth;
+		m_WindowModeHeight = m_WindowHeight;
+	}
 	InputControl::Instance()->Update();
 	if (m_IsPauseEnable) {
 		if (InputControl::Instance()->GetPauseEnter().IsTrigger()) {
@@ -61,20 +83,24 @@ bool FrameWork::Update()
 		FadeControl::Instance()->Draw();
 	}
 	//描画
+	SetDrawMode(DX_DRAWMODE_NEAREST);
 	SetDrawScreen(DX_SCREEN_BACK);
 	ClearDrawScreen();
 	{
 		DrawBox(0, 0, GetWindowWidth(), GetWindowHeight(), ColorPalette::Gray085, TRUE);
 
-		int Width = GetWindowHeight() * m_ScreenWidth / m_ScreenHeight;
-		DrawExtendGraph(GetWindowWidth() / 2 - Width / 2, 0, GetWindowWidth() / 2 + Width / 2, GetWindowHeight(), BackScreen, FALSE);
+		double rate = static_cast<double>(Mathf::Min(
+			static_cast<float>(GetWindowHeight()) / static_cast<float>(m_ScreenHeight),
+			static_cast<float>(GetWindowWidth()) / static_cast<float>(m_ScreenWidth)
+		));
+		DrawRotaGraph(GetWindowWidth() / 2, GetWindowHeight()/2, rate ,0.0, BackScreen, FALSE);
 		//デバッグ表示
 		//clsDx();
 		//printfDx("FPS:%4.1f\n", GetFPS());
 		//printfDx("%d\n", MenuEnter);
 		//printfDx("デルタタイム:%5.2fs\n", GetDeltaTime());
 	}
-
+	SetDrawMode(DX_DRAWMODE_NEAREST);
 	if ((GetWaitVSyncFlag() == TRUE) != isVsync) {
 		SetWaitVSyncFlag(isVsync);
 	}
