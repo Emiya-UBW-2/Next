@@ -37,11 +37,17 @@ void TitleScene::DrawSub() {
 		DrawBox(0, Ypos - static_cast<int>(50.f * per), FrameWork::Instance()->GetScreenWidth(), Ypos, ColorPalette::Red075, TRUE);
 	}
 	DrawBox(0, 0, FrameWork::Instance()->GetScreenWidth(), YposBase, ColorPalette::Gray025, TRUE);
+	
+	double Rate = static_cast<double>(static_cast<float>(FrameWork::Instance()->GetScreenWidth()) / 960.f);
+
 	//飛行機画像描画
-	DrawGraph(0, static_cast<int>(50 + 50.f * std::sin(Mathf::Deg2Rad(m_Timer * 0.3f * 180.f))), m_TitleImage.GetHandle(), TRUE);
+
+	DrawRotaGraph(
+		FrameWork::Instance()->GetScreenWidth()/2, FrameWork::Instance()->GetScreenHeight()/2 + static_cast<int>(50 + 50.f * std::sin(Mathf::Deg2Rad(m_Timer * 0.3f * 180.f))),
+		Rate,0.0,m_TitleImage.GetHandle(), TRUE);
 	//タイトル文字
 	SetDrawBlendMode(DX_BLENDMODE_MUL, 255);
-	DrawGraph(FrameWork::Instance()->GetScreenWidth() / 2 - 768 / 2, 64, m_Title.GetHandle(), TRUE);
+	DrawRotaGraph(FrameWork::Instance()->GetScreenWidth() / 2, (64 + 48) * Rate, Rate, 0.0, m_Title.GetHandle(), TRUE);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 	//Press Space To Start
 	if (!FadeControl::Instance()->IsFading() &&  ((static_cast<int>(m_Timer * 10) % 10 < 5))) {

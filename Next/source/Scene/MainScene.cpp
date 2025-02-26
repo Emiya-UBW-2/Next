@@ -369,10 +369,11 @@ void MainGame::DrawUI() {
 		DrawFormatString2ToHandle(x1, y2, ColorPalette::Red, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 12, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "HP");
 	}
 
-	DrawRotaGraph(960 - 32, 720 - 32, 1.0, 0.0, m_gauge.GetHandle(), TRUE);
-	DrawRotaGraph(960 - 32, 720 - 32, 1.0, static_cast<double>(Mathf::Deg2Rad((m_BoostMeterRand - 1.f) * 90.f)), m_meter.GetHandle(), TRUE);
+	double Rate = static_cast<double>(static_cast<float>(FrameWork::Instance()->GetScreenWidth()) / 960.f);
+	DrawRotaGraph(FrameWork::Instance()->GetScreenWidth() - 32, FrameWork::Instance()->GetScreenHeight() - 32, Rate, 0.0, m_gauge.GetHandle(), TRUE);
+	DrawRotaGraph(FrameWork::Instance()->GetScreenWidth() - 32, FrameWork::Instance()->GetScreenHeight() - 32, Rate, static_cast<double>(Mathf::Deg2Rad((m_BoostMeterRand - 1.f) * 90.f)), m_meter.GetHandle(), TRUE);
 	if (!PlayerChara.m_BoostActive && (static_cast<int>(m_MainTimer * 100) % 10 < 5)) {
-		DrawFormatString2ToHandle(960 - 32 - 128 + 32, 720 - 32 - 128 + 64, ColorPalette::Red, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 12, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "OVER HEAT!");
+		DrawFormatString2ToHandle(FrameWork::Instance()->GetScreenWidth() - 32 - 128 + 32, FrameWork::Instance()->GetScreenHeight() - 32 - 128 + 64, ColorPalette::Red, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 12, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "OVER HEAT!");
 	}
 	DrawFormatString2ToHandle(32, FrameWork::Instance()->GetScreenHeight() - 32, ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 12, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "AD : 旋回　W : ブースト S : 減速 スペース : 前方射撃 左クリック : 旋回機銃射撃");
 }

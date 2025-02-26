@@ -26,9 +26,9 @@ public:
 		Mathf::Vector3 Ret;
 
 		float Xrate = Mathf::Lerp(0.25f, 1.f, X);
-
-		Ret.x = -200.f + std::cos(Rad1) * (1200.f * X) + std::cos(Rad2) * (Y * Xrate * 1000.f);
-		Ret.y = -200.f + std::sin(Rad1) * (1200.f * X) + std::sin(Rad2) * (Y * Xrate * 1000.f) - Z * 10.f;
+		float Rate = static_cast<float>(FrameWork::Instance()->GetScreenWidth()) / 960.f;
+		Ret.x = -200.f * Rate + std::cos(Rad1) * (1200.f * X * Rate) + std::cos(Rad2) * (Y * Xrate * 1000.f * Rate);
+		Ret.y = -200.f * Rate + std::sin(Rad1) * (1200.f * X * Rate) + std::sin(Rad2) * (Y * Xrate * 1000.f * Rate) - Z * 10.f * Rate;
 		Ret.z = 0.f;
 
 		return Ret;

@@ -9,8 +9,8 @@ void InputControl::Update() {
 	//マウス座標を取得しておく
 	GetMousePoint(&m_MouseX, &m_MouseY);
 
-	m_MouseX = m_MouseX * FrameWork::Instance()->GetScreenWidth() / FrameWork::Instance()->GetWindowWidth();
-	m_MouseY = m_MouseY * FrameWork::Instance()->GetScreenHeight() / FrameWork::Instance()->GetWindowHeight();
+	m_MouseX = FrameWork::Instance()->GetScreenWidth() / 2 + ((m_MouseX - FrameWork::Instance()->GetWindowWidth() / 2) * FrameWork::Instance()->GetScreenWidth() / FrameWork::Instance()->GetWindowHeight());
+	m_MouseY = FrameWork::Instance()->GetScreenHeight() / 2 + ((m_MouseY - FrameWork::Instance()->GetWindowHeight() / 2) * FrameWork::Instance()->GetScreenHeight() / FrameWork::Instance()->GetWindowHeight());
 	//
 	m_WKey.Update(CheckHitKey(KEY_INPUT_W));
 	m_AKey.Update(CheckHitKey(KEY_INPUT_A));

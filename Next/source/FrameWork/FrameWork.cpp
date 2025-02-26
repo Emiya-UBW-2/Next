@@ -13,6 +13,9 @@ void FrameWork::Init()
 		//デフォルト解像度
 		m_WindowWidth = 1280;
 		m_WindowHeight = 720;
+		//スクリーン解像度
+		m_ScreenWidth = 960;
+		m_ScreenHeight = 720;
 		// DPI設定
 		int DPI = 96;
 		GetMonitorDpi(NULL, &DPI);
@@ -95,9 +98,8 @@ bool FrameWork::Update()
 		));
 		DrawRotaGraph(GetWindowWidth() / 2, GetWindowHeight()/2, rate ,0.0, BackScreen, FALSE);
 		//デバッグ表示
-		//clsDx();
+		clsDx();
 		//printfDx("FPS:%4.1f\n", GetFPS());
-		//printfDx("%d\n", MenuEnter);
 		//printfDx("デルタタイム:%5.2fs\n", GetDeltaTime());
 	}
 	SetDrawMode(DX_DRAWMODE_NEAREST);

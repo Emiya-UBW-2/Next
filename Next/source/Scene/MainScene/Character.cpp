@@ -146,7 +146,7 @@ void Character::DrawShadow() const {
 	}
 	SetDrawBright(0, 0, 0);
 	Mathf::Vector3 P1 = MainCamera::Instance()->GetDisplayPoint(m_Pos.x, m_Pos.y, 0.f);
-	DrawRotaGraph(static_cast<int>(P1.x), static_cast<int>(P1.y), 1.0, static_cast<double>(m_Rad * 1.5f), m_GraphHandle.at(m_GraphAnim).GetHandle(), TRUE);
+	DrawRotaGraph(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<double>(static_cast<float>(FrameWork::Instance()->GetScreenWidth()) / 960.f), static_cast<double>(m_Rad * 1.5f), m_GraphHandle.at(m_GraphAnim).GetHandle(), TRUE);
 	SetDrawBright(255, 255, 255);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 }
@@ -159,9 +159,9 @@ void Character::Draw() const {
 	}
 	SetDrawBright(255, 255 * m_HitPoint / MaxHP, 255 * m_HitPoint / MaxHP);
 	Mathf::Vector3 P2 = MainCamera::Instance()->GetDisplayPoint(m_GunPos);
-	DrawRotaGraph(static_cast<int>(P2.x), static_cast<int>(P2.y), 1.0, static_cast<double>(m_GunRad + Mathf::Deg2Rad(-30.f)), m_SubHandle.GetHandle(), TRUE);
+	DrawRotaGraph(static_cast<int>(P2.x), static_cast<int>(P2.y), static_cast<double>(static_cast<float>(FrameWork::Instance()->GetScreenWidth()) / 960.f), static_cast<double>(m_GunRad + Mathf::Deg2Rad(-30.f)), m_SubHandle.GetHandle(), TRUE);
 	Mathf::Vector3 P1 = MainCamera::Instance()->GetDisplayPoint(m_Pos);
-	DrawRotaGraph(static_cast<int>(P1.x), static_cast<int>(P1.y), 1.0, static_cast<double>(m_Rad * 1.5f), m_GraphHandle.at(m_GraphAnim).GetHandle(), TRUE);
+	DrawRotaGraph(static_cast<int>(P1.x), static_cast<int>(P1.y), static_cast<double>(static_cast<float>(FrameWork::Instance()->GetScreenWidth()) / 960.f), static_cast<double>(m_Rad * 1.5f), m_GraphHandle.at(m_GraphAnim).GetHandle(), TRUE);
 	SetDrawBright(255, 255, 255);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 }

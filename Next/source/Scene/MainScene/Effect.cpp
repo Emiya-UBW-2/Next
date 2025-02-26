@@ -37,7 +37,9 @@ private:
 	void DrawSub() const override {
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(32.f / this->Time));
 		Mathf::Vector3 P1 = MainCamera::Instance()->GetDisplayPoint(this->Pos);
-		DrawRotaGraph3(static_cast<int>(P1.x), static_cast<int>(P1.y), 128 / 2, 128 / 2, double(this->Time * 640 / 128), double(this->Time / 2 * 640 / 128), double(Mathf::Deg2Rad(30)), m_Screen.GetHandle(), TRUE);
+
+		double Rate = static_cast<double>(static_cast<float>(FrameWork::Instance()->GetScreenWidth()) / 960.f);
+		DrawRotaGraph3(static_cast<int>(P1.x), static_cast<int>(P1.y), 128 / 2, 128 / 2, double(this->Time * 640 / 128) * Rate, double(this->Time / 2 * 640 / 128) * Rate, double(Mathf::Deg2Rad(30)), m_Screen.GetHandle(), TRUE);
 	}
 };
 class EffectDeath : public EffectBase {
@@ -52,7 +54,8 @@ private:
 	void DrawSub() const override {
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(32.f / this->Time));
 		Mathf::Vector3 P1 = MainCamera::Instance()->GetDisplayPoint(this->Pos);
-		DrawRotaGraph3(static_cast<int>(P1.x), static_cast<int>(P1.y), 128 / 2, 128 / 2, double(this->Time * 640 / 128), double(this->Time * 0.8f * 640 / 128), double(Mathf::Deg2Rad(30)), m_Screen.GetHandle(), TRUE);
+		double Rate = static_cast<double>(static_cast<float>(FrameWork::Instance()->GetScreenWidth()) / 960.f);
+		DrawRotaGraph3(static_cast<int>(P1.x), static_cast<int>(P1.y), 128 / 2, 128 / 2, double(this->Time * 640 / 128) * Rate, double(this->Time * 0.8f * 640 / 128) * Rate, double(Mathf::Deg2Rad(30)), m_Screen.GetHandle(), TRUE);
 	}
 };
 class EffectHit : public EffectBase {
@@ -69,8 +72,9 @@ private:
 	}
 	void DrawShadowSub() const override {}
 	void DrawSub() const override {
+		double Rate = static_cast<double>(static_cast<float>(FrameWork::Instance()->GetScreenWidth()) / 960.f);
 		float alpha = std::sin(Mathf::Deg2Rad(this->Time / MaxTime * 180.f));
-		float scale = this->Time / MaxTime * 0.15f * 640 / 128;
+		float scale = this->Time / MaxTime * 0.15f * 640 / 128 * Rate;
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * alpha));
 		Mathf::Vector3 P1 = MainCamera::Instance()->GetDisplayPoint(this->Pos);
 		DrawRotaGraph3(static_cast<int>(P1.x), static_cast<int>(P1.y), 128 / 2, 128 / 2, double(scale), double(scale), double(this->Rad), m_Screen.GetHandle(), TRUE);
