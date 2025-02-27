@@ -381,32 +381,83 @@ void MainGame::DrawPauseUI() {
 	m_PausePer = Mathf::Clamp(m_PausePer + (FrameWork::Instance()->GetIsPauseActive() ? FrameWork::Instance()->GetFixedDeltaTime() : -FrameWork::Instance()->GetFixedDeltaTime())/0.25f, 0.f, 1.f);
 	if (FrameWork::Instance()->GetIsPauseActive()) {
 		m_PauseTimer += FrameWork::Instance()->GetFixedDeltaTime();
-
-		if (InputControl::Instance()->GetSKey().IsTrigger()) {
-			++m_PauseSelect;
-		}
-		if (InputControl::Instance()->GetWKey().IsTrigger()) {
-			--m_PauseSelect;
-		}
-		if (m_PauseSelect > 3 - 1) { m_PauseSelect = 0; }
-		if (m_PauseSelect < 0) { m_PauseSelect = 3 - 1; }
-		if (InputControl::Instance()->GetMenuEnter().IsTrigger()) {
-			switch (m_PauseSelect) {
-			case 0:
-				BaseScene::SetSceneEnd();
-				break;
-			case 1:
-				break;
-			case 2:
-				FrameWork::Instance()->SetPauseActive(false);
-				break;
-			default:
-				break;
+		switch (m_PauseOpen){
+		case 0:
+		{
+			if (InputControl::Instance()->GetSKey().IsTrigger()) {
+				++m_PauseSelect;
 			}
+			if (InputControl::Instance()->GetWKey().IsTrigger()) {
+				--m_PauseSelect;
+			}
+			if (m_PauseSelect > 3 - 1) { m_PauseSelect = 0; }
+			if (m_PauseSelect < 0) { m_PauseSelect = 3 - 1; }
+			if (InputControl::Instance()->GetMenuEnter().IsTrigger()) {
+				switch (m_PauseSelect) {
+				case 0:
+					BaseScene::SetSceneEnd();
+					break;
+				case 1:
+					m_OptionSelect = 0;
+					m_PauseOpen = 1;
+					break;
+				case 2:
+					FrameWork::Instance()->SetPauseActive(false);
+					break;
+				default:
+					break;
+				}
+			}
+		}
+			break;
+		case 1:
+		{
+			if (InputControl::Instance()->GetSKey().IsTrigger()) {
+				++m_OptionSelect;
+			}
+			if (InputControl::Instance()->GetWKey().IsTrigger()) {
+				--m_OptionSelect;
+			}
+			if (m_OptionSelect > 3 - 1) { m_OptionSelect = 0; }
+			if (m_OptionSelect < 0) { m_OptionSelect = 3 - 1; }
+			if (InputControl::Instance()->GetMenuEnter().IsTrigger()) {
+				switch (m_OptionSelect) {
+				case 0:
+				{
+					switch (SaveData::Instance()->GetWindowSetting()) {
+					case WindowSetting::WindowMode:
+						SaveData::Instance()->SetWindowSetting(WindowSetting::BorderLess);
+						break;
+					case WindowSetting::BorderLess:
+						SaveData::Instance()->SetWindowSetting(WindowSetting::FullScreen);
+						break;
+					case WindowSetting::FullScreen:
+						SaveData::Instance()->SetWindowSetting(WindowSetting::WindowMode);
+						break;
+					default:
+						break;
+					}
+					FrameWork::Instance()->UpdateWindowSetting();
+				}
+					break;
+				case 1:
+					break;
+				case 2:
+					m_PauseOpen = 0;
+					break;
+				default:
+					break;
+				}
+			}
+		}
+			break;
+		default:
+			break;
 		}
 	}
 	else {
 		m_PauseSelect = 0;
+		m_PauseOpen = 0;
 	}
 	int Alpha = static_cast<int>(128 * m_PausePer);
 	if (Alpha > 0) {
@@ -416,15 +467,36 @@ void MainGame::DrawPauseUI() {
 		
 	}
 	if (FrameWork::Instance()->GetIsPauseActive()){
-		if ((static_cast<int>(m_PauseTimer * 10) % 10 < 5)) {
-			DrawFormatString2ToHandle(32, 32, ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "Pause");
+		switch (m_PauseOpen) {
+		case 0:
+		{
+			if ((static_cast<int>(m_PauseTimer * 10) % 10 < 5)) {
+				DrawFormatString2ToHandle(32, 32, ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "Pause");
+			}
+
+			DrawFormatString2ToHandle(32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 2, (m_PauseSelect == 0) ? ColorPalette::Red : ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "Return Title");
+			DrawFormatString2ToHandle(32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 1, (m_PauseSelect == 1) ? ColorPalette::Red : ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "Option");
+			DrawFormatString2ToHandle(32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 0, (m_PauseSelect == 2) ? ColorPalette::Red : ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "Return Game");
+
+			DrawFormatString2ToHandle(32, FrameWork::Instance()->GetScreenHeight() - 32, ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 12, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "WS : 選択 スペース : 決定");
 		}
+		break;
+		case 1:
+		{
+			if ((static_cast<int>(m_PauseTimer * 10) % 10 < 5)) {
+				DrawFormatString2ToHandle(32, 32, ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "Option");
+			}
 
-		DrawFormatString2ToHandle(32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 2, (m_PauseSelect == 0) ? ColorPalette::Red : ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "Return Title");
-		DrawFormatString2ToHandle(32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 1, (m_PauseSelect == 1) ? ColorPalette::Red : ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "Option");
-		DrawFormatString2ToHandle(32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 0, (m_PauseSelect == 2) ? ColorPalette::Red : ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "Return Game");
+			DrawFormatString2ToHandle(32 + 32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 2, (m_OptionSelect == 0) ? ColorPalette::Red : ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), ("Window Mode:"+std::string(SaveData::Instance()->GetWindowSettingStr())).c_str());
+			DrawFormatString2ToHandle(32 + 32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 1, (m_OptionSelect == 1) ? ColorPalette::Red : ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "B");
+			DrawFormatString2ToHandle(32 + 32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 0, (m_OptionSelect == 2) ? ColorPalette::Red : ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "Return");
 
-		DrawFormatString2ToHandle(32, FrameWork::Instance()->GetScreenHeight() - 32, ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 12, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "WS : 選択 スペース : 決定");
+			DrawFormatString2ToHandle(32, FrameWork::Instance()->GetScreenHeight() - 32, ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 12, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "WS : 選択 スペース : 決定");
+		}
+		break;
+		default:
+			break;
+		}
 	}
 }
 void MainGame::InitResult()

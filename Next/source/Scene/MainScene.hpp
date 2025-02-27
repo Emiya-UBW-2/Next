@@ -29,6 +29,8 @@ public:
 	float m_PausePer = 0.f;
 	float m_PauseTimer = 0.f;
 	int m_PauseSelect = 0;
+	int m_PauseOpen = 0;
+	int m_OptionSelect = 0;
 protected:
 	void InitSub() override;
 	void UpdateSub() override;

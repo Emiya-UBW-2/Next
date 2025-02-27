@@ -1,17 +1,11 @@
 #pragma once
 
 #include "Define.hpp"
+#include "SaveData.hpp"
 
 #include <optional>
 
 class SceneController;
-
-enum class WindowSetting {
-	Default,
-	WindowMode = Default,
-	BorderLess,
-	FullScreen,
-};
 
 class FrameWork : public SingletonBase<FrameWork, "FrameWork"> {
 private:
@@ -31,7 +25,6 @@ private:
 private:
 	int BackScreen = 0;
 
-	WindowSetting m_WindowSetting = WindowSetting::Default;
 	int m_WindowWidth = 1280;			//ウィンドウサイズX
 	int m_WindowHeight = 720;			//ウィンドウサイズY
 
@@ -92,54 +85,7 @@ public:
 		}
 		m_TimeScale = value;
 	}
-	void SetWindowSetting(WindowSetting value) {
-		m_WindowSetting = value;
-
-		// DPI設定
-		int DPI = 96;
-		GetMonitorDpi(NULL, &DPI);
-		if (DPI == 0) {
-			DPI = 96;
-		}
-		// DPIを反映するデスクトップサイズ
-		int DispXSize = static_cast<int>(GetSystemMetrics(SM_CXSCREEN)) * 96 / DPI;
-		int DispYSize = static_cast<int>(GetSystemMetrics(SM_CYSCREEN)) * 96 / DPI;
-
-		switch (m_WindowSetting) {
-		case WindowSetting::WindowMode:
-			m_WindowWidth = m_WindowModeWidth;
-			m_WindowHeight = m_WindowModeHeight;
-			SetWindowSize(m_WindowWidth, m_WindowHeight);
-			SetWindowStyleMode(0);
-			SetWindowPosition((DispXSize - m_WindowWidth) / 2, (DispYSize - m_WindowHeight) / 2);
-			SetWindowSizeExtendRate(1.0, 1.0);
-			ChangeWindowMode(TRUE);
-			break;
-		case WindowSetting::BorderLess:
-			m_WindowWidth = m_FullScreenModeWidth;
-			m_WindowHeight = m_FullScreenModeHeight;
-			SetWindowStyleMode(2);
-			SetWindowPosition(0, 0);
-			SetWindowSizeExtendRate(
-				static_cast<double>(DispXSize) / static_cast<double>(m_WindowWidth),
-				static_cast<double>(DispYSize) / static_cast<double>(m_WindowHeight)
-			);
-			ChangeWindowMode(TRUE);
-			break;
-		case WindowSetting::FullScreen:
-			m_WindowWidth = m_FullScreenModeWidth;
-			m_WindowHeight = m_FullScreenModeHeight;
-			SetWindowStyleMode(2);
-			SetWindowPosition(0, 0);
-			SetWindowSizeExtendRate(1.0, 1.0);
-			SetFullScreenResolutionMode(DX_FSRESOLUTIONMODE_NATIVE);
-			SetFullScreenScalingMode(DX_FSSCALINGMODE_NEAREST);
-			ChangeWindowMode(FALSE);
-			break;
-		default:
-			break;
-		}
-	}
+	void UpdateWindowSetting();
 public:
 	void Init();
 	bool Update();

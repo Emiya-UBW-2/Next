@@ -69,6 +69,9 @@
     <ClCompile Include="source\FrameWork\Singleton.cpp">
       <Filter>source\FrameWork</Filter>
     </ClCompile>
+    <ClCompile Include="source\FrameWork\SaveData.cpp">
+      <Filter>source\FrameWork</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Scene\TitleScene.hpp">
@@ -123,6 +126,9 @@
       <Filter>source\FrameWork</Filter>
     </ClInclude>
     <ClInclude Include="source\FrameWork\Singleton.hpp">
+      <Filter>source\FrameWork</Filter>
+    </ClInclude>
+    <ClInclude Include="source\FrameWork\SaveData.hpp">
       <Filter>source\FrameWork</Filter>
     </ClInclude>
   </ItemGroup>

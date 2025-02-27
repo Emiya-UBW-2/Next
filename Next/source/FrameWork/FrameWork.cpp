@@ -2,8 +2,65 @@
 
 const FrameWork* SingletonBase<FrameWork, "FrameWork">::m_Singleton = nullptr;
 
+void FrameWork::UpdateWindowSetting() {
+	switch (SaveData::Instance()->GetWindowSetting()) {
+	case WindowSetting::WindowMode:
+		m_WindowWidth = m_WindowModeWidth;
+		m_WindowHeight = m_WindowModeHeight;
+		ChangeWindowMode(TRUE);
+		SetWindowSize(m_WindowWidth, m_WindowHeight);
+		SetWindowStyleMode(0);
+		{
+			// DPI設定
+			int DPI = 96;
+			GetMonitorDpi(NULL, &DPI);
+			if (DPI == 0) {
+				DPI = 96;
+			}
+			// DPIを反映するデスクトップサイズ
+			int DispXSize = static_cast<int>(GetSystemMetrics(SM_CXSCREEN)) * 96 / DPI;
+			int DispYSize = static_cast<int>(GetSystemMetrics(SM_CYSCREEN)) * 96 / DPI;
+			SetWindowPosition((DispXSize - m_WindowWidth) / 2, (DispYSize - m_WindowHeight) / 2);
+		}
+		SetWindowSizeExtendRate(1.0, 1.0);
+		break;
+	case WindowSetting::BorderLess:
+		m_WindowWidth = m_FullScreenModeWidth;
+		m_WindowHeight = m_FullScreenModeHeight;
+		ChangeWindowMode(TRUE);
+		SetWindowStyleMode(2);
+		SetWindowPosition(0, 0);
+		{
+			// DPI設定
+			int DPI = 96;
+			GetMonitorDpi(NULL, &DPI);
+			if (DPI == 0) {
+				DPI = 96;
+			}
+			// DPIを反映するデスクトップサイズ
+			int DispXSize = static_cast<int>(GetSystemMetrics(SM_CXSCREEN)) * 96 / DPI;
+			int DispYSize = static_cast<int>(GetSystemMetrics(SM_CYSCREEN)) * 96 / DPI;
+			SetWindowSizeExtendRate(static_cast<double>(DispXSize) / static_cast<double>(m_WindowWidth), static_cast<double>(DispYSize) / static_cast<double>(m_WindowHeight));
+		}
+		break;
+	case WindowSetting::FullScreen:
+		m_WindowWidth = m_FullScreenModeWidth;
+		m_WindowHeight = m_FullScreenModeHeight;
+		SetFullScreenResolutionMode(DX_FSRESOLUTIONMODE_NATIVE);
+		SetFullScreenScalingMode(DX_FSSCALINGMODE_NEAREST);
+		ChangeWindowMode(FALSE);
+		SetWindowStyleMode(2);
+		SetWindowPosition(0, 0);
+		SetWindowSizeExtendRate(1.0, 1.0);
+		break;
+	default:
+		break;
+	}
+}
+
 void FrameWork::Init()
 {
+	SaveData::Create();
 	SetOutApplicationLogValidFlag(FALSE);
 	SetMainWindowText("Starting Game...");
 	SetChangeScreenModeGraphicsSystemResetFlag(FALSE);
@@ -42,7 +99,7 @@ void FrameWork::Init()
 	BackScreen = MakeScreen(m_ScreenWidth, m_ScreenHeight, FALSE);
 	//
 	SetPauseActive(false);
-	SetWindowSetting(WindowSetting::WindowMode);
+	UpdateWindowSetting();
 	SetMainWindowText("Game");
 	//
 	InputControl::Create();
@@ -60,7 +117,7 @@ bool FrameWork::Update()
 		}
 		return true;
 	}
-	if (m_WindowSetting == WindowSetting::WindowMode) {
+	if (SaveData::Instance()->GetWindowSetting() == WindowSetting::WindowMode) {
 		m_WindowWidth = Width;
 		m_WindowHeight = Height;
 		m_WindowModeWidth = m_WindowWidth;
@@ -126,5 +183,6 @@ void FrameWork::Dispose()
 	SceneController::Release();
 	InputControl::Release();
 	FadeControl::Release();
+	SaveData::Release();
 	DxLib_End();
 }

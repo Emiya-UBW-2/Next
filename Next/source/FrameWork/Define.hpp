@@ -16,6 +16,8 @@
 
 #include "Scene/SceneController.hpp"
 
+#include "SaveData.hpp"
+
 namespace ColorPalette {
 	inline unsigned int Black = GetColor(0, 0, 0);
 	inline unsigned int Gray085 = GetColor(32, 32, 32);

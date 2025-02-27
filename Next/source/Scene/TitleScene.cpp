@@ -47,7 +47,7 @@ void TitleScene::DrawSub() {
 		Rate,0.0,m_TitleImage.GetHandle(), TRUE);
 	//ƒ^ƒCƒgƒ‹•¶Žš
 	SetDrawBlendMode(DX_BLENDMODE_MUL, 255);
-	DrawRotaGraph(FrameWork::Instance()->GetScreenWidth() / 2, (64 + 48) * Rate, Rate, 0.0, m_Title.GetHandle(), TRUE);
+	DrawRotaGraph(FrameWork::Instance()->GetScreenWidth() / 2, static_cast<int>((64 + 48) * Rate), Rate, 0.0, m_Title.GetHandle(), TRUE);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 	//Press Space To Start
 	if (!FadeControl::Instance()->IsFading() &&  ((static_cast<int>(m_Timer * 10) % 10 < 5))) {

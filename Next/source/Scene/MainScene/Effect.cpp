@@ -72,7 +72,7 @@ private:
 	}
 	void DrawShadowSub() const override {}
 	void DrawSub() const override {
-		double Rate = static_cast<double>(static_cast<float>(FrameWork::Instance()->GetScreenWidth()) / 960.f);
+		float Rate = static_cast<float>(FrameWork::Instance()->GetScreenWidth()) / 960.f;
 		float alpha = std::sin(Mathf::Deg2Rad(this->Time / MaxTime * 180.f));
 		float scale = this->Time / MaxTime * 0.15f * 640 / 128 * Rate;
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255.f * alpha));
