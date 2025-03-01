@@ -16,6 +16,7 @@
 
 #include "Scene/SceneController.hpp"
 
+#include "ProjectData.hpp"
 #include "SaveData.hpp"
 
 namespace ColorPalette {

@@ -438,6 +438,7 @@ void MainGame::DrawPauseUI() {
 						break;
 					}
 					FrameWork::Instance()->UpdateWindowSetting();
+					SaveData::Instance()->Save();
 				}
 					break;
 				case 1:

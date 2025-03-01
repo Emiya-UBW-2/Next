@@ -1,6 +1,9 @@
 #pragma once
 
 #include "Define.hpp"
+static const char* ConfigStr[] = {
+	"WindowSetting",
+};
 
 enum class WindowSetting {
 	Default,
@@ -20,6 +23,7 @@ private:
 	friend class SingletonBase<SaveData, "SaveData">;
 private:
 	SaveData() {
+		SetPath();
 		Load();
 	}
 	virtual ~SaveData() {
@@ -32,6 +36,7 @@ private:
 	SaveData& operator=(SaveData&&) = delete;
 private:
 	WindowSetting m_WindowSetting = WindowSetting::Default;
+	char m_SavePath[260] = {};
 public:
 	WindowSetting GetWindowSetting() const { return m_WindowSetting; }
 	const char* GetWindowSettingStr() const { return WindowSettingStr[(int)m_WindowSetting]; }
@@ -41,6 +46,7 @@ public:
 		m_WindowSetting = value;
 	}
 public:
+	void SetPath();
 	void Load();
 	void Save();
 };

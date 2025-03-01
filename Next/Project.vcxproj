@@ -161,6 +161,7 @@
     <ClCompile Include="source\FrameWork\FrameWork.cpp" />
     <ClCompile Include="source\FrameWork\GraphControl.cpp" />
     <ClCompile Include="source\FrameWork\InputControl.cpp" />
+    <ClCompile Include="source\FrameWork\ProjectData.cpp" />
     <ClCompile Include="source\FrameWork\ResourceHandle.cpp" />
     <ClCompile Include="source\FrameWork\SaveData.cpp" />
     <ClCompile Include="source\FrameWork\Scene\SceneController.cpp" />
@@ -183,6 +184,7 @@
     <ClInclude Include="source\FrameWork\GraphControl.hpp" />
     <ClInclude Include="source\FrameWork\InputControl.hpp" />
     <ClInclude Include="source\FrameWork\json.hpp" />
+    <ClInclude Include="source\FrameWork\ProjectData.hpp" />
     <ClInclude Include="source\FrameWork\ResourceHandle.hpp" />
     <ClInclude Include="source\FrameWork\SaveData.hpp" />
     <ClInclude Include="source\FrameWork\Scene\SceneController.hpp" />

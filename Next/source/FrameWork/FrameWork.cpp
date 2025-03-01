@@ -60,6 +60,7 @@ void FrameWork::UpdateWindowSetting() {
 
 void FrameWork::Init()
 {
+	ProjectData::Create();
 	SaveData::Create();
 	SetOutApplicationLogValidFlag(FALSE);
 	SetMainWindowText("Starting Game...");
@@ -100,7 +101,7 @@ void FrameWork::Init()
 	//
 	SetPauseActive(false);
 	UpdateWindowSetting();
-	SetMainWindowText("Game");
+	SetMainWindowText(ProjectData::Instance()->GetGameName());
 	//
 	InputControl::Create();
 	FadeControl::Create();
@@ -184,5 +185,6 @@ void FrameWork::Dispose()
 	InputControl::Release();
 	FadeControl::Release();
 	SaveData::Release();
+	ProjectData::Release();
 	DxLib_End();
 }
