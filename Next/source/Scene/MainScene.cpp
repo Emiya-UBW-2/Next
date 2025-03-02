@@ -359,6 +359,11 @@ void MainGame::DrawUI() const {
 	if (IsMainGame()) {
 		DrawFormatString2ToHandle(32, 32, ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "%d:%02d.%02d", static_cast<int>(m_MainTimer / 60.f), static_cast<int>(m_MainTimer) % 60, static_cast<int>(m_MainTimer * 100) % 60);
 	}
+	else if (IsInGame()) {
+		//開始前カウントダウン
+		int Width = GetDrawFormatStringWidthToHandle(FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "%05.2f", m_MainTimer - m_TotalTimer);
+		DrawFormatString2ToHandle(FrameWork::Instance()->GetScreenWidth() / 2 - Width / 2, FrameWork::Instance()->GetScreenHeight() / 3 - 24 / 2, ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "%05.2f", m_MainTimer - m_TotalTimer);
+	}
 
 	if (!PlayerChara.IsAlive()) { return; }
 
@@ -395,41 +400,53 @@ void MainGame::UpdatePauseUI(){
 		{
 			int Now = 0;
 			{
+				bool prev = OnMousePause[m_PauseOpen][Now];
 				const char* Str = "Return Title";
 				int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle());
 				OnMousePause[m_PauseOpen][Now] = IntoMouse(32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (2 - Now),
 					32 + Width, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (2 - Now) + 24);
 				if (OnMousePause[m_PauseOpen][Now]) {
 					m_PauseSelect = Now;
-				}
-				if (OnMousePause[m_PauseOpen][Now] && InputControl::Instance()->GetLMEnter().IsTrigger()) {
-					OnMouse = true;
+					if (prev != OnMousePause[m_PauseOpen][Now]) {
+						SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, SoundType::SE, "data/Audio/sel.wav");
+					}
+					if (InputControl::Instance()->GetLMEnter().IsTrigger()) {
+						OnMouse = true;
+					}
 				}
 			}
 			Now++;
 			{
+				bool prev = OnMousePause[m_PauseOpen][Now];
 				const char* Str = "Option";
 				int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle());
 				OnMousePause[m_PauseOpen][Now] = IntoMouse(32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (2 - Now),
 					32 + Width, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (2 - Now) + 24);
 				if (OnMousePause[m_PauseOpen][Now]) {
 					m_PauseSelect = Now;
-				}
-				if (OnMousePause[m_PauseOpen][Now] && InputControl::Instance()->GetLMEnter().IsTrigger()) {
-					OnMouse = true;
+					if (prev != OnMousePause[m_PauseOpen][Now]) {
+						SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, SoundType::SE, "data/Audio/sel.wav");
+					}
+					if (InputControl::Instance()->GetLMEnter().IsTrigger()) {
+						OnMouse = true;
+					}
 				}
 			}
 			Now++;
 			{
+				bool prev = OnMousePause[m_PauseOpen][Now];
 				const char* Str = "Return Game";
 				int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle());
 				OnMousePause[m_PauseOpen][Now] = IntoMouse(32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (2 - Now),
 					32 + Width, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (2 - Now) + 24);
 				if (OnMousePause[m_PauseOpen][Now]) {
 					m_PauseSelect = Now;
-				}
-				if (OnMousePause[m_PauseOpen][Now] && InputControl::Instance()->GetLMEnter().IsTrigger()) {
-					OnMouse = true;
+					if (prev != OnMousePause[m_PauseOpen][Now]) {
+						SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, SoundType::SE, "data/Audio/sel.wav");
+					}
+					if (InputControl::Instance()->GetLMEnter().IsTrigger()) {
+						OnMouse = true;
+					}
 				}
 			}
 			Now++;
@@ -439,54 +456,70 @@ void MainGame::UpdatePauseUI(){
 		{
 			int Now = 0;
 			{
+				bool prev = OnMousePause[m_PauseOpen][Now];
 				const char* Str = "Window Mode:";
 				int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle());
 				OnMousePause[m_PauseOpen][Now] = IntoMouse(32 + 32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (3 - Now),
 					32 + 32 + Width, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (3 - Now) + 24);
 				if (OnMousePause[m_PauseOpen][Now]) {
 					m_OptionSelect = Now;
-				}
-				if (OnMousePause[m_PauseOpen][Now] && InputControl::Instance()->GetLMEnter().IsTrigger()) {
-					OnMouse = true;
+					if (prev != OnMousePause[m_PauseOpen][Now]) {
+						SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, SoundType::SE, "data/Audio/sel.wav");
+					}
+					if (InputControl::Instance()->GetLMEnter().IsTrigger()) {
+						OnMouse = true;
+					}
 				}
 			}
 			Now++;
 			{
+				bool prev = OnMousePause[m_PauseOpen][Now];
 				const char* Str = "BGM:";
 				int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle());
 				OnMousePause[m_PauseOpen][Now] = IntoMouse(32 + 32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (3 - Now),
 					32 + 32 + Width, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (3 - Now) + 24);
 				if (OnMousePause[m_PauseOpen][Now]) {
 					m_OptionSelect = Now;
-				}
-				if (OnMousePause[m_PauseOpen][Now] && InputControl::Instance()->GetLMEnter().IsTrigger()) {
-					OnMouse = true;
+					if (prev != OnMousePause[m_PauseOpen][Now]) {
+						SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, SoundType::SE, "data/Audio/sel.wav");
+					}
+					if (InputControl::Instance()->GetLMEnter().IsTrigger()) {
+						OnMouse = true;
+					}
 				}
 			}
 			Now++;
 			{
+				bool prev = OnMousePause[m_PauseOpen][Now];
 				const char* Str = "SE:";
 				int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle());
 				OnMousePause[m_PauseOpen][Now] = IntoMouse(32 + 32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (3 - Now),
 					32 + 32 + Width, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (3 - Now) + 24);
 				if (OnMousePause[m_PauseOpen][Now]) {
 					m_OptionSelect = Now;
-				}
-				if (OnMousePause[m_PauseOpen][Now] && InputControl::Instance()->GetLMEnter().IsTrigger()) {
-					OnMouse = true;
+					if (prev != OnMousePause[m_PauseOpen][Now]) {
+						SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, SoundType::SE, "data/Audio/sel.wav");
+					}
+					if (InputControl::Instance()->GetLMEnter().IsTrigger()) {
+						OnMouse = true;
+					}
 				}
 			}
 			Now++;
 			{
+				bool prev = OnMousePause[m_PauseOpen][Now];
 				const char* Str = "Return";
 				int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle());
 				OnMousePause[m_PauseOpen][Now] = IntoMouse(32 + 32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (3 - Now),
 					32 + 32 + Width, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (3 - Now) + 24);
 				if (OnMousePause[m_PauseOpen][Now]) {
 					m_OptionSelect = Now;
-				}
-				if (OnMousePause[m_PauseOpen][Now] && InputControl::Instance()->GetLMEnter().IsTrigger()) {
-					OnMouse = true;
+					if (prev != OnMousePause[m_PauseOpen][Now]) {
+						SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, SoundType::SE, "data/Audio/sel.wav");
+					}
+					if (InputControl::Instance()->GetLMEnter().IsTrigger()) {
+						OnMouse = true;
+					}
 				}
 			}
 			Now++;
@@ -502,13 +535,16 @@ void MainGame::UpdatePauseUI(){
 		{
 			if (InputControl::Instance()->GetSKey().IsTrigger()) {
 				++m_PauseSelect;
+				SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, SoundType::SE, "data/Audio/sel.wav");
 			}
 			if (InputControl::Instance()->GetWKey().IsTrigger()) {
 				--m_PauseSelect;
+				SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, SoundType::SE, "data/Audio/sel.wav");
 			}
 			if (m_PauseSelect > 3 - 1) { m_PauseSelect = 0; }
 			if (m_PauseSelect < 0) { m_PauseSelect = 3 - 1; }
 			if (InputControl::Instance()->GetMenuEnter().IsTrigger() || OnMouse) {
+				SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, SoundType::SE, "data/Audio/decide.wav");
 				switch (m_PauseSelect) {
 				case 0:
 					BaseScene::SetSceneEnd();
@@ -530,13 +566,16 @@ void MainGame::UpdatePauseUI(){
 		{
 			if (InputControl::Instance()->GetSKey().IsTrigger()) {
 				++m_OptionSelect;
+				SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, SoundType::SE, "data/Audio/sel.wav");
 			}
 			if (InputControl::Instance()->GetWKey().IsTrigger()) {
 				--m_OptionSelect;
+				SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, SoundType::SE, "data/Audio/sel.wav");
 			}
-			if (m_OptionSelect > 3 - 1) { m_OptionSelect = 0; }
-			if (m_OptionSelect < 0) { m_OptionSelect = 3 - 1; }
+			if (m_OptionSelect > 4 - 1) { m_OptionSelect = 0; }
+			if (m_OptionSelect < 0) { m_OptionSelect = 4 - 1; }
 			if (InputControl::Instance()->GetMenuEnter().IsTrigger() || OnMouse) {
+				SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, SoundType::SE, "data/Audio/decide.wav");
 				switch (m_OptionSelect) {
 				case 0:
 				{
@@ -566,6 +605,7 @@ void MainGame::UpdatePauseUI(){
 					break;
 				case 3:
 					m_PauseOpen = 0;
+					SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, SoundType::SE, "data/Audio/decide.wav");
 					break;
 				default:
 					break;
@@ -574,6 +614,7 @@ void MainGame::UpdatePauseUI(){
 			}
 
 			if (InputControl::Instance()->GetDKey().IsTrigger()) {
+				SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, SoundType::SE, "data/Audio/sel.wav");
 				switch (m_OptionSelect) {
 				case 0:
 				{
@@ -612,6 +653,7 @@ void MainGame::UpdatePauseUI(){
 				SaveData::Instance()->Save();
 			}
 			if (InputControl::Instance()->GetAKey().IsTrigger()) {
+				SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, SoundType::SE, "data/Audio/sel.wav");
 				switch (m_OptionSelect) {
 				case 0:
 				{

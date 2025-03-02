@@ -159,7 +159,7 @@ bool FrameWork::Update()
 		clsDx();
 		//printfDx("FPS:%4.1f\n", GetFPS());
 		//printfDx("デルタタイム:%5.2fs\n", GetDeltaTime());
-		printfDx("[%d,%d,]\n", InputControl::Instance()->GetMouseX(), InputControl::Instance()->GetMouseY());
+		//printfDx("[%d,%d,]\n", InputControl::Instance()->GetMouseX(), InputControl::Instance()->GetMouseY());
 	}
 	SetDrawMode(DX_DRAWMODE_NEAREST);
 	if ((GetWaitVSyncFlag() == TRUE) != isVsync) {

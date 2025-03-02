@@ -2,25 +2,33 @@
 #include "MainScene.hpp"
 
 void TitleScene::InitSub() {
+	SoundPool::Instance()->Add(1, SoundType::SE, "data/Audio/sel.wav");
+	SoundPool::Instance()->Add(1, SoundType::SE, "data/Audio/decide.wav");
+
 	m_Title.LoadGraph("data/UI/Title.png");
 	m_TitleImage.LoadGraph("data/UI/titleImage.bmp");
 
 	FadeControl::Instance()->SetFadeOut(ColorPalette::Black, 1.f);
 	IsGoingNextScene = false;
+	OnMouse = false;
 }
 
 void TitleScene::UpdateSub() {
 	const char* Str = "Press Space To Start";
 	int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle());
 
+	bool prev = OnMouse;
 	OnMouse = IntoMouse(FrameWork::Instance()->GetScreenWidth() / 2 - Width / 2, FrameWork::Instance()->GetScreenHeight() * 3 / 4,
 		FrameWork::Instance()->GetScreenWidth() / 2 + Width / 2, FrameWork::Instance()->GetScreenHeight() * 3 / 4 + 24);
-
+	if (OnMouse && prev != OnMouse) {
+		SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, SoundType::SE, "data/Audio/sel.wav");
+	}
 	FrameWork::Instance()->SetPauseEnable(false);
 	m_Timer += FrameWork::Instance()->GetDeltaTime();
 	if (!IsGoingNextScene) {
 		if (!FadeControl::Instance()->IsFading()) {
 			if (InputControl::Instance()->GetMenuEnter().IsTrigger() || (OnMouse && InputControl::Instance()->GetLMEnter().IsTrigger())) {
+				SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, TRUE, SoundType::SE, "data/Audio/decide.wav");
 				FadeControl::Instance()->SetFadeIn(ColorPalette::Black, 1.f);
 				IsGoingNextScene = true;
 			}
