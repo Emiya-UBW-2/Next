@@ -9,6 +9,7 @@ TaskTab::TaskTab(const char* TabName) {
 	OnMouse = false;
 	IsActiveTab = false;
 	m_TabName = TabName;
+	m_Column = 0;
 }
 
 void TaskTab::Update(int xofs, int yofs) {
@@ -17,20 +18,30 @@ void TaskTab::Update(int xofs, int yofs) {
 		IsActiveTab ^= 1;
 	}
 	if (IsActiveTab) {
-		hAdd = 32*5;
+		m_Column = 24*5;
+		hAdd = m_Column+2;
 	}
 	else {
 		hAdd = 0;
 	}
 }
 void TaskTab::Draw() const {
+	const auto& Font = FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle();
 	DrawBox(x, y, x + w, y + h + hAdd, ColorPalette::Black, TRUE);
 	if (hAdd > 0) {
 		DrawBox(x + 1, y + h, x + w - 1, y + h + hAdd - 1, ColorPalette::Gray010, TRUE);
 	}
 	DrawBox(x + 1, y + 1, x + w - 1, y + h - 1, OnMouse ? ColorPalette::Gray050 : ColorPalette::White, TRUE);
-	int Width = GetDrawStringWidthToHandle(m_TabName.c_str(), static_cast<int>(m_TabName.length()), FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle());
-	DrawFormatString2ToHandle(x + w / 2 - Width / 2, y + h / 2 - 24 / 2, ColorPalette::White, ColorPalette::Gray085, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), m_TabName.c_str());
+	int Width = GetDrawStringWidthToHandle(m_TabName.c_str(), static_cast<int>(m_TabName.length()), Font);
+	DrawFormatString2ToHandle(x + w / 2 - Width / 2, y + h / 2 - 24 / 2, ColorPalette::White, ColorPalette::Gray085, Font, m_TabName.c_str());
+	if (IsActiveTab) {
+		int column = 0;
+		DrawFormatString2ToHandle(x + 16, y + h + column, ColorPalette::White, ColorPalette::Gray085, Font, m_TabName.c_str()); column += 24;
+		DrawFormatString2ToHandle(x + 16, y + h + column, ColorPalette::White, ColorPalette::Gray085, Font, m_TabName.c_str()); column += 24;
+		DrawFormatString2ToHandle(x + 16, y + h + column, ColorPalette::White, ColorPalette::Gray085, Font, m_TabName.c_str()); column += 24;
+		DrawFormatString2ToHandle(x + 16, y + h + column, ColorPalette::White, ColorPalette::Gray085, Font, m_TabName.c_str()); column += 24;
+		DrawFormatString2ToHandle(x + 16, y + h + column, ColorPalette::White, ColorPalette::Gray085, Font, m_TabName.c_str()); column += 24;
+	}
 }
 
 

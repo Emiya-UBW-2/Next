@@ -7,6 +7,7 @@ class TaskTab {
 	bool OnMouse = false;
 	bool IsActiveTab = false;
 	std::string m_TabName;
+	int m_Column = 0;
 public:
 	void SetPos(int XP, int YP) {
 		x = 16 + XP;

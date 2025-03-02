@@ -4459,7 +4459,7 @@ class parse_error : public exception
     static std::string position_string(const position_t& pos)
     {
         return concat(" at line ", std::to_string(pos.lines_read + 1),
-                      ", column ", std::to_string(pos.chars_read_current_line));
+                      ", m_Column ", std::to_string(pos.chars_read_current_line));
     }
 };
 
