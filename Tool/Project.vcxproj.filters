@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="source">
+      <UniqueIdentifier>{6375a775-fbd8-48f6-86e5-5bf7f79006ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\Sceme">
+      <UniqueIdentifier>{199d9a2f-de85-45fb-aaa6-a30610bab77a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\FrameWork">
+      <UniqueIdentifier>{28e7ef27-4e1e-415c-825d-5f38bc76989a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\FrameWork\Scene">
+      <UniqueIdentifier>{ca49b26e-eed3-49a9-80e2-d55f5093d12a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\main.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Scene\TitleScene.cpp">
+      <Filter>source\Sceme</Filter>
+    </ClCompile>
+    <ClCompile Include="source\FrameWork\FrameWork.cpp">
+      <Filter>source\FrameWork</Filter>
+    </ClCompile>
+    <ClCompile Include="source\FrameWork\Algorithm.cpp">
+      <Filter>source\FrameWork</Filter>
+    </ClCompile>
+    <ClCompile Include="source\FrameWork\InputControl.cpp">
+      <Filter>source\FrameWork</Filter>
+    </ClCompile>
+    <ClCompile Include="source\FrameWork\Scene\SceneController.cpp">
+      <Filter>source\FrameWork\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="source\FrameWork\GraphControl.cpp">
+      <Filter>source\FrameWork</Filter>
+    </ClCompile>
+    <ClCompile Include="source\FrameWork\ResourceHandle.cpp">
+      <Filter>source\FrameWork</Filter>
+    </ClCompile>
+    <ClCompile Include="source\FrameWork\FontControl.cpp">
+      <Filter>source\FrameWork</Filter>
+    </ClCompile>
+    <ClCompile Include="source\FrameWork\FadeControl.cpp">
+      <Filter>source\FrameWork</Filter>
+    </ClCompile>
+    <ClCompile Include="source\FrameWork\Singleton.cpp">
+      <Filter>source\FrameWork</Filter>
+    </ClCompile>
+    <ClCompile Include="source\FrameWork\SaveData.cpp">
+      <Filter>source\FrameWork</Filter>
+    </ClCompile>
+    <ClCompile Include="source\FrameWork\ProjectData.cpp">
+      <Filter>source\FrameWork</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="source\Scene\TitleScene.hpp">
+      <Filter>source\Sceme</Filter>
+    </ClInclude>
+    <ClInclude Include="source\FrameWork\Algorithm.hpp">
+      <Filter>source\FrameWork</Filter>
+    </ClInclude>
+    <ClInclude Include="source\FrameWork\Define.hpp">
+      <Filter>source\FrameWork</Filter>
+    </ClInclude>
+    <ClInclude Include="source\FrameWork\FrameWork.hpp">
+      <Filter>source\FrameWork</Filter>
+    </ClInclude>
+    <ClInclude Include="source\FrameWork\json.hpp">
+      <Filter>source\FrameWork</Filter>
+    </ClInclude>
+    <ClInclude Include="source\FrameWork\InputControl.hpp">
+      <Filter>source\FrameWork</Filter>
+    </ClInclude>
+    <ClInclude Include="source\FrameWork\Scene\SceneController.hpp">
+      <Filter>source\FrameWork\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="source\FrameWork\GraphControl.hpp">
+      <Filter>source\FrameWork</Filter>
+    </ClInclude>
+    <ClInclude Include="source\FrameWork\ResourceHandle.hpp">
+      <Filter>source\FrameWork</Filter>
+    </ClInclude>
+    <ClInclude Include="source\FrameWork\FontControl.hpp">
+      <Filter>source\FrameWork</Filter>
+    </ClInclude>
+    <ClInclude Include="source\FrameWork\FadeControl.hpp">
+      <Filter>source\FrameWork</Filter>
+    </ClInclude>
+    <ClInclude Include="source\FrameWork\Singleton.hpp">
+      <Filter>source\FrameWork</Filter>
+    </ClInclude>
+    <ClInclude Include="source\FrameWork\SaveData.hpp">
+      <Filter>source\FrameWork</Filter>
+    </ClInclude>
+    <ClInclude Include="source\FrameWork\ProjectData.hpp">
+      <Filter>source\FrameWork</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
