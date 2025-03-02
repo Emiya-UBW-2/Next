@@ -3,8 +3,7 @@
 
 const ProjectData* SingletonBase<ProjectData, "ProjectData">::m_Singleton = nullptr;
 
-void ProjectData::Load()
-{
+void ProjectData::Load() {
 	std::ifstream SettingIni{};
 	SettingIni.open("data/ProjectSetting.ini");
 	if (!SettingIni.is_open()) {

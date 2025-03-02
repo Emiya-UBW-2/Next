@@ -13,7 +13,7 @@ private:
 protected:
 	void InitSub() override;
 	void UpdateSub() override;
-	void DrawSub() override;
+	void DrawSub() const override;
 	void DisposeSub() override;
 
 	std::unique_ptr<BaseScene> MakeNextScene() override;

@@ -13,7 +13,7 @@ public:
 protected:
 	virtual void InitSub() = 0;
 	virtual void UpdateSub() = 0;
-	virtual void DrawSub() = 0;
+	virtual void DrawSub() const = 0;
 	virtual void DisposeSub() = 0;
 protected:
 	void SetSceneEnd() { m_IsEnd = true; }
@@ -25,7 +25,7 @@ public:
 	void Update() {
 		UpdateSub();
 	}
-	void Draw() {
+	void Draw() const {
 		DrawSub();
 	}
 	void Dispose() {

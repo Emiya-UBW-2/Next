@@ -37,12 +37,12 @@ void MainGame::InitSub() {
 	m_meter.LoadGraph("data/UI/boostmeter.bmp", true);
 	m_FinImage.LoadGraph("data/UI/Fin.png", true);
 	//
-	SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, FALSE, SoundType::BGM, "data/Audio/BGM.wav");
-	m_MainTimer = m_TotalTimer + 2.f;
 	InitResult();
-
+	InitPauseUI();
+	//
+	SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, FALSE, SoundType::BGM, "data/Audio/BGM.wav", DX_SOUNDDATATYPE_FILE);
+	m_MainTimer = m_TotalTimer + 2.f;
 	FadeControl::Instance()->SetFadeOut(ColorPalette::Black, 1.f);
-	IsGoingNextScene = false;
 }
 void MainGame::UpdateSub() {
 	FrameWork::Instance()->SetPauseEnable(IsMainGame());
@@ -50,6 +50,12 @@ void MainGame::UpdateSub() {
 		UpdateResult();
 		return;
 	}
+	UpdatePauseUI();
+	if (FrameWork::Instance()->GetIsPauseActive()) {
+		SoundPool::Instance()->StopAll(SoundType::BGM, "data/Audio/BGM.wav", DX_SOUNDDATATYPE_FILE);
+		return;
+	}
+	SoundPool::Instance()->Play(DX_PLAYTYPE_BACK, FALSE, SoundType::BGM, "data/Audio/BGM.wav", DX_SOUNDDATATYPE_FILE);
 	auto& PlayerChara = m_Characters.back();
 	for (auto& e : m_Characters) {
 		if (IsMainGame()) {
@@ -281,7 +287,7 @@ void MainGame::UpdateSub() {
 		}
 	}
 }
-void MainGame::DrawSub() {
+void MainGame::DrawSub() const {
 	DrawMain();
 	if (!IsResultActive()) {
 		if (!FrameWork::Instance()->GetIsPauseActive()) {
@@ -311,7 +317,7 @@ std::unique_ptr<BaseScene> MainGame::MakeNextScene()
 {
 	return std::make_unique<TitleScene>();
 }
-void MainGame::DrawMain() {
+void MainGame::DrawMain() const {
 	//背景
 	DrawBox(0, 0, FrameWork::Instance()->GetScreenWidth(), FrameWork::Instance()->GetScreenHeight(), ColorPalette::Red075, TRUE);
 	for (int loop = -5; loop < 20; ++loop) {
@@ -345,7 +351,7 @@ void MainGame::DrawMain() {
 	}
 	EffectControl::Instance()->Draw();
 }
-void MainGame::DrawUI() {
+void MainGame::DrawUI() const {
 	auto& PlayerChara = m_Characters.back();
 
 	if (!IsInGame()) { return; }
@@ -377,89 +383,113 @@ void MainGame::DrawUI() {
 	}
 	DrawFormatString2ToHandle(32, FrameWork::Instance()->GetScreenHeight() - 32, ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 12, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "AD : 旋回　W : ブースト S : 減速 スペース : 前方射撃 左クリック : 旋回機銃射撃");
 }
-void MainGame::DrawPauseUI() {
-	m_PausePer = Mathf::Clamp(m_PausePer + (FrameWork::Instance()->GetIsPauseActive() ? FrameWork::Instance()->GetFixedDeltaTime() : -FrameWork::Instance()->GetFixedDeltaTime())/0.25f, 0.f, 1.f);
+
+void MainGame::InitPauseUI(){
+}
+void MainGame::UpdatePauseUI(){
+	m_PausePer = Mathf::Clamp(m_PausePer + (FrameWork::Instance()->GetIsPauseActive() ? FrameWork::Instance()->GetFixedDeltaTime() : -FrameWork::Instance()->GetFixedDeltaTime()) / 0.25f, 0.f, 1.f);
 	bool OnMouse = false;
 	if (FrameWork::Instance()->GetIsPauseActive()) {
 		switch (m_PauseOpen) {
 		case 0:
 		{
+			int Now = 0;
 			{
 				const char* Str = "Return Title";
 				int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle());
-				OnMousePause[m_PauseOpen][0] = IntoMouse(32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 2,
-					32 + Width, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 2 + 24);
-				if (OnMousePause[m_PauseOpen][0]) {
-					m_PauseSelect = 0;
+				OnMousePause[m_PauseOpen][Now] = IntoMouse(32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (2 - Now),
+					32 + Width, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (2 - Now) + 24);
+				if (OnMousePause[m_PauseOpen][Now]) {
+					m_PauseSelect = Now;
 				}
-				if (OnMousePause[m_PauseOpen][0] && InputControl::Instance()->GetLMEnter().IsTrigger()) {
+				if (OnMousePause[m_PauseOpen][Now] && InputControl::Instance()->GetLMEnter().IsTrigger()) {
 					OnMouse = true;
 				}
 			}
+			Now++;
 			{
 				const char* Str = "Option";
 				int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle());
-				OnMousePause[m_PauseOpen][1] = IntoMouse(32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 1,
-					32 + Width, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 1 + 24);
-				if (OnMousePause[m_PauseOpen][1]) {
-					m_PauseSelect = 1;
+				OnMousePause[m_PauseOpen][Now] = IntoMouse(32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (2 - Now),
+					32 + Width, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (2 - Now) + 24);
+				if (OnMousePause[m_PauseOpen][Now]) {
+					m_PauseSelect = Now;
 				}
-				if (OnMousePause[m_PauseOpen][1] && InputControl::Instance()->GetLMEnter().IsTrigger()) {
+				if (OnMousePause[m_PauseOpen][Now] && InputControl::Instance()->GetLMEnter().IsTrigger()) {
 					OnMouse = true;
 				}
 			}
+			Now++;
 			{
 				const char* Str = "Return Game";
 				int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle());
-				OnMousePause[m_PauseOpen][2] = IntoMouse(32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 0,
-					32 + Width, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 0 + 24);
-				if (OnMousePause[m_PauseOpen][2]) {
-					m_PauseSelect = 2;
+				OnMousePause[m_PauseOpen][Now] = IntoMouse(32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (2 - Now),
+					32 + Width, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (2 - Now) + 24);
+				if (OnMousePause[m_PauseOpen][Now]) {
+					m_PauseSelect = Now;
 				}
-				if (OnMousePause[m_PauseOpen][2] && InputControl::Instance()->GetLMEnter().IsTrigger()) {
+				if (OnMousePause[m_PauseOpen][Now] && InputControl::Instance()->GetLMEnter().IsTrigger()) {
 					OnMouse = true;
 				}
 			}
+			Now++;
 		}
 		break;
 		case 1:
 		{
+			int Now = 0;
 			{
 				const char* Str = "Window Mode:";
 				int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle());
-				OnMousePause[m_PauseOpen][0] = IntoMouse(32 + 32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 2,
-					32 + 32 + Width, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 2 + 24);
-				if (OnMousePause[m_PauseOpen][0]) {
-					m_OptionSelect = 0;
+				OnMousePause[m_PauseOpen][Now] = IntoMouse(32 + 32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (3 - Now),
+					32 + 32 + Width, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (3 - Now) + 24);
+				if (OnMousePause[m_PauseOpen][Now]) {
+					m_OptionSelect = Now;
 				}
-				if (OnMousePause[m_PauseOpen][0] && InputControl::Instance()->GetLMEnter().IsTrigger()) {
+				if (OnMousePause[m_PauseOpen][Now] && InputControl::Instance()->GetLMEnter().IsTrigger()) {
 					OnMouse = true;
 				}
 			}
+			Now++;
 			{
-				const char* Str = "B";
+				const char* Str = "BGM:";
 				int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle());
-				OnMousePause[m_PauseOpen][1] = IntoMouse(32 + 32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 1,
-					32 + 32 + Width, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 1 + 24);
-				if (OnMousePause[m_PauseOpen][1]) {
-					m_OptionSelect = 1;
+				OnMousePause[m_PauseOpen][Now] = IntoMouse(32 + 32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (3 - Now),
+					32 + 32 + Width, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (3 - Now) + 24);
+				if (OnMousePause[m_PauseOpen][Now]) {
+					m_OptionSelect = Now;
 				}
-				if (OnMousePause[m_PauseOpen][1] && InputControl::Instance()->GetLMEnter().IsTrigger()) {
+				if (OnMousePause[m_PauseOpen][Now] && InputControl::Instance()->GetLMEnter().IsTrigger()) {
 					OnMouse = true;
 				}
 			}
+			Now++;
+			{
+				const char* Str = "SE:";
+				int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle());
+				OnMousePause[m_PauseOpen][Now] = IntoMouse(32 + 32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (3 - Now),
+					32 + 32 + Width, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (3 - Now) + 24);
+				if (OnMousePause[m_PauseOpen][Now]) {
+					m_OptionSelect = Now;
+				}
+				if (OnMousePause[m_PauseOpen][Now] && InputControl::Instance()->GetLMEnter().IsTrigger()) {
+					OnMouse = true;
+				}
+			}
+			Now++;
 			{
 				const char* Str = "Return";
 				int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle());
-				OnMousePause[m_PauseOpen][2] = IntoMouse(32 + 32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 0,
-					32 + 32 + Width, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 0 + 24);
-				if (OnMousePause[m_PauseOpen][2]) {
-					m_OptionSelect = 2;
+				OnMousePause[m_PauseOpen][Now] = IntoMouse(32 + 32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (3 - Now),
+					32 + 32 + Width, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (3 - Now) + 24);
+				if (OnMousePause[m_PauseOpen][Now]) {
+					m_OptionSelect = Now;
 				}
-				if (OnMousePause[m_PauseOpen][2] && InputControl::Instance()->GetLMEnter().IsTrigger()) {
+				if (OnMousePause[m_PauseOpen][Now] && InputControl::Instance()->GetLMEnter().IsTrigger()) {
 					OnMouse = true;
 				}
 			}
+			Now++;
 		}
 		break;
 		default:
@@ -467,7 +497,7 @@ void MainGame::DrawPauseUI() {
 		}
 
 		m_PauseTimer += FrameWork::Instance()->GetFixedDeltaTime();
-		switch (m_PauseOpen){
+		switch (m_PauseOpen) {
 		case 0:
 		{
 			if (InputControl::Instance()->GetSKey().IsTrigger()) {
@@ -495,7 +525,7 @@ void MainGame::DrawPauseUI() {
 				}
 			}
 		}
-			break;
+		break;
 		case 1:
 		{
 			if (InputControl::Instance()->GetSKey().IsTrigger()) {
@@ -524,20 +554,103 @@ void MainGame::DrawPauseUI() {
 						break;
 					}
 					FrameWork::Instance()->UpdateWindowSetting();
-					SaveData::Instance()->Save();
 				}
-					break;
+				break;
 				case 1:
+					SaveData::Instance()->SetIsMuteBGMVol(SaveData::Instance()->GetIsMuteBGMVol() ^ 1);
+					SoundPool::Instance()->SetVol(SoundType::BGM, SaveData::Instance()->GetIsMuteBGMVol() ? 0 : SaveData::Instance()->GetBGMVol());
 					break;
 				case 2:
+					SaveData::Instance()->SetIsMuteSEVol(SaveData::Instance()->GetIsMuteSEVol() ^ 1);
+					SoundPool::Instance()->SetVol(SoundType::SE, SaveData::Instance()->GetIsMuteSEVol() ? 0 : SaveData::Instance()->GetSEVol());
+					break;
+				case 3:
 					m_PauseOpen = 0;
 					break;
 				default:
 					break;
 				}
+				SaveData::Instance()->Save();
+			}
+
+			if (InputControl::Instance()->GetDKey().IsTrigger()) {
+				switch (m_OptionSelect) {
+				case 0:
+				{
+					switch (SaveData::Instance()->GetWindowSetting()) {
+					case WindowSetting::WindowMode:
+						SaveData::Instance()->SetWindowSetting(WindowSetting::BorderLess);
+						break;
+					case WindowSetting::BorderLess:
+						SaveData::Instance()->SetWindowSetting(WindowSetting::FullScreen);
+						break;
+					case WindowSetting::FullScreen:
+						SaveData::Instance()->SetWindowSetting(WindowSetting::WindowMode);
+						break;
+					default:
+						break;
+					}
+					FrameWork::Instance()->UpdateWindowSetting();
+					SaveData::Instance()->Save();
+				}
+				break;
+				case 1:
+					SaveData::Instance()->SetIsMuteBGMVol(false);
+					SaveData::Instance()->SetBGMVol(SaveData::Instance()->GetBGMVol() + 10);
+					SoundPool::Instance()->SetVol(SoundType::BGM, SaveData::Instance()->GetIsMuteBGMVol() ? 0 : SaveData::Instance()->GetBGMVol());
+					break;
+				case 2:
+					SaveData::Instance()->SetIsMuteSEVol(false);
+					SaveData::Instance()->SetSEVol(SaveData::Instance()->GetSEVol() + 10);
+					SoundPool::Instance()->SetVol(SoundType::SE, SaveData::Instance()->GetIsMuteSEVol() ? 0 : SaveData::Instance()->GetSEVol());
+					break;
+				case 3:
+					break;
+				default:
+					break;
+				}
+				SaveData::Instance()->Save();
+			}
+			if (InputControl::Instance()->GetAKey().IsTrigger()) {
+				switch (m_OptionSelect) {
+				case 0:
+				{
+					switch (SaveData::Instance()->GetWindowSetting()) {
+					case WindowSetting::WindowMode:
+						SaveData::Instance()->SetWindowSetting(WindowSetting::FullScreen);
+						break;
+					case WindowSetting::BorderLess:
+						SaveData::Instance()->SetWindowSetting(WindowSetting::WindowMode);
+						break;
+					case WindowSetting::FullScreen:
+						SaveData::Instance()->SetWindowSetting(WindowSetting::BorderLess);
+						break;
+					default:
+						break;
+					}
+					FrameWork::Instance()->UpdateWindowSetting();
+					SaveData::Instance()->Save();
+				}
+				break;
+				case 1:
+					SaveData::Instance()->SetIsMuteBGMVol(false);
+					SaveData::Instance()->SetBGMVol(SaveData::Instance()->GetBGMVol() - 10);
+					SoundPool::Instance()->SetVol(SoundType::BGM, SaveData::Instance()->GetIsMuteBGMVol() ? 0 : SaveData::Instance()->GetBGMVol());
+					break;
+				case 2:
+					SaveData::Instance()->SetIsMuteSEVol(false);
+					SaveData::Instance()->SetSEVol(SaveData::Instance()->GetSEVol() - 10);
+					SoundPool::Instance()->SetVol(SoundType::SE, SaveData::Instance()->GetIsMuteSEVol() ? 0 : SaveData::Instance()->GetSEVol());
+					break;
+				case 3:
+					break;
+				default:
+					break;
+				}
+				SaveData::Instance()->Save();
 			}
 		}
-			break;
+		break;
 		default:
 			break;
 		}
@@ -546,6 +659,8 @@ void MainGame::DrawPauseUI() {
 		m_PauseSelect = 0;
 		m_PauseOpen = 0;
 	}
+}
+void MainGame::DrawPauseUI() const {
 	int Alpha = static_cast<int>(128 * m_PausePer);
 	if (Alpha > 0) {
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, Alpha);
@@ -561,9 +676,10 @@ void MainGame::DrawPauseUI() {
 				DrawFormatString2ToHandle(32, 32, ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "Pause");
 			}
 
-			DrawFormatString2ToHandle(32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 2, (m_PauseSelect == 0) ? ColorPalette::Red : ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "Return Title");
-			DrawFormatString2ToHandle(32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 1, (m_PauseSelect == 1) ? ColorPalette::Red : ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "Option");
-			DrawFormatString2ToHandle(32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 0, (m_PauseSelect == 2) ? ColorPalette::Red : ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "Return Game");
+			int Now = 0;
+			DrawFormatString2ToHandle(32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (2 - Now), (m_PauseSelect == Now) ? ColorPalette::Red : ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "Return Title"); Now++;
+			DrawFormatString2ToHandle(32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (2 - Now), (m_PauseSelect == Now) ? ColorPalette::Red : ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "Option"); Now++;
+			DrawFormatString2ToHandle(32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (2 - Now), (m_PauseSelect == Now) ? ColorPalette::Red : ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "Return Game"); Now++;
 
 			DrawFormatString2ToHandle(32, FrameWork::Instance()->GetScreenHeight() - 32, ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 12, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "WS : 選択 スペース : 決定");
 		}
@@ -574,9 +690,21 @@ void MainGame::DrawPauseUI() {
 				DrawFormatString2ToHandle(32, 32, ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "Option");
 			}
 
-			DrawFormatString2ToHandle(32 + 32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 2, (m_OptionSelect == 0) ? ColorPalette::Red : ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), ("Window Mode:"+std::string(SaveData::Instance()->GetWindowSettingStr())).c_str());
-			DrawFormatString2ToHandle(32 + 32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 1, (m_OptionSelect == 1) ? ColorPalette::Red : ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "B");
-			DrawFormatString2ToHandle(32 + 32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 0, (m_OptionSelect == 2) ? ColorPalette::Red : ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "Return");
+			int Now = 0;
+			DrawFormatString2ToHandle(32 + 32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (3 - Now), (m_OptionSelect == Now) ? ColorPalette::Red : ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "Window Mode:%s", SaveData::Instance()->GetWindowSettingStr()); Now++;
+			if (SaveData::Instance()->GetIsMuteBGMVol()) {
+				DrawFormatString2ToHandle(32 + 32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (3 - Now), (m_OptionSelect == Now) ? ColorPalette::Red : ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "BGM:%s", "Mute"); Now++;
+			}
+			else {
+				DrawFormatString2ToHandle(32 + 32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (3 - Now), (m_OptionSelect == Now) ? ColorPalette::Red : ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "BGM:%d", SaveData::Instance()->GetBGMVol()); Now++;
+			}
+			if (SaveData::Instance()->GetIsMuteSEVol()) {
+				DrawFormatString2ToHandle(32 + 32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (3 - Now), (m_OptionSelect == Now) ? ColorPalette::Red : ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "SE:%s", "Mute"); Now++;
+			}
+			else {
+				DrawFormatString2ToHandle(32 + 32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (3 - Now), (m_OptionSelect == Now) ? ColorPalette::Red : ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "SE:%d", SaveData::Instance()->GetSEVol()); Now++;
+			}
+			DrawFormatString2ToHandle(32 + 32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * (3 - Now), (m_OptionSelect == Now) ? ColorPalette::Red : ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "Return"); Now++;
 
 			DrawFormatString2ToHandle(32, FrameWork::Instance()->GetScreenHeight() - 32, ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 12, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), "WS : 選択 スペース : 決定");
 		}
@@ -586,8 +714,8 @@ void MainGame::DrawPauseUI() {
 		}
 	}
 }
-void MainGame::InitResult()
-{
+
+void MainGame::InitResult() {
 	m_Respawn = 0.f;
 	m_Kill = 0.f;
 	m_HitRatio = 0.f;
@@ -600,6 +728,7 @@ void MainGame::InitResult()
 	for (auto& s : m_ResultAnim) {
 		s = -1000.f;
 	}
+	IsGoingNextScene = false;
 }
 void MainGame::UpdateResult() {
 	if (m_ResultClear == -1) {
@@ -688,8 +817,7 @@ void MainGame::UpdateResult() {
 		}
 	}
 }
-void MainGame::DrawResult()
-{
+void MainGame::DrawResult() const {
 	DrawBox(0, 0, FrameWork::Instance()->GetScreenWidth(), FrameWork::Instance()->GetScreenHeight(), ColorPalette::Black, TRUE);
 	DrawGraph(FrameWork::Instance()->GetScreenWidth() - 128 - 32, FrameWork::Instance()->GetScreenHeight() - 64 - 32, m_FinImage.GetHandle(), FALSE);
 

@@ -33,7 +33,7 @@ void TitleScene::UpdateSub() {
 	}
 }
 
-void TitleScene::DrawSub() {
+void TitleScene::DrawSub() const {
 	//”wŒi•`‰æ
 	int YposBase = FrameWork::Instance()->GetScreenHeight() * 2 / 3;
 	DrawBox(0, YposBase, FrameWork::Instance()->GetScreenWidth(), FrameWork::Instance()->GetScreenHeight(), ColorPalette::Red, TRUE);

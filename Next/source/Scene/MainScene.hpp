@@ -31,18 +31,21 @@ public:
 	int m_PauseSelect = 0;
 	int m_PauseOpen = 0;
 	int m_OptionSelect = 0;
-	bool OnMousePause[2][3] = {};
+	bool OnMousePause[2][4] = {};
 protected:
 	void InitSub() override;
 	void UpdateSub() override;
-	void DrawSub() override;
+	void DrawSub() const override;
 	void DisposeSub() override;
 
 	std::unique_ptr<BaseScene> MakeNextScene() override;
 private:
-	void DrawMain();
-	void DrawUI();
-	void DrawPauseUI();
+	void DrawMain() const;
+	void DrawUI() const;
+private:
+	void InitPauseUI();
+	void UpdatePauseUI();
+	void DrawPauseUI() const;
 private:
 	float m_Respawn = 0.f;
 	float m_Kill = 0.f;
@@ -60,7 +63,7 @@ private:
 private:
 	void InitResult();
 	void UpdateResult();
-	void DrawResult();
+	void DrawResult() const;
 	bool IsResultActive() const { return m_MainTimer <= -3.5f; }
 private:
 	bool IsInGame() const { return 0.f < m_MainTimer; }
