@@ -14,6 +14,6 @@ float Mathf::Clamp(float value, float min, float max) { return std::clamp(value,
 
 float Mathf::Lerp(float valueA, float valueB, float per) { return std::lerp(valueA, valueB, per); }
 
-float Mathf::GetEasingRatio(float ratio) noexcept {
+float Mathf::GetEasingRatio(float ratio) {
 	return (1.f - std::powf(ratio, 60.f * FrameWork::Instance()->GetDeltaTime()));
 }

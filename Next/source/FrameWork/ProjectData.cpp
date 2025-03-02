@@ -14,7 +14,7 @@ void ProjectData::Load()
 	char right[260]{};
 	while (!SettingIni.eof()) {
 		SettingIni.getline(line, sizeof(line));
-		int Point = strchrDx(line, '=') - line;
+		int Point = static_cast<int>(strchrDx(line, '=') - line);
 		if (Point < 0) { continue; }
 		strpcpyDx(right, line, Point + 1);
 		//

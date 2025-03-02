@@ -24,13 +24,13 @@ class SingletonBase {
 private:
 	static const T* m_Singleton;
 public:
-	static void Create(void) noexcept {
+	static void Create(void) {
 		m_Singleton = new T();
 	}
-	static void Release(void) noexcept {
+	static void Release(void) {
 		delete m_Singleton;
 	}
-	static T* Instance(void) noexcept {
+	static T* Instance(void) {
 		if (m_Singleton == nullptr) {
 			char Message[256]{};
 			sprintfDx(Message, "Failed Instance Create[%s]", MES.buf);
@@ -41,8 +41,8 @@ public:
 		return (T*)m_Singleton;
 	}
 protected:
-	SingletonBase(void) noexcept {}
-	virtual ~SingletonBase(void) noexcept {}
+	SingletonBase(void) {}
+	virtual ~SingletonBase(void) {}
 private:
 	SingletonBase(const SingletonBase&) = delete;
 	SingletonBase& operator=(const SingletonBase&) = delete;

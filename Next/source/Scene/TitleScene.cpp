@@ -10,11 +10,17 @@ void TitleScene::InitSub() {
 }
 
 void TitleScene::UpdateSub() {
+	const char* Str = "Press Space To Start";
+	int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle());
+
+	OnMouse = IntoMouse(FrameWork::Instance()->GetScreenWidth() / 2 - Width / 2, FrameWork::Instance()->GetScreenHeight() * 3 / 4,
+		FrameWork::Instance()->GetScreenWidth() / 2 + Width / 2, FrameWork::Instance()->GetScreenHeight() * 3 / 4 + 24);
+
 	FrameWork::Instance()->SetPauseEnable(false);
 	m_Timer += FrameWork::Instance()->GetDeltaTime();
 	if (!IsGoingNextScene) {
 		if (!FadeControl::Instance()->IsFading()) {
-			if (InputControl::Instance()->GetMenuEnter().IsTrigger()) {
+			if (InputControl::Instance()->GetMenuEnter().IsTrigger() || (OnMouse && InputControl::Instance()->GetLMEnter().IsTrigger())) {
 				FadeControl::Instance()->SetFadeIn(ColorPalette::Black, 1.f);
 				IsGoingNextScene = true;
 			}
@@ -50,10 +56,15 @@ void TitleScene::DrawSub() {
 	DrawRotaGraph(FrameWork::Instance()->GetScreenWidth() / 2, static_cast<int>((64 + 48) * Rate), Rate, 0.0, m_Title.GetHandle(), TRUE);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 	//Press Space To Start
-	if (!FadeControl::Instance()->IsFading() &&  ((static_cast<int>(m_Timer * 10) % 10 < 5))) {
+
+	bool isDraw = !FadeControl::Instance()->IsFading();
+	if (!OnMouse) {
+		isDraw &= ((static_cast<int>(m_Timer * 10) % 10 < 5));
+	}
+	if (isDraw) {
 		const char* Str = "Press Space To Start";
 		int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle());
-		DrawFormatString2ToHandle(FrameWork::Instance()->GetScreenWidth() / 2 - Width / 2, FrameWork::Instance()->GetScreenHeight() * 3 / 4, ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), Str);
+		DrawFormatString2ToHandle(FrameWork::Instance()->GetScreenWidth() / 2 - Width / 2, FrameWork::Instance()->GetScreenHeight() * 3 / 4, OnMouse ? ColorPalette::Red : ColorPalette::White, ColorPalette::Black, FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle(), Str);
 	}
 }
 

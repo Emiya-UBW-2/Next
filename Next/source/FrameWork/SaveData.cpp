@@ -2,9 +2,6 @@
 #include <filesystem>
 #include <fstream>
 
-bool IsFileExist(const std::string& name) {
-	return std::filesystem::is_regular_file(name);
-}
 const SaveData* SingletonBase<SaveData, "SaveData">::m_Singleton = nullptr;
 
 void SaveData::SetPath() {
@@ -36,7 +33,7 @@ void SaveData::Load() {
 		char right[260]{};
 		while (!ConfigIni.eof()) {
 			ConfigIni.getline(line, sizeof(line));
-			int Point = strchrDx(line, '=') - line;
+			int Point = static_cast<int>(strchrDx(line, '=') - line);
 			if (Point < 0) { continue; }
 			strpcpyDx(right, line, Point + 1);
 

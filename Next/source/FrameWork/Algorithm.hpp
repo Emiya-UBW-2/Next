@@ -77,8 +77,8 @@ namespace Mathf {
 		float Length() const {
 			return std::hypotf(std::hypotf(this->x, this->y), this->z);
 		}
-		inline static Vector3		Cross(const Vector3& A, const Vector3& B) noexcept { return Vector3(A.y * B.z - A.z * B.y, A.z * B.x - A.x * B.z, A.x * B.y - A.y * B.x); }
-		inline static float			Dot(const Vector3& A, const Vector3& B) noexcept { return A.x * B.x + A.y * B.y + A.z * B.z; }
+		inline static Vector3		Cross(const Vector3& A, const Vector3& B) { return Vector3(A.y * B.z - A.z * B.y, A.z * B.x - A.x * B.z, A.x * B.y - A.y * B.x); }
+		inline static float			Dot(const Vector3& A, const Vector3& B) { return A.x * B.x + A.y * B.y + A.z * B.z; }
 	};
 	//角度を度からラジアンに変換
 	static float Deg2Rad(float value) { return value * DX_PI_F / 180.f; }
@@ -90,15 +90,15 @@ namespace Mathf {
 	//線形補完
 	extern float Lerp(float valueA, float valueB, float per);
 	//イージング
-	extern float GetEasingRatio(float ratio) noexcept;
-	static void Easing(float* A, const float& B, float ratio) noexcept { *A = Lerp(*A, B, GetEasingRatio(ratio)); }
-	static void Easing(Vector3* A, const Vector3& B, float ratio) noexcept {
+	extern float GetEasingRatio(float ratio);
+	static void Easing(float* A, const float& B, float ratio) { *A = Lerp(*A, B, GetEasingRatio(ratio)); }
+	static void Easing(Vector3* A, const Vector3& B, float ratio) {
 		A->x = Lerp(A->x, B.x, GetEasingRatio(ratio));
 		A->y = Lerp(A->y, B.y, GetEasingRatio(ratio));
 		A->z = Lerp(A->z, B.z, GetEasingRatio(ratio));
 	}
 	// 線分同士の交差判定
-	static bool GetSegmenttoSegment(const Vector3& SegmentAPos1, const Vector3& SegmentAPos2, const Vector3& SegmentBPos1, const Vector3& SegmentBPos2, SEGMENT_SEGMENT_RESULT* Result) noexcept {
+	static bool GetSegmenttoSegment(const Vector3& SegmentAPos1, const Vector3& SegmentAPos2, const Vector3& SegmentBPos1, const Vector3& SegmentBPos2, SEGMENT_SEGMENT_RESULT* Result) {
 		VECTOR Pos1t = VGet(SegmentAPos1.x, SegmentAPos1.y, SegmentAPos1.z);
 		VECTOR Pos2t = VGet(SegmentAPos2.x, SegmentAPos2.y, SegmentAPos2.z);
 		VECTOR PosAt = VGet(SegmentBPos1.x, SegmentBPos1.y, SegmentBPos1.z);
@@ -107,4 +107,6 @@ namespace Mathf {
 		float len = 0.001f;
 		return (Result->SegA_SegB_MinDist_Square <= (len * len));
 	}
+	// 点と矩形との2D判定
+	static bool HitPointToRectangle(int xp, int yp, int x1, int y1, int x2, int y2) { return (xp >= x1 && xp <= x2 && yp >= y1 && yp <= y2); }
 }

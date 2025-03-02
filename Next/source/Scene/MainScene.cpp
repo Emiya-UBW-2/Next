@@ -379,7 +379,93 @@ void MainGame::DrawUI() {
 }
 void MainGame::DrawPauseUI() {
 	m_PausePer = Mathf::Clamp(m_PausePer + (FrameWork::Instance()->GetIsPauseActive() ? FrameWork::Instance()->GetFixedDeltaTime() : -FrameWork::Instance()->GetFixedDeltaTime())/0.25f, 0.f, 1.f);
+	bool OnMouse = false;
 	if (FrameWork::Instance()->GetIsPauseActive()) {
+		switch (m_PauseOpen) {
+		case 0:
+		{
+			{
+				const char* Str = "Return Title";
+				int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle());
+				OnMousePause[m_PauseOpen][0] = IntoMouse(32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 2,
+					32 + Width, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 2 + 24);
+				if (OnMousePause[m_PauseOpen][0]) {
+					m_PauseSelect = 0;
+				}
+				if (OnMousePause[m_PauseOpen][0] && InputControl::Instance()->GetLMEnter().IsTrigger()) {
+					OnMouse = true;
+				}
+			}
+			{
+				const char* Str = "Option";
+				int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle());
+				OnMousePause[m_PauseOpen][1] = IntoMouse(32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 1,
+					32 + Width, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 1 + 24);
+				if (OnMousePause[m_PauseOpen][1]) {
+					m_PauseSelect = 1;
+				}
+				if (OnMousePause[m_PauseOpen][1] && InputControl::Instance()->GetLMEnter().IsTrigger()) {
+					OnMouse = true;
+				}
+			}
+			{
+				const char* Str = "Return Game";
+				int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle());
+				OnMousePause[m_PauseOpen][2] = IntoMouse(32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 0,
+					32 + Width, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 0 + 24);
+				if (OnMousePause[m_PauseOpen][2]) {
+					m_PauseSelect = 2;
+				}
+				if (OnMousePause[m_PauseOpen][2] && InputControl::Instance()->GetLMEnter().IsTrigger()) {
+					OnMouse = true;
+				}
+			}
+		}
+		break;
+		case 1:
+		{
+			{
+				const char* Str = "Window Mode:";
+				int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle());
+				OnMousePause[m_PauseOpen][0] = IntoMouse(32 + 32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 2,
+					32 + 32 + Width, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 2 + 24);
+				if (OnMousePause[m_PauseOpen][0]) {
+					m_OptionSelect = 0;
+				}
+				if (OnMousePause[m_PauseOpen][0] && InputControl::Instance()->GetLMEnter().IsTrigger()) {
+					OnMouse = true;
+				}
+			}
+			{
+				const char* Str = "B";
+				int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle());
+				OnMousePause[m_PauseOpen][1] = IntoMouse(32 + 32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 1,
+					32 + 32 + Width, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 1 + 24);
+				if (OnMousePause[m_PauseOpen][1]) {
+					m_OptionSelect = 1;
+				}
+				if (OnMousePause[m_PauseOpen][1] && InputControl::Instance()->GetLMEnter().IsTrigger()) {
+					OnMouse = true;
+				}
+			}
+			{
+				const char* Str = "Return";
+				int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle());
+				OnMousePause[m_PauseOpen][2] = IntoMouse(32 + 32, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 0,
+					32 + 32 + Width, FrameWork::Instance()->GetScreenHeight() - 32 - 24 - 28 * 0 + 24);
+				if (OnMousePause[m_PauseOpen][2]) {
+					m_OptionSelect = 2;
+				}
+				if (OnMousePause[m_PauseOpen][2] && InputControl::Instance()->GetLMEnter().IsTrigger()) {
+					OnMouse = true;
+				}
+			}
+		}
+		break;
+		default:
+			break;
+		}
+
 		m_PauseTimer += FrameWork::Instance()->GetFixedDeltaTime();
 		switch (m_PauseOpen){
 		case 0:
@@ -392,7 +478,7 @@ void MainGame::DrawPauseUI() {
 			}
 			if (m_PauseSelect > 3 - 1) { m_PauseSelect = 0; }
 			if (m_PauseSelect < 0) { m_PauseSelect = 3 - 1; }
-			if (InputControl::Instance()->GetMenuEnter().IsTrigger()) {
+			if (InputControl::Instance()->GetMenuEnter().IsTrigger() || OnMouse) {
 				switch (m_PauseSelect) {
 				case 0:
 					BaseScene::SetSceneEnd();
@@ -420,7 +506,7 @@ void MainGame::DrawPauseUI() {
 			}
 			if (m_OptionSelect > 3 - 1) { m_OptionSelect = 0; }
 			if (m_OptionSelect < 0) { m_OptionSelect = 3 - 1; }
-			if (InputControl::Instance()->GetMenuEnter().IsTrigger()) {
+			if (InputControl::Instance()->GetMenuEnter().IsTrigger() || OnMouse) {
 				switch (m_OptionSelect) {
 				case 0:
 				{
@@ -578,8 +664,13 @@ void MainGame::UpdateResult() {
 			m_ResultClear = 4;
 		}
 	}
+	const char* Str = "Space :Return Title";
+	int Width = GetDrawStringWidthToHandle(Str, static_cast<int>(strlenDx(Str)), FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle());
+
+	OnMouseResultSkip = IntoMouse(FrameWork::Instance()->GetScreenWidth() / 2 - Width / 2, FrameWork::Instance()->GetScreenHeight() * 3 / 4,
+		FrameWork::Instance()->GetScreenWidth() / 2 + Width / 2, FrameWork::Instance()->GetScreenHeight() * 3 / 4 + 24);
 	if (!IsGoingNextScene) {
-		if (m_ResultClear == 4 && InputControl::Instance()->GetMenuEnter().IsTrigger()) {
+		if (m_ResultClear == 4 && (InputControl::Instance()->GetMenuEnter().IsTrigger() || (OnMouseResultSkip && InputControl::Instance()->GetLMEnter().IsTrigger()))) {
 			FadeControl::Instance()->SetFadeIn(ColorPalette::White, 1.f);
 			IsGoingNextScene = true;
 		}

@@ -31,6 +31,7 @@ public:
 	int m_PauseSelect = 0;
 	int m_PauseOpen = 0;
 	int m_OptionSelect = 0;
+	bool OnMousePause[2][3] = {};
 protected:
 	void InitSub() override;
 	void UpdateSub() override;
@@ -55,6 +56,7 @@ private:
 	float m_ResultTimer = 0.f;
 	std::array<float, 5> m_ResultAnim{};
 	int m_ResultClear = 0;
+	bool OnMouseResultSkip = false;
 private:
 	void InitResult();
 	void UpdateResult();
