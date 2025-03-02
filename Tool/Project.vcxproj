@@ -127,6 +127,7 @@
       <AdditionalIncludeDirectories>..\..\DxLib_VC\DX_VC</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -145,6 +146,7 @@
       <AdditionalIncludeDirectories>..\..\DxLib_VC\DX_VC</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -167,7 +169,7 @@
     <ClCompile Include="source\FrameWork\Scene\SceneController.cpp" />
     <ClCompile Include="source\FrameWork\Singleton.cpp" />
     <ClCompile Include="source\main.cpp" />
-    <ClCompile Include="source\Scene\TitleScene.cpp" />
+    <ClCompile Include="source\Scene\MainScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\FrameWork\Algorithm.hpp" />
@@ -183,7 +185,7 @@
     <ClInclude Include="source\FrameWork\SaveData.hpp" />
     <ClInclude Include="source\FrameWork\Scene\SceneController.hpp" />
     <ClInclude Include="source\FrameWork\Singleton.hpp" />
-    <ClInclude Include="source\Scene\TitleScene.hpp" />
+    <ClInclude Include="source\Scene\MainScene.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

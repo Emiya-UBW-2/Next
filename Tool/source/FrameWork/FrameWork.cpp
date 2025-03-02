@@ -69,10 +69,10 @@ void FrameWork::Init()
 	SetUseDirect3DVersion(DX_DIRECT3D_11);
 	{
 		//デフォルト解像度
-		m_WindowWidth = 1280;
+		m_WindowWidth = 384;
 		m_WindowHeight = 720;
 		//スクリーン解像度
-		m_ScreenWidth = 960;
+		m_ScreenWidth = 384;
 		m_ScreenHeight = 720;
 		// DPI設定
 		int DPI = 96;

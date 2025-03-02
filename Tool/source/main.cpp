@@ -1,7 +1,7 @@
 #include "FrameWork/Define.hpp"
 //#include<WinUser.h>
 
-#include "Scene/TitleScene.hpp"
+#include "Scene/MainScene.hpp"
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	SetTransColor(0, 255, 0);
@@ -13,7 +13,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	FontPool::Instance()->Add("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1);
 	//‰ŠúƒV[ƒ“‚ğİ’è
-	std::unique_ptr<BaseScene> First = std::make_unique<TitleScene>();
+	std::unique_ptr<BaseScene> First = std::make_unique<MainScene>();
 	SceneController::Instance()->Active(First);
 
 	while (true) {
