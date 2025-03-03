@@ -5,42 +5,112 @@
 TaskTab::TaskTab(const char* TabName) {
 	w = FrameWork::Instance()->GetScreenWidth() - 16 * 2;
 	h = 32;
+	wSub = 64;
 	hAdd = 0;
 	OnMouse = false;
+	IsPlayTask = false;
 	IsActiveTab = false;
 	m_TabName = TabName;
-	m_Column = 0;
+
+	SetTime(10, 0, 0);
+	m_TabColumn.clear();
 }
 
 void TaskTab::Update(int xofs, int yofs) {
-	OnMouse = IntoMouse(xofs + x, yofs + y, xofs + x + w, yofs + y + h);
+	const auto& Font = FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle();
+	OnMouse = IntoMouse(xofs + x, yofs + y, xofs + x + w - wSub, yofs + y + h);
 	if (OnMouse && InputControl::Instance()->GetLMEnter().IsTrigger()) {
 		IsActiveTab ^= 1;
 	}
-	if (IsActiveTab) {
-		m_Column = 24*5;
-		hAdd = m_Column+2;
+	if ((IsActiveTab && !IsPlayTask) || (m_TabColumn.size() == 0)) {
+		m_TabColumn.resize(5);
+		int column = 0;
+		{
+			m_TabColumn.at(0).m_TabString = "Type:" + std::string(TaskTypeStr[static_cast<int>(m_TaskType)]);
+			m_TabColumn.at(0).m_OnMouse = IntoMouse(xofs + x, yofs + y + h + column, xofs + x + w - wSub, yofs + y + h + column + 24);
+			if (m_TabColumn.at(0).m_OnMouse && InputControl::Instance()->GetLMEnter().IsTrigger()) {
+				m_TaskType = static_cast<TaskType>((static_cast<int>(m_TaskType) + 1) % static_cast<int>(TaskType::Max));
+			}
+		} column += 24;
+		{
+			char TimeStr[256] = "";
+			sprintfDx(TimeStr, "%02d:%02d:%02d", (m_Type / 60 / 60) % 24, (m_Type / 60) % 60, m_Type % 60);
+			m_TabColumn.at(1).m_TabString = "Time:" + std::string(TimeStr);
+			m_TabColumn.at(1).m_OnMouse = IntoMouse(xofs + x, yofs + y + h + column, xofs + x + w - wSub, yofs + y + h + column + 24);
+			if (m_TabColumn.at(1).m_OnMouse && InputControl::Instance()->GetLMEnter().IsTrigger()) {
+				int wtmp = GetDrawStringWidthToHandle("Time:", sizeof("Time:"), Font);
+				{
+					int Width = GetDrawStringWidthToHandle("Time:00", sizeof("Time:00"), Font);
+					if (IntoMouse(xofs + x + wtmp, yofs + y + h + column, xofs + x + Width, yofs + y + h + column + 24)) {
+						SetTime(GetHour() + 1, GetMinute(), GetSecond());
+					}
+					wtmp = Width;
+				}
+				{
+					int Width = GetDrawStringWidthToHandle("Time:00:00", sizeof("Time:00:00"), Font);
+					if (IntoMouse(xofs + x + wtmp, yofs + y + h + column, xofs + x + Width, yofs + y + h + column + 24)) {
+						SetTime(GetHour(), GetMinute() + 5, GetSecond());
+					}
+					wtmp = Width;
+				}
+				{
+					int Width = GetDrawStringWidthToHandle("Time:00:00:00", sizeof("Time:00:00:00"), Font);
+					if (IntoMouse(xofs + x + wtmp, yofs + y + h + column, xofs + x + Width, yofs + y + h + column + 24)) {
+						SetTime(GetHour(), GetMinute(), GetSecond() + 5);
+					}
+					wtmp = Width;
+				}
+			}
+		} column += 24;
+		{
+			m_TabColumn.at(2).m_TabString = "Icon:Slack.png";
+			m_TabColumn.at(2).m_OnMouse = IntoMouse(xofs + x, yofs + y + h + column, xofs + x + w - wSub, yofs + y + h + column + 24);
+			if (m_TabColumn.at(2).m_OnMouse && InputControl::Instance()->GetLMEnter().IsTrigger()) {
+
+			}
+		} column += 24;
+		{
+			m_TabColumn.at(3).m_TabString = "Move:" + std::string(TaskMoveStr[static_cast<int>(m_TaskMove)]);
+			m_TabColumn.at(3).m_OnMouse = IntoMouse(xofs + x, yofs + y + h + column, xofs + x + w - wSub, yofs + y + h + column + 24);
+			if (m_TabColumn.at(3).m_OnMouse && InputControl::Instance()->GetLMEnter().IsTrigger()) {
+				m_TaskMove = static_cast<TaskMove>((static_cast<int>(m_TaskMove) + 1) % static_cast<int>(TaskMove::Max));
+			}
+		} column += 24;
+		{
+			m_TabColumn.at(4).m_TabString = "Next:" + std::string(TaskNextStr[static_cast<int>(m_TaskNext)]);
+			m_TabColumn.at(4).m_OnMouse = IntoMouse(xofs + x, yofs + y + h + column, xofs + x + w - wSub, yofs + y + h + column + 24);
+			if (m_TabColumn.at(4).m_OnMouse && InputControl::Instance()->GetLMEnter().IsTrigger()) {
+				m_TaskNext = static_cast<TaskNext>((static_cast<int>(m_TaskNext) + 1) % static_cast<int>(TaskNext::Max));
+			}
+		} column += 24;
 	}
-	else {
-		hAdd = 0;
-	}
+	hAdd = IsActiveTab ? (24 * static_cast<int>(m_TabColumn.size()) + 2) : 0;
 }
 void TaskTab::Draw() const {
 	const auto& Font = FontPool::Instance()->Get("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1)->GetHandle();
-	DrawBox(x, y, x + w, y + h + hAdd, ColorPalette::Black, TRUE);
+	DrawBox(x, y, x + w, y + h, ColorPalette::Black, TRUE);
+	DrawBox(x, y, x + w - wSub, y + h + hAdd, ColorPalette::Black, TRUE);
 	if (hAdd > 0) {
-		DrawBox(x + 1, y + h, x + w - 1, y + h + hAdd - 1, ColorPalette::Gray010, TRUE);
+		DrawBox(x + 1, y + h, x + w - wSub - 1, y + h + hAdd - 1, ColorPalette::Gray010, TRUE);
 	}
-	DrawBox(x + 1, y + 1, x + w - 1, y + h - 1, OnMouse ? ColorPalette::Gray050 : ColorPalette::White, TRUE);
-	int Width = GetDrawStringWidthToHandle(m_TabName.c_str(), static_cast<int>(m_TabName.length()), Font);
-	DrawFormatString2ToHandle(x + w / 2 - Width / 2, y + h / 2 - 24 / 2, ColorPalette::White, ColorPalette::Gray085, Font, m_TabName.c_str());
+	{
+		DrawBox(x + 1, y + 1, x + w - wSub - 1, y + h - 1, OnMouse ? ColorPalette::Gray050 : ColorPalette::White, TRUE);
+		int Width = GetDrawStringWidthToHandle(m_TabName.c_str(), static_cast<int>(m_TabName.length()), Font);
+		DrawFormatString2ToHandle(x + (w - wSub) / 2 - Width / 2, y + h / 2 - 24 / 2, ColorPalette::White, ColorPalette::Gray085, Font, m_TabName.c_str());
+	}
+	//走るボタン
+	{
+		std::string Xname = IsPlayTask ? "Run" : "Stop";
+		DrawBox(x + w - wSub, y + 1, x + w - 1, y + h - 1, IsPlayTask ? ColorPalette::Red : ColorPalette::Green, TRUE);
+		int Width = GetDrawStringWidthToHandle(Xname.c_str(), static_cast<int>(Xname.length()), Font);
+		DrawFormatString2ToHandle(x + w - wSub + wSub / 2 - Width / 2, y + h / 2 - 24 / 2, ColorPalette::White, ColorPalette::Gray085, Font, Xname.c_str());
+	}
+	//
 	if (IsActiveTab) {
 		int column = 0;
-		DrawFormatString2ToHandle(x + 16, y + h + column, ColorPalette::White, ColorPalette::Gray085, Font, m_TabName.c_str()); column += 24;
-		DrawFormatString2ToHandle(x + 16, y + h + column, ColorPalette::White, ColorPalette::Gray085, Font, m_TabName.c_str()); column += 24;
-		DrawFormatString2ToHandle(x + 16, y + h + column, ColorPalette::White, ColorPalette::Gray085, Font, m_TabName.c_str()); column += 24;
-		DrawFormatString2ToHandle(x + 16, y + h + column, ColorPalette::White, ColorPalette::Gray085, Font, m_TabName.c_str()); column += 24;
-		DrawFormatString2ToHandle(x + 16, y + h + column, ColorPalette::White, ColorPalette::Gray085, Font, m_TabName.c_str()); column += 24;
+		for (auto& s : m_TabColumn) {
+			DrawFormatString2ToHandle(x, y + h + column, (!IsPlayTask && s.m_OnMouse) ? ColorPalette::Red : ColorPalette::White, ColorPalette::Gray085, Font, s.m_TabString.c_str()); column += 24;
+		}
 	}
 }
 
@@ -79,6 +149,12 @@ void MainScene::InitSub() {
 	m_YListPos = 32;
 	int Height = (FrameWork::Instance()->GetScreenHeight() - m_YListPos - 8);
 	m_ListGraph.Create(FrameWork::Instance()->GetScreenWidth(), Height, true);
+
+	{
+		// DPIを反映するデスクトップサイズ
+		DispXSize = static_cast<int>(GetSystemMetrics(SM_CXSCREEN));
+		DispYSize = static_cast<int>(GetSystemMetrics(SM_CYSCREEN));
+	}
 }
 
 void MainScene::UpdateSub() {
@@ -107,6 +183,11 @@ void MainScene::UpdateSub() {
 			t->Draw();
 		}
 	}
+
+	//test
+	if (CheckHitKey(KEY_INPUT_SPACE)) {
+		MoveToMousePoint(960, 640);
+	}
 }
 
 void MainScene::DrawSub() const {
@@ -122,4 +203,23 @@ void MainScene::DisposeSub() {
 std::unique_ptr<BaseScene> MainScene::MakeNextScene()
 {
 	return std::make_unique<MainScene>();
+}
+
+void MoveToMousePoint(int x, int y)
+{
+	// DPIを反映するデスクトップサイズ
+	int DispXSize = static_cast<int>(GetSystemMetrics(SM_CXSCREEN));
+	int DispYSize = static_cast<int>(GetSystemMetrics(SM_CYSCREEN));
+	LONG absX = (x * 65536 + DispXSize - 1) / DispXSize;
+	LONG absY = (y * 65536 + DispYSize - 1) / DispYSize;
+
+	INPUT inputs[1] = {};
+	ZeroMemory(inputs, sizeof(inputs));
+
+	inputs[0].type = INPUT_MOUSE;
+	inputs[0].mi.dx = absX;
+	inputs[0].mi.dy = absY;
+	inputs[0].mi.dwFlags = MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE;
+
+	SendInput(ARRAYSIZE(inputs), inputs, sizeof(INPUT));
 }
