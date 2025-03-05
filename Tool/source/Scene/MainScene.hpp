@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../FrameWork/Define.hpp"
+#include <opencv2/opencv.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 enum class TaskType {
 	ClickPoint,
@@ -51,13 +53,13 @@ public:
 	void SetTime(int Hour,int Minute,int Second) {
 		m_Type = 60 * 60 * (Hour % 24) + 60 * (Minute % 60) + (Second % 60);
 	}
-	int GetHour() {
+	int GetHour() const {
 		return (m_Type / 60 / 60) % 24;
 	}
-	int GetMinute() {
+	int GetMinute() const {
 		return (m_Type/ 60) % 60;
 	}
-	int GetSecond() {
+	int GetSecond() const {
 		return (m_Type) % 60;
 	}
 public:
@@ -87,6 +89,16 @@ private:
 	GraphHandle m_ListGraph{};
 	int DispXSize{ 1 };
 	int DispYSize{ 1 };
+
+	//
+	int GrHandle{};
+	cv::Mat monitor_img{};
+	cv::Mat checkimage{};
+	cv::Mat resultimage{};
+	BASEIMAGE DesktopImage{};
+
+	cv::Point max_pt{};
+	double maxVal{};
 private:
 	void DrawTab() const;
 protected:

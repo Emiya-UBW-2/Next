@@ -1,6 +1,68 @@
 #include "MainScene.hpp"
 
+cv::Mat Hwnd2Mat(HWND hwnd, int nPosLeft, int nPosTop, int nDestWidth, int nDestHeight)
+{
+	HDC hwindowDC = GetDC(hwnd);
+	HDC hwindowCompatibleDC = CreateCompatibleDC(hwindowDC);
 
+	HBITMAP           hbwindow = NULL;
+	cv::Mat           src;
+	BITMAPINFOHEADER  bi;
+
+	SetStretchBltMode(hwindowCompatibleDC, COLORONCOLOR);
+
+	RECT windowsize;
+	GetClientRect(hwnd, &windowsize);
+
+	int srcheight = windowsize.bottom;
+	int srcwidth = windowsize.right;
+
+	src.create(nDestHeight, nDestWidth, CV_8UC3);
+
+	hbwindow = CreateCompatibleBitmap(hwindowDC, nDestWidth, nDestHeight);
+	if (hbwindow == NULL)
+	{
+		src.data = NULL;
+		return src;
+	}
+
+	bi.biSize = sizeof(BITMAPINFOHEADER);
+	bi.biWidth = nDestWidth;
+	bi.biHeight = -nDestHeight;
+	bi.biPlanes = 1;
+	bi.biBitCount = 24;
+	bi.biCompression = BI_RGB;
+	bi.biSizeImage = 0;
+	bi.biXPelsPerMeter = 0;
+	bi.biYPelsPerMeter = 0;
+	bi.biClrUsed = 0;
+	bi.biClrImportant = 0;
+
+	SelectObject(hwindowCompatibleDC, hbwindow);
+
+	StretchBlt(hwindowCompatibleDC, 0, 0, nDestWidth, nDestHeight, hwindowDC, nPosLeft, nPosTop, nDestWidth, nDestHeight, SRCCOPY);
+	GetDIBits(hwindowCompatibleDC, hbwindow, 0, nDestHeight, src.data, (BITMAPINFO*)&bi, DIB_RGB_COLORS);
+
+	if (hbwindow != NULL)
+	{
+		DeleteObject(hbwindow);
+		hbwindow = NULL;
+	}
+
+	if (hwindowCompatibleDC != NULL)
+	{
+		DeleteDC(hwindowCompatibleDC);
+		hwindowCompatibleDC = NULL;
+	}
+
+	if (hwindowDC != NULL)
+	{
+		ReleaseDC(hwnd, hwindowDC);
+		hwindowDC = NULL;
+	}
+
+	return src;
+}
 
 TaskTab::TaskTab(const char* TabName) {
 	w = FrameWork::Instance()->GetScreenWidth() - 16 * 2;
@@ -150,11 +212,16 @@ void MainScene::InitSub() {
 	int Height = (FrameWork::Instance()->GetScreenHeight() - m_YListPos - 8);
 	m_ListGraph.Create(FrameWork::Instance()->GetScreenWidth(), Height, true);
 
-	{
-		// DPIを反映するデスクトップサイズ
-		DispXSize = static_cast<int>(GetSystemMetrics(SM_CXSCREEN));
-		DispYSize = static_cast<int>(GetSystemMetrics(SM_CYSCREEN));
-	}
+	// DPIを反映するデスクトップサイズ
+	DispXSize = static_cast<int>(GetSystemMetrics(SM_CXSCREEN));
+	DispYSize = static_cast<int>(GetSystemMetrics(SM_CYSCREEN));
+
+	checkimage = cv::imread("C:\\Users\\Yabushita_Maki\\Documents\\GitHub\\Next\\Tool\\data\\Fin.png", cv::IMREAD_UNCHANGED);
+	// 空のグラフィックハンドルの値を初期化
+	GrHandle = MakeScreen(DispXSize, DispYSize, FALSE);
+	memset(&DesktopImage, 0, sizeof(BASEIMAGE));	// BASEIMAGE 構造体を０で初期化
+	CreateBGR8ColorData(&DesktopImage.ColorData);	// カラーフォーマットは変化しないので最初に設定
+	DesktopImage.MipMapCount = 0;					// ミップマップではないので０
 }
 
 void MainScene::UpdateSub() {
@@ -184,9 +251,21 @@ void MainScene::UpdateSub() {
 		}
 	}
 
-	//test
-	if (CheckHitKey(KEY_INPUT_SPACE)) {
-		MoveToMousePoint(960, 640);
+	//ウィンドウ画面キャプチャ
+	monitor_img = Hwnd2Mat(GetDesktopWindow(), 0, 0, DispXSize, DispYSize);
+	//ウィンドウ画像の割り当て
+	DesktopImage.Width = monitor_img.cols;
+	DesktopImage.Height = monitor_img.rows;
+	DesktopImage.Pitch = (int)monitor_img.step;
+	DesktopImage.GraphData = monitor_img.data;
+	ReCreateGraphFromBaseImage(&DesktopImage, GrHandle);
+	//マッチ検出
+	cv::matchTemplate(monitor_img, checkimage, resultimage, cv::TM_CCOEFF_NORMED);
+	cv::minMaxLoc(resultimage, NULL, &maxVal, NULL, &max_pt);
+	if (maxVal > 0.9f) {
+		if (CheckHitKey(KEY_INPUT_SPACE)) {
+			MoveToMousePoint(max_pt.x, max_pt.y);
+		}
 	}
 }
 
@@ -195,6 +274,10 @@ void MainScene::DrawSub() const {
 	DrawBox(0, 0, FrameWork::Instance()->GetScreenWidth(), FrameWork::Instance()->GetScreenHeight(), ColorPalette::Gray025, TRUE);
 	//
 	DrawGraph(0, m_YListPos, m_ListGraph.GetHandle(), TRUE);
+
+	DrawExtendGraph(0, 0, 256 * 1920 / 1920, 256 * 1080 / 1920, GrHandle, FALSE);
+	printfDx("max_pt[%d,%d]\n", max_pt.x, max_pt.y);
+	printfDx("maxVal[%lf]\n", maxVal);
 }
 
 void MainScene::DisposeSub() {

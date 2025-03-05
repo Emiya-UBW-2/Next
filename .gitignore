@@ -10,3 +10,5 @@
 /Tool/.vs/Project
 /Tool/Project/x64
 /Tool/x64/Debug
+/Tool/opencv_world500.dll
+/Tool/opencv_world500d.dll

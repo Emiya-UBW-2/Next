@@ -109,6 +109,7 @@ void FrameWork::Init()
 }
 bool FrameWork::Update()
 {
+	clsDx();
 	int Width, Height;
 	GetWindowSize(&Width, &Height);
 	if (Width <= 0 || Height <= 0) {
@@ -156,7 +157,6 @@ bool FrameWork::Update()
 		));
 		DrawRotaGraph(GetWindowWidth() / 2, GetWindowHeight()/2, rate ,0.0, BackScreen, FALSE);
 		//デバッグ表示
-		clsDx();
 		//printfDx("FPS:%4.1f\n", GetFPS());
 		//printfDx("デルタタイム:%5.2fs\n", GetDeltaTime());
 		//printfDx("[%d,%d,]\n", InputControl::Instance()->GetMouseX(), InputControl::Instance()->GetMouseY());
