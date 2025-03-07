@@ -3,6 +3,7 @@
 #include "../FrameWork/Define.hpp"
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <thread>
 
 enum class TaskType {
 	ClickPoint,
@@ -91,14 +92,15 @@ private:
 	int DispYSize{ 1 };
 
 	//
-	int GrHandle{};
 	cv::Mat monitor_img{};
 	cv::Mat checkimage{};
 	cv::Mat resultimage{};
-	BASEIMAGE DesktopImage{};
 
-	cv::Point max_pt{};
-	double maxVal{};
+	int matchPointX{}, matchPointY{};
+	bool isMatch{};
+
+	std::thread m_MatchThread{};
+	bool m_IsMatchThreadEnd{};
 private:
 	void DrawTab() const;
 protected:

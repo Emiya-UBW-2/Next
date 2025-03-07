@@ -6,8 +6,8 @@ cv::Mat Hwnd2Mat(HWND hwnd, int nPosLeft, int nPosTop, int nDestWidth, int nDest
 	HDC hwindowCompatibleDC = CreateCompatibleDC(hwindowDC);
 
 	HBITMAP           hbwindow = NULL;
-	cv::Mat           src;
-	BITMAPINFOHEADER  bi;
+	cv::Mat           src{};
+	BITMAPINFOHEADER  bi{};
 
 	SetStretchBltMode(hwindowCompatibleDC, COLORONCOLOR);
 
@@ -216,12 +216,13 @@ void MainScene::InitSub() {
 	DispXSize = static_cast<int>(GetSystemMetrics(SM_CXSCREEN));
 	DispYSize = static_cast<int>(GetSystemMetrics(SM_CYSCREEN));
 
-	checkimage = cv::imread("C:\\Users\\Yabushita_Maki\\Documents\\GitHub\\Next\\Tool\\data\\Fin.png", cv::IMREAD_UNCHANGED);
-	// 空のグラフィックハンドルの値を初期化
-	GrHandle = MakeScreen(DispXSize, DispYSize, FALSE);
-	memset(&DesktopImage, 0, sizeof(BASEIMAGE));	// BASEIMAGE 構造体を０で初期化
-	CreateBGR8ColorData(&DesktopImage.ColorData);	// カラーフォーマットは変化しないので最初に設定
-	DesktopImage.MipMapCount = 0;					// ミップマップではないので０
+	//checkimage = cv::imread("C:\\Users\\Yabushita_Maki\\Documents\\GitHub\\Next\\Tool\\data\\Fin.png", cv::IMREAD_UNCHANGED);
+	checkimage = cv::imread("C:\\Users\\a6m3z\\source\\repos\\Next\\Tool\\data\\Fin.png", cv::IMREAD_UNCHANGED);
+
+	m_IsMatchThreadEnd = true;
+	matchPointX = -1;
+	matchPointY = -1;
+	isMatch = false;
 }
 
 void MainScene::UpdateSub() {
@@ -252,19 +253,28 @@ void MainScene::UpdateSub() {
 	}
 
 	//ウィンドウ画面キャプチャ
-	monitor_img = Hwnd2Mat(GetDesktopWindow(), 0, 0, DispXSize, DispYSize);
-	//ウィンドウ画像の割り当て
-	DesktopImage.Width = monitor_img.cols;
-	DesktopImage.Height = monitor_img.rows;
-	DesktopImage.Pitch = (int)monitor_img.step;
-	DesktopImage.GraphData = monitor_img.data;
-	ReCreateGraphFromBaseImage(&DesktopImage, GrHandle);
-	//マッチ検出
-	cv::matchTemplate(monitor_img, checkimage, resultimage, cv::TM_CCOEFF_NORMED);
-	cv::minMaxLoc(resultimage, NULL, &maxVal, NULL, &max_pt);
-	if (maxVal > 0.9f) {
+	if (m_IsMatchThreadEnd) {
+		m_IsMatchThreadEnd = false;
+		if (m_MatchThread.joinable()) {
+			m_MatchThread.join();
+		}
+		std::thread Thread([&]() {
+			monitor_img = Hwnd2Mat(GetDesktopWindow(), 0, 0, DispXSize, DispYSize);
+			//マッチ検出
+			cv::Point max_pt{};
+			double maxVal{};
+			cv::matchTemplate(monitor_img, checkimage, resultimage, cv::TM_CCOEFF_NORMED);
+			cv::minMaxLoc(resultimage, NULL, &maxVal, NULL, &max_pt);
+			isMatch = maxVal > 0.9f;
+			matchPointX = isMatch  ? max_pt.x : -1;
+			matchPointY = isMatch ? max_pt.y : -1;
+			m_IsMatchThreadEnd = true;
+			});
+		m_MatchThread.swap(Thread);
+	}
+	if (isMatch) {
 		if (CheckHitKey(KEY_INPUT_SPACE)) {
-			MoveToMousePoint(max_pt.x, max_pt.y);
+			MoveToMousePoint(matchPointX, matchPointY);
 		}
 	}
 }
@@ -274,10 +284,9 @@ void MainScene::DrawSub() const {
 	DrawBox(0, 0, FrameWork::Instance()->GetScreenWidth(), FrameWork::Instance()->GetScreenHeight(), ColorPalette::Gray025, TRUE);
 	//
 	DrawGraph(0, m_YListPos, m_ListGraph.GetHandle(), TRUE);
-
-	DrawExtendGraph(0, 0, 256 * 1920 / 1920, 256 * 1080 / 1920, GrHandle, FALSE);
-	printfDx("max_pt[%d,%d]\n", max_pt.x, max_pt.y);
-	printfDx("maxVal[%lf]\n", maxVal);
+	if (isMatch) {
+		printfDx("max_pt[%d,%d]\n", matchPointX, matchPointY);
+	}
 }
 
 void MainScene::DisposeSub() {
