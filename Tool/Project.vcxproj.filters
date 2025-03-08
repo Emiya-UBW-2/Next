@@ -54,6 +54,9 @@
     <ClCompile Include="source\FrameWork\ProjectData.cpp">
       <Filter>source\FrameWork</Filter>
     </ClCompile>
+    <ClCompile Include="source\Scene\TaskTab.cpp">
+      <Filter>source\Sceme</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Scene\MainScene.hpp">
@@ -97,6 +100,9 @@
     </ClInclude>
     <ClInclude Include="source\FrameWork\ProjectData.hpp">
       <Filter>source\FrameWork</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Scene\TaskTab.hpp">
+      <Filter>source\Sceme</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

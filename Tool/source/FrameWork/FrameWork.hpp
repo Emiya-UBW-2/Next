@@ -4,6 +4,7 @@
 #include "SaveData.hpp"
 
 #include <optional>
+#include <string>
 
 class SceneController;
 
@@ -92,3 +93,47 @@ public:
 	void Dispose();
 };
 
+// ファイル選択ダイアログ
+class DialogManager {
+	OPENFILENAME	ofn;
+	TCHAR			strFile[MAX_PATH]{ 0 };
+	TCHAR			cdir[MAX_PATH]{ 0 };
+public:
+	DialogManager(void) noexcept {
+		char Path[MAX_PATH];
+		GetModuleFileName(NULL, Path, MAX_PATH);			// EXEのあるフォルダのパスを取得
+		SetCurrentDirectory(Path);							// カレントディレクトリの設定
+	}
+	~DialogManager(void) noexcept {}
+public:
+	void			Init(void) noexcept {
+		GetCurrentDirectory(MAX_PATH, cdir);
+		ofn.lStructSize = sizeof(OPENFILENAME);
+		ofn.hwndOwner = GetMainWindowHandle();
+		ofn.lpstrFilter =
+			TEXT("Picture files {*.bmp}\0*.bmp\0")
+			TEXT("Picture files {*.dds}\0*.dds\0")
+			TEXT("Picture files {*.jpg}\0*.jpg\0")
+			TEXT("Picture files {*.png}\0*.png\0");
+		ofn.lpstrCustomFilter = NULL;
+		ofn.nMaxCustFilter = NULL;
+		ofn.nFilterIndex = 0;
+		ofn.lpstrFile = strFile;
+		ofn.nMaxFile = MAX_PATH;
+		ofn.Flags = OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
+		ofn.lpstrInitialDir = cdir;
+		ofn.lpstrTitle = "";
+	}
+	bool			Open(void) noexcept {
+		ofn.lpstrTitle = "開く";
+		return GetOpenFileName(&ofn);
+	}
+	bool			Save(void) noexcept {
+		ofn.lpstrTitle = "保存";
+		return GetSaveFileName(&ofn);
+	}
+	const auto* GetPath(void) noexcept {
+		std::string str = strFile;
+		return (str.find(cdir) != std::string::npos) ? &strFile[strlen(cdir) + 1] : strFile;
+	}
+};
