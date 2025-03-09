@@ -10,6 +10,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	//SetClassLongA(GetMainWindowHandle(), -12, (LONG)Cursor);
 	//メインループ開始
 	FontPool::Create();
+	KeyGuide::Create();
 
 	FontPool::Instance()->Add("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1);
 	//初期シーンを設定
@@ -23,6 +24,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		}
 	}
 
+	KeyGuide::Release();
 	FontPool::Release();
 	FrameWork::Release();
 	return 0;// ソフトの終了 

@@ -20,6 +20,7 @@ void SaveData::SetPath() {
 
 void SaveData::Load() {
 	char ConfigPath[260] = {};
+	//コンフィグ
 	strcpyDx(ConfigPath, m_SavePath);
 	strcatDx(ConfigPath, "config.ini");
 	if (std::filesystem::is_regular_file(ConfigPath)) {
@@ -62,6 +63,33 @@ void SaveData::Load() {
 	}
 	else {
 		//コンフィグの新規作成
+	}
+	//タスクデータ
+	strcpyDx(ConfigPath, m_SavePath);
+	strcatDx(ConfigPath, "config.ini");
+	if (std::filesystem::is_regular_file(ConfigPath)) {
+		//タスクデータ読み込み
+		std::ifstream ConfigIni{};
+		ConfigIni.open(ConfigPath);
+		if (!ConfigIni.is_open()) {
+			return;
+		}
+		char line[260]{};
+		char right[260]{};
+		while (!ConfigIni.eof()) {
+			ConfigIni.getline(line, sizeof(line));
+			int Point = static_cast<int>(strchrDx(line, '=') - line);
+			if (Point < 0) { continue; }
+			strpcpyDx(right, line, Point + 1);
+
+			if (strncmpDx(line, ConfigStr[1], sizeof(ConfigStr[1])) == 0) {
+				m_BGMVol = static_cast<int>(Mathf::Clamp(static_cast<float>(std::atoi(right)), 0.f, 100.f));
+			}
+		}
+		ConfigIni.close();
+	}
+	else {
+		//タスクデータの新規作成
 	}
 }
 

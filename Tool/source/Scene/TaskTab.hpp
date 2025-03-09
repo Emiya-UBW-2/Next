@@ -40,15 +40,15 @@ static const char* TaskTypeStr[] = {
 };
 
 enum class TaskMove {
-	LeftMouseTrigger,
-	LeftMouseDragStart,
-	LeftMouseDragEnd,
+	Trigger,
+	DragStart,
+	DragEnd,
 	Max,
 };
 static const char* TaskMoveStr[] = {
-	"LeftMouseTrigger",
-	"LeftMouseDragStart",
-	"LeftMouseDragEnd",
+	"Trigger",
+	"DragStart",
+	"DragEnd",
 };
 
 enum class TaskNext {
@@ -74,9 +74,12 @@ class TaskTab {
 	std::string m_TabName;
 	DialogManager m_Dialog;
 	std::string m_CheckFilePath;
+	GraphHandle m_CheckImage;
+
+	std::string m_CheckKey;
 	std::vector<TabColumn> m_TabColumn{};
 	TaskType m_TaskType = TaskType::ClickPoint;
-	TaskMove m_TaskMove = TaskMove::LeftMouseTrigger;
+	TaskMove m_TaskMove = TaskMove::Trigger;
 	TaskNext m_TaskNext = TaskNext::GoNextTask;
 	int m_Type{};
 	std::unique_ptr<MatchTask> m_MatchTask;
