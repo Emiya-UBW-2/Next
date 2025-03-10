@@ -29,35 +29,6 @@ public:
 };
 
 
-enum class TaskType {
-	ClickPoint,
-	KeyType,
-	Max,
-};
-static const char* TaskTypeStr[] = {
-	"ClickPoint",
-	"KeyType",
-};
-
-enum class TaskMove {
-	Trigger,
-	DragStart,
-	DragEnd,
-	Max,
-};
-static const char* TaskMoveStr[] = {
-	"Trigger",
-	"DragStart",
-	"DragEnd",
-};
-
-enum class TaskNext {
-	GoNextTask,
-	Max,
-};
-static const char* TaskNextStr[] = {
-	"GoNextTask",
-};
 
 
 struct TabColumn {
@@ -66,23 +37,23 @@ struct TabColumn {
 };
 
 class TaskTab {
-	int x{}, y{}, w{}, wSub{}, h{}, hAdd{};
+	int x{}, y{}, w{}, wAdd{}, wSub{}, h{}, hAdd{};
+	bool OnMouseClose = false;
+	bool OnMouseMove = false;
 	bool OnMouse = false;
 	bool IsActiveTab = false;
 	bool IsPlayTask = false;
 	bool m_IsEnd = false;
-	std::string m_TabName;
 	DialogManager m_Dialog;
-	std::string m_CheckFilePath;
 	GraphHandle m_CheckImage;
-
-	std::string m_CheckKey;
 	std::vector<TabColumn> m_TabColumn{};
-	TaskType m_TaskType = TaskType::ClickPoint;
-	TaskMove m_TaskMove = TaskMove::Trigger;
-	TaskNext m_TaskNext = TaskNext::GoNextTask;
-	int m_Type{};
 	std::unique_ptr<MatchTask> m_MatchTask;
+
+	std::string m_TabName;
+	TaskType m_TaskType;
+	std::string m_CheckFilePath;
+	std::string m_CheckKey;
+	bool m_isEraseTask = false;
 public:
 	void Start() {
 		IsPlayTask = true;
@@ -94,19 +65,8 @@ public:
 	}
 
 	bool IsEnd() const { return m_IsEnd; }
-public:
-	void SetTime(int Hour, int Minute, int Second) {
-		m_Type = 60 * 60 * (Hour % 24) + 60 * (Minute % 60) + (Second % 60);
-	}
-	int GetHour() const {
-		return (m_Type / 60 / 60) % 24;
-	}
-	int GetMinute() const {
-		return (m_Type / 60) % 60;
-	}
-	int GetSecond() const {
-		return (m_Type) % 60;
-	}
+	bool IsEraseTask() const { return m_isEraseTask; }
+	void ResetEraseTask() { m_isEraseTask = false; }
 public:
 	void SetPos(int XP, int YP) {
 		x = 16 + XP;
@@ -114,10 +74,10 @@ public:
 	}
 	const int GetHeight() const { return h + hAdd; }
 public:
-	TaskTab(const char* TabName);
+	TaskTab();
 	~TaskTab() {}
 public:
-	void Update(int xofs, int yofs);
+	void Update(int xofs, int yofs, int index);
 	void Draw() const;
 };
 

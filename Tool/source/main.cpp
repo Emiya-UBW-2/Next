@@ -12,7 +12,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	FontPool::Create();
 	KeyGuide::Create();
 
-	FontPool::Instance()->Add("Agency FB", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1);
+	FontPool::Instance()->Add("Bahnschrift Condensed", 24, -1, DX_FONTTYPE_ANTIALIASING_EDGE, DX_CHARSET_DEFAULT, 1);
 	//‰ŠúƒV[ƒ“‚ğİ’è
 	std::unique_ptr<BaseScene> First = std::make_unique<MainScene>();
 	SceneController::Instance()->Active(First);
