@@ -38,7 +38,7 @@ void SaveData::Load() {
 			int Point = static_cast<int>(strchrDx(line, '=') - line);
 			if (Point < 0) { continue; }
 			strpcpyDx(right, line, Point + 1);
-			if (strncmpDx(line, ConfigStr[0], strlenDx(ConfigStr[0])) == 0) {
+			if (strncmpDx(line, ConfigStr[0], static_cast<int>(strlenDx(ConfigStr[0]))) == 0) {
 				for (int loop = 0; loop < (sizeof(WindowSettingStr)/sizeof(WindowSettingStr[0])); ++loop) {
 					if (strcmpDx(right, WindowSettingStr[loop]) == 0) {
 						m_WindowSetting = static_cast<WindowSetting>(loop);
@@ -46,16 +46,16 @@ void SaveData::Load() {
 					}
 				}
 			}
-			if (strncmpDx(line, ConfigStr[1], strlenDx(ConfigStr[1])) == 0) {
+			if (strncmpDx(line, ConfigStr[1], static_cast<int>(strlenDx(ConfigStr[1]))) == 0) {
 				m_BGMVol = static_cast<int>(Mathf::Clamp(static_cast<float>(std::atoi(right)), 0.f, 100.f));
 			}
-			if (strncmpDx(line, ConfigStr[2], strlenDx(ConfigStr[2])) == 0) {
+			if (strncmpDx(line, ConfigStr[2], static_cast<int>(strlenDx(ConfigStr[2]))) == 0) {
 				m_SEVol = static_cast<int>(Mathf::Clamp(static_cast<float>(std::atoi(right)), 0.f, 100.f));
 			}
-			if (strncmpDx(line, ConfigStr[3], strlenDx(ConfigStr[3])) == 0) {
+			if (strncmpDx(line, ConfigStr[3], static_cast<int>(strlenDx(ConfigStr[3]))) == 0) {
 				m_IsMuteBGMVol = (strcmpDx(right, "TRUE") == 0);
 			}
-			if (strncmpDx(line, ConfigStr[4], strlenDx(ConfigStr[4])) == 0) {
+			if (strncmpDx(line, ConfigStr[4], static_cast<int>(strlenDx(ConfigStr[4]))) == 0) {
 				m_IsMuteSEVol = (strcmpDx(right, "TRUE") == 0);
 			}
 		}
@@ -82,12 +82,12 @@ void SaveData::Load() {
 			int Point = static_cast<int>(strchrDx(line, '=') - line);
 			if (Point < 0) { continue; }
 			strpcpyDx(right, line, Point + 1);
-			if (strncmpDx(line, TaskStr[0], strlenDx(TaskStr[0])) == 0) {
+			if (strncmpDx(line, TaskStr[0], static_cast<int>(strlenDx(TaskStr[0]))) == 0) {
 				m_TabData.emplace_back();
 				m_TabData.back().m_TabName = right;
 				m_TabData.back().m_Type = 0;
 			}
-			if (strncmpDx(line, TaskStr[1], strlenDx(TaskStr[1])) == 0) {
+			if (strncmpDx(line, TaskStr[1], static_cast<int>(strlenDx(TaskStr[1]))) == 0) {
 				for (int loop = 0; loop < (sizeof(TaskTypeStr) / sizeof(TaskTypeStr[0])); ++loop) {
 					if (strcmpDx(right, TaskTypeStr[loop]) == 0) {
 						m_TabData.back().m_TaskType = static_cast<TaskType>(loop);
@@ -95,12 +95,12 @@ void SaveData::Load() {
 					}
 				}
 			}
-			if (strncmpDx(line, TaskStr[2], strlenDx(TaskStr[2])) == 0) { m_TabData.back().m_Type += 60 * 60 * (std::atoi(right) % 24); }
-			if (strncmpDx(line, TaskStr[3], strlenDx(TaskStr[3])) == 0) { m_TabData.back().m_Type += 60 * (std::atoi(right) % 60); }
-			if (strncmpDx(line, TaskStr[4], strlenDx(TaskStr[4])) == 0) { m_TabData.back().m_Type += (std::atoi(right) % 60); }
-			if (strncmpDx(line, TaskStr[5], strlenDx(TaskStr[5])) == 0) { m_TabData.back().m_CheckFilePath = right; }
-			if (strncmpDx(line, TaskStr[6], strlenDx(TaskStr[6])) == 0) { m_TabData.back().m_CheckKey = right; }
-			if (strncmpDx(line, TaskStr[7], strlenDx(TaskStr[7])) == 0) {
+			if (strncmpDx(line, TaskStr[2], static_cast<int>(strlenDx(TaskStr[2]))) == 0) { m_TabData.back().m_Type += 60 * 60 * (std::atoi(right) % 24); }
+			if (strncmpDx(line, TaskStr[3], static_cast<int>(strlenDx(TaskStr[3]))) == 0) { m_TabData.back().m_Type += 60 * (std::atoi(right) % 60); }
+			if (strncmpDx(line, TaskStr[4], static_cast<int>(strlenDx(TaskStr[4]))) == 0) { m_TabData.back().m_Type += (std::atoi(right) % 60); }
+			if (strncmpDx(line, TaskStr[5], static_cast<int>(strlenDx(TaskStr[5]))) == 0) { m_TabData.back().m_CheckFilePath = right; }
+			if (strncmpDx(line, TaskStr[6], static_cast<int>(strlenDx(TaskStr[6]))) == 0) { m_TabData.back().m_CheckKey = right; }
+			if (strncmpDx(line, TaskStr[7], static_cast<int>(strlenDx(TaskStr[7]))) == 0) {
 				for (int loop = 0; loop < (sizeof(TaskMoveStr) / sizeof(TaskMoveStr[0])); ++loop) {
 					if (strcmpDx(right, TaskMoveStr[loop]) == 0) {
 						m_TabData.back().m_TaskMove = static_cast<TaskMove>(loop);
@@ -108,7 +108,7 @@ void SaveData::Load() {
 					}
 				}
 			}
-			if (strncmpDx(line, TaskStr[8], strlenDx(TaskStr[8])) == 0) {
+			if (strncmpDx(line, TaskStr[8], static_cast<int>(strlenDx(TaskStr[8]))) == 0) {
 				for (int loop = 0; loop < (sizeof(TaskNextStr) / sizeof(TaskNextStr[0])); ++loop) {
 					if (strcmpDx(right, TaskNextStr[loop]) == 0) {
 						m_TabData.back().m_TaskNext = static_cast<TaskNext>(loop);

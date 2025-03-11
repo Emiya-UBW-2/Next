@@ -29,6 +29,79 @@ public:
 };
 
 
+class MsgBar {
+	std::array<int, ('Z' - 'A' + 1) + ('9' - '0' + 1) + 1> m_PrevKeyBuffer;
+	std::array<int, ('Z' - 'A' + 1) + ('9' - '0' + 1) + 1> m_NowKeyBuffer;
+public:
+	void Update() {
+		m_PrevKeyBuffer = m_NowKeyBuffer;
+		int i = 0;
+		for (char az = 'A'; az <= 'Z'; az++) {
+			char Str[2]{}; Str[0] = az; Str[1] = '\0';
+			if (KeyGuide::GetButtonPress(ControlType::PC, KeyGuide::GetStrtoID(Str, ControlType::PC))) {
+				m_NowKeyBuffer.at(i) = 1;
+			}
+			else {
+				m_NowKeyBuffer.at(i) = 0;
+			}
+			i++;
+		}
+		for (char az = '0'; az <= '9'; az++) {
+			char Str[2]{}; Str[0] = az; Str[1] = '\0';
+			if (KeyGuide::GetButtonPress(ControlType::PC, KeyGuide::GetStrtoID(Str, ControlType::PC))) {
+				m_NowKeyBuffer.at(i) = 1;
+			}
+			else {
+				m_NowKeyBuffer.at(i) = 0;
+			}
+			i++;
+		}
+		{
+			if (KeyGuide::GetButtonPress(ControlType::PC, KeyGuide::GetStrtoID("BACK", ControlType::PC))) {
+				m_NowKeyBuffer.at(i) = 1;
+			}
+			else {
+				m_NowKeyBuffer.at(i) = 0;
+			}
+			i++;
+		}
+	}
+	void SetStr(std::string* pText) const {
+		//“ü—Í
+		int i = 0;
+		if (KeyGuide::GetButtonPress(ControlType::PC, KeyGuide::GetStrtoID("LSHIFT", ControlType::PC))) {
+			for (char az = 'A'; az <= 'Z'; az++) {
+				char Str[2]{}; Str[0] = az; Str[1] = '\0';
+				if (m_NowKeyBuffer.at(i) && m_NowKeyBuffer.at(i) != m_PrevKeyBuffer.at(i)) {
+					*pText += Str;
+				}
+				i++;
+			}
+		}
+		else {
+			for (char az = 'a'; az <= 'z'; az++) {
+				char Str[2]{}; Str[0] = az; Str[1] = '\0';
+				if (m_NowKeyBuffer.at(i) && m_NowKeyBuffer.at(i) != m_PrevKeyBuffer.at(i)) {
+					*pText += Str;
+				}
+				i++;
+			}
+		}
+		for (char az = '0'; az <= '9'; az++) {
+			char Str[2]{}; Str[0] = az; Str[1] = '\0';
+			if (m_NowKeyBuffer.at(i) && m_NowKeyBuffer.at(i) != m_PrevKeyBuffer.at(i)) {
+				*pText += Str;
+			}
+			i++;
+		}
+		{
+			if ((m_NowKeyBuffer.at(i) && m_NowKeyBuffer.at(i) != m_PrevKeyBuffer.at(i)) && *pText != "") {
+				pText->pop_back();
+			}
+			i++;
+		}
+	}
+};
 
 
 struct TabColumn {
@@ -48,6 +121,9 @@ class TaskTab {
 	GraphHandle m_CheckImage;
 	std::vector<TabColumn> m_TabColumn{};
 	std::unique_ptr<MatchTask> m_MatchTask;
+
+	//“ü—Í
+	MsgBar m_MsgBar;
 
 	std::string m_TabName;
 	TaskType m_TaskType;

@@ -128,25 +128,34 @@ void TaskTab::Update(int xofs, int yofs, int index) {
 	if (OnMouse && InputControl::Instance()->GetLMEnter().IsTrigger()) {
 		IsActiveTab ^= 1;
 	}
+	m_MsgBar.Update();
 	if ((IsActiveTab && !IsPlayTask) || (m_TabColumn.size() == 0)) {
 		switch (tabData.m_TaskType) {
 		case TaskType::ClickPoint:
 		{
-			m_TabColumn.resize(6);
+			m_TabColumn.resize(7);
+			int index = 0;
 			int column = 0;
 			{
-				m_TabColumn.at(0).m_TabString = "Type:" + std::string(TaskTypeStr[static_cast<int>(tabData.m_TaskType)]);
-				m_TabColumn.at(0).m_OnMouse = IntoMouse(xofs + x + wAdd, yofs + y + h + column, xofs + x + w - wSub, yofs + y + h + column + 24);
-				if (m_TabColumn.at(0).m_OnMouse && InputControl::Instance()->GetLMEnter().IsTrigger()) {
+				m_TabColumn.at(index).m_TabString = "Name:" + tabData.m_TabName;
+				m_TabColumn.at(index).m_OnMouse = IntoMouse(xofs + x + wAdd, yofs + y + h + column, xofs + x + w - wSub, yofs + y + h + column + 24);
+				if (m_TabColumn.at(index).m_OnMouse) {
+					m_MsgBar.SetStr(&tabData.m_TabName);
+				}
+			} column += 24; index++;
+			{
+				m_TabColumn.at(index).m_TabString = "Type:" + std::string(TaskTypeStr[static_cast<int>(tabData.m_TaskType)]);
+				m_TabColumn.at(index).m_OnMouse = IntoMouse(xofs + x + wAdd, yofs + y + h + column, xofs + x + w - wSub, yofs + y + h + column + 24);
+				if (m_TabColumn.at(index).m_OnMouse && InputControl::Instance()->GetLMEnter().IsTrigger()) {
 					tabData.m_TaskType = static_cast<TaskType>((static_cast<int>(tabData.m_TaskType) + 1) % static_cast<int>(TaskType::Max));
 				}
-			} column += 24;
+			} column += 24; index++;
 			{
 				char TimeStr[256] = "";
 				sprintfDx(TimeStr, "%02d:%02d:%02d", tabData.GetHour(), tabData.GetMinute(), tabData.GetSecond());
-				m_TabColumn.at(1).m_TabString = "Time:" + std::string(TimeStr);
-				m_TabColumn.at(1).m_OnMouse = IntoMouse(xofs + x + wAdd, yofs + y + h + column, xofs + x + w - wSub, yofs + y + h + column + 24);
-				if (m_TabColumn.at(1).m_OnMouse && InputControl::Instance()->GetLMEnter().IsTrigger()) {
+				m_TabColumn.at(index).m_TabString = "Time:" + std::string(TimeStr);
+				m_TabColumn.at(index).m_OnMouse = IntoMouse(xofs + x + wAdd, yofs + y + h + column, xofs + x + w - wSub, yofs + y + h + column + 24);
+				if (m_TabColumn.at(index).m_OnMouse && InputControl::Instance()->GetLMEnter().IsTrigger()) {
 					int wtmp = GetDrawStringWidthToHandle("Time:", sizeof("Time:"), Font);
 					{
 						int Width = GetDrawStringWidthToHandle("Time:00", sizeof("Time:00"), Font);
@@ -170,24 +179,24 @@ void TaskTab::Update(int xofs, int yofs, int index) {
 						wtmp = Width;
 					}
 				}
-			} column += 24;
+			} column += 24; index++;
 			{
 				std::string FileName = tabData.m_CheckFilePath;
 				if (tabData.m_CheckFilePath.rfind("\\") != std::string::npos) {
 					FileName = tabData.m_CheckFilePath.substr(tabData.m_CheckFilePath.rfind("\\") + 1);
 				}
-				m_TabColumn.at(2).m_TabString = "Icon:[" + FileName + "]";
-				m_TabColumn.at(2).m_OnMouse = IntoMouse(xofs + x + wAdd, yofs + y + h + column, xofs + x + w - wSub, yofs + y + h + column + 24);
-				if (m_TabColumn.at(2).m_OnMouse && InputControl::Instance()->GetLMEnter().IsTrigger()) {
+				m_TabColumn.at(index).m_TabString = "Icon:[" + FileName + "]";
+				m_TabColumn.at(index).m_OnMouse = IntoMouse(xofs + x + wAdd, yofs + y + h + column, xofs + x + w - wSub, yofs + y + h + column + 24);
+				if (m_TabColumn.at(index).m_OnMouse && InputControl::Instance()->GetLMEnter().IsTrigger()) {
 					if (m_Dialog.Open()) {
 						tabData.m_CheckFilePath = m_Dialog.GetPath();
 					}
 				}
-			} column += 24;
+			} column += 24; index++;
 			{
-				m_TabColumn.at(3).m_TabString = "Key:";
-				m_TabColumn.at(3).m_OnMouse = IntoMouse(xofs + x + wAdd, yofs + y + h + column, xofs + x + w - wSub, yofs + y + h + column + 24);
-				if (m_TabColumn.at(3).m_OnMouse) {
+				m_TabColumn.at(index).m_TabString = "Key:";
+				m_TabColumn.at(index).m_OnMouse = IntoMouse(xofs + x + wAdd, yofs + y + h + column, xofs + x + w - wSub, yofs + y + h + column + 24);
+				if (m_TabColumn.at(index).m_OnMouse) {
 					for (size_t i = 0; i < static_cast<size_t>(KeyNum); ++i) {
 						int ID = KeyGuide::GetOffsettoID(static_cast<int>(i), ControlType::PC);
 						if (KeyGuide::GetButtonPress(ControlType::PC, ID)) {
@@ -196,40 +205,49 @@ void TaskTab::Update(int xofs, int yofs, int index) {
 						}
 					}
 				}
-			} column += 24;
+			} column += 24; index++;
 			{
-				m_TabColumn.at(4).m_TabString = "Move:" + std::string(TaskMoveStr[static_cast<int>(tabData.m_TaskMove)]);
-				m_TabColumn.at(4).m_OnMouse = IntoMouse(xofs + x + wAdd, yofs + y + h + column, xofs + x + w - wSub, yofs + y + h + column + 24);
-				if (m_TabColumn.at(4).m_OnMouse && InputControl::Instance()->GetLMEnter().IsTrigger()) {
+				m_TabColumn.at(index).m_TabString = "Move:" + std::string(TaskMoveStr[static_cast<int>(tabData.m_TaskMove)]);
+				m_TabColumn.at(index).m_OnMouse = IntoMouse(xofs + x + wAdd, yofs + y + h + column, xofs + x + w - wSub, yofs + y + h + column + 24);
+				if (m_TabColumn.at(index).m_OnMouse && InputControl::Instance()->GetLMEnter().IsTrigger()) {
 					tabData.m_TaskMove = static_cast<TaskMove>((static_cast<int>(tabData.m_TaskMove) + 1) % static_cast<int>(TaskMove::Max));
 				}
-			} column += 24;
+			} column += 24; index++;
 			{
-				m_TabColumn.at(5).m_TabString = "Next:" + std::string(TaskNextStr[static_cast<int>(tabData.m_TaskNext)]);
-				m_TabColumn.at(5).m_OnMouse = IntoMouse(xofs + x + wAdd, yofs + y + h + column, xofs + x + w - wSub, yofs + y + h + column + 24);
-				if (m_TabColumn.at(5).m_OnMouse && InputControl::Instance()->GetLMEnter().IsTrigger()) {
+				m_TabColumn.at(index).m_TabString = "Next:" + std::string(TaskNextStr[static_cast<int>(tabData.m_TaskNext)]);
+				m_TabColumn.at(index).m_OnMouse = IntoMouse(xofs + x + wAdd, yofs + y + h + column, xofs + x + w - wSub, yofs + y + h + column + 24);
+				if (m_TabColumn.at(index).m_OnMouse && InputControl::Instance()->GetLMEnter().IsTrigger()) {
 					tabData.m_TaskNext = static_cast<TaskNext>((static_cast<int>(tabData.m_TaskNext) + 1) % static_cast<int>(TaskNext::Max));
 				}
-			} column += 24;
+			} column += 24; index++;
 		}
 			break;
 		case TaskType::KeyType:
 		{
-			m_TabColumn.resize(6);
+			m_TabColumn.resize(7);
 			int column = 0;
+			int index = 0;
 			{
-				m_TabColumn.at(0).m_TabString = "Type:" + std::string(TaskTypeStr[static_cast<int>(tabData.m_TaskType)]);
-				m_TabColumn.at(0).m_OnMouse = IntoMouse(xofs + x + wAdd, yofs + y + h + column, xofs + x + w - wSub, yofs + y + h + column + 24);
-				if (m_TabColumn.at(0).m_OnMouse && InputControl::Instance()->GetLMEnter().IsTrigger()) {
+				m_TabColumn.at(index).m_TabString = "Name:" + tabData.m_TabName;
+				m_TabColumn.at(index).m_OnMouse = IntoMouse(xofs + x + wAdd, yofs + y + h + column, xofs + x + w - wSub, yofs + y + h + column + 24);
+				if (m_TabColumn.at(index).m_OnMouse) {
+					//“ü—Í
+					m_MsgBar.SetStr(&tabData.m_TabName);
+				}
+			} column += 24; index++;
+			{
+				m_TabColumn.at(index).m_TabString = "Type:" + std::string(TaskTypeStr[static_cast<int>(tabData.m_TaskType)]);
+				m_TabColumn.at(index).m_OnMouse = IntoMouse(xofs + x + wAdd, yofs + y + h + column, xofs + x + w - wSub, yofs + y + h + column + 24);
+				if (m_TabColumn.at(index).m_OnMouse && InputControl::Instance()->GetLMEnter().IsTrigger()) {
 					tabData.m_TaskType = static_cast<TaskType>((static_cast<int>(tabData.m_TaskType) + 1) % static_cast<int>(TaskType::Max));
 				}
-			} column += 24;
+			} column += 24; index++;
 			{
 				char TimeStr[256] = "";
 				sprintfDx(TimeStr, "%02d:%02d:%02d", tabData.GetHour(), tabData.GetMinute(), tabData.GetSecond());
-				m_TabColumn.at(1).m_TabString = "Time:" + std::string(TimeStr);
-				m_TabColumn.at(1).m_OnMouse = IntoMouse(xofs + x + wAdd, yofs + y + h + column, xofs + x + w - wSub, yofs + y + h + column + 24);
-				if (m_TabColumn.at(1).m_OnMouse && InputControl::Instance()->GetLMEnter().IsTrigger()) {
+				m_TabColumn.at(index).m_TabString = "Time:" + std::string(TimeStr);
+				m_TabColumn.at(index).m_OnMouse = IntoMouse(xofs + x + wAdd, yofs + y + h + column, xofs + x + w - wSub, yofs + y + h + column + 24);
+				if (m_TabColumn.at(index).m_OnMouse && InputControl::Instance()->GetLMEnter().IsTrigger()) {
 					int wtmp = GetDrawStringWidthToHandle("Time:", sizeof("Time:"), Font);
 					{
 						int Width = GetDrawStringWidthToHandle("Time:00", sizeof("Time:00"), Font);
@@ -253,17 +271,17 @@ void TaskTab::Update(int xofs, int yofs, int index) {
 						wtmp = Width;
 					}
 				}
-			} column += 24;
+			} column += 24; index++;
 			{
-				m_TabColumn.at(2).m_TabString = "";
-				m_TabColumn.at(2).m_OnMouse = IntoMouse(xofs + x + wAdd, yofs + y + h + column, xofs + x + w - wSub, yofs + y + h + column + 24);
-				if (m_TabColumn.at(2).m_OnMouse && InputControl::Instance()->GetLMEnter().IsTrigger()) {
+				m_TabColumn.at(index).m_TabString = "";
+				m_TabColumn.at(index).m_OnMouse = IntoMouse(xofs + x + wAdd, yofs + y + h + column, xofs + x + w - wSub, yofs + y + h + column + 24);
+				if (m_TabColumn.at(index).m_OnMouse && InputControl::Instance()->GetLMEnter().IsTrigger()) {
 				}
-			} column += 24;
+			} column += 24; index++;
 			{
-				m_TabColumn.at(3).m_TabString = "Key:";
-				m_TabColumn.at(3).m_OnMouse = IntoMouse(xofs + x + wAdd, yofs + y + h + column, xofs + x + w - wSub, yofs + y + h + column + 24);
-				if (m_TabColumn.at(3).m_OnMouse) {
+				m_TabColumn.at(index).m_TabString = "Key:";
+				m_TabColumn.at(index).m_OnMouse = IntoMouse(xofs + x + wAdd, yofs + y + h + column, xofs + x + w - wSub, yofs + y + h + column + 24);
+				if (m_TabColumn.at(index).m_OnMouse) {
 					for (size_t i = 0; i < static_cast<size_t>(KeyNum); ++i) {
 						int ID = KeyGuide::GetOffsettoID(static_cast<int>(i), ControlType::PC);
 						if (KeyGuide::GetButtonPress(ControlType::PC, ID)) {
@@ -272,21 +290,21 @@ void TaskTab::Update(int xofs, int yofs, int index) {
 						}
 					}
 				}
-			} column += 24;
+			} column += 24; index++;
 			{
-				m_TabColumn.at(4).m_TabString = "Move:" + std::string(TaskMoveStr[static_cast<int>(tabData.m_TaskMove)]);
-				m_TabColumn.at(4).m_OnMouse = IntoMouse(xofs + x + wAdd, yofs + y + h + column, xofs + x + w - wSub, yofs + y + h + column + 24);
-				if (m_TabColumn.at(4).m_OnMouse && InputControl::Instance()->GetLMEnter().IsTrigger()) {
+				m_TabColumn.at(index).m_TabString = "Move:" + std::string(TaskMoveStr[static_cast<int>(tabData.m_TaskMove)]);
+				m_TabColumn.at(index).m_OnMouse = IntoMouse(xofs + x + wAdd, yofs + y + h + column, xofs + x + w - wSub, yofs + y + h + column + 24);
+				if (m_TabColumn.at(index).m_OnMouse && InputControl::Instance()->GetLMEnter().IsTrigger()) {
 					tabData.m_TaskMove = static_cast<TaskMove>((static_cast<int>(tabData.m_TaskMove) + 1) % static_cast<int>(TaskMove::Max));
 				}
-			} column += 24;
+			} column += 24; index++;
 			{
-				m_TabColumn.at(5).m_TabString = "Next:" + std::string(TaskNextStr[static_cast<int>(tabData.m_TaskNext)]);
-				m_TabColumn.at(5).m_OnMouse = IntoMouse(xofs + x + wAdd, yofs + y + h + column, xofs + x + w - wSub, yofs + y + h + column + 24);
-				if (m_TabColumn.at(5).m_OnMouse && InputControl::Instance()->GetLMEnter().IsTrigger()) {
+				m_TabColumn.at(index).m_TabString = "Next:" + std::string(TaskNextStr[static_cast<int>(tabData.m_TaskNext)]);
+				m_TabColumn.at(index).m_OnMouse = IntoMouse(xofs + x + wAdd, yofs + y + h + column, xofs + x + w - wSub, yofs + y + h + column + 24);
+				if (m_TabColumn.at(index).m_OnMouse && InputControl::Instance()->GetLMEnter().IsTrigger()) {
 					tabData.m_TaskNext = static_cast<TaskNext>((static_cast<int>(tabData.m_TaskNext) + 1) % static_cast<int>(TaskNext::Max));
 				}
-			} column += 24;
+			} column += 24; index++;
 		}
 		break;
 		default:
@@ -383,8 +401,10 @@ void TaskTab::Draw() const {
 	{
 
 		DrawBox(x + wAdd + 1, y + 1, x + w - wSub - 1, y + h - 1, OnMouse ? ColorPalette::Gray050 : ColorPalette::White, TRUE);
-		int Width = GetDrawStringWidthToHandle(m_TabName.c_str(), static_cast<int>(m_TabName.length()), Font);
-		DrawFormatString2ToHandle(x + wAdd + (w - wSub - wAdd) / 2 - Width / 2, y + h / 2 - 24 / 2, ColorPalette::White, ColorPalette::Gray085, Font, m_TabName.c_str());
+		if (!IsActiveTab) {
+			int Width = GetDrawStringWidthToHandle(m_TabName.c_str(), static_cast<int>(m_TabName.length()), Font);
+			DrawFormatString2ToHandle(x + wAdd + (w - wSub - wAdd) / 2 - Width / 2, y + h / 2 - 24 / 2, ColorPalette::White, ColorPalette::Gray085, Font, m_TabName.c_str());
+		}
 	}
 	//Run
 	{
@@ -409,7 +429,7 @@ void TaskTab::Draw() const {
 		for (auto& s : m_TabColumn) {
 			int index = static_cast<int>(&s - &m_TabColumn.front());
 			DrawFormatString2ToHandle(x + wAdd, y + h + column, (!IsPlayTask && s.m_OnMouse) ? ColorPalette::Red : ColorPalette::White, ColorPalette::Gray085, Font, s.m_TabString.c_str());
-			if (index == 3) {
+			if (index == 4) {//TODO
 				if (m_CheckKey != "") {
 					KeyGuide::Instance()->DrawButton(x + wAdd + 64, y + h + column, KeyGuide::GetIDtoOffset(KeyGuide::GetStrtoID(m_CheckKey.c_str(), ControlType::PC), ControlType::PC));
 				}
