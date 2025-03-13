@@ -110,13 +110,19 @@ struct TabColumn {
 };
 
 class TaskTab {
-	int x{}, y{}, w{}, wAdd{}, wSub{}, h{}, hAdd{};
+	int x{}, y{}, w{}, wAdd{}, wSub{}, h{};
 	bool OnMouseClose = false;
 	bool OnMouseMove = false;
+	bool OnMouseMoveing = false;
 	bool OnMouse = false;
 	bool IsActiveTab = false;
 	bool IsPlayTask = false;
 	bool m_IsEnd = false;
+
+	int OnMouseMoveY = 0;
+	int OnMoveY = 0;
+	int OnMouseMoveIndex = 0;
+
 	DialogManager m_Dialog;
 	GraphHandle m_CheckImage;
 	std::vector<TabColumn> m_TabColumn{};
@@ -142,24 +148,29 @@ public:
 
 	bool IsEnd() const { return m_IsEnd; }
 	bool IsEraseTask() const { return m_isEraseTask; }
+	bool IsMoveing() const { return OnMouseMoveing; }
 	void ResetEraseTask() { m_isEraseTask = false; }
 public:
 	void SetPos(int XP, int YP) {
 		x = 16 + XP;
 		y = YP;
 	}
-	const int GetHeight() const { return h + hAdd; }
+	const int GetHeight() const {
+		int hAdd = IsActiveTab ? (24 * static_cast<int>(m_TabColumn.size()) + 2) : 0;
+		return h + hAdd;
+	}
 public:
 	TaskTab();
 	~TaskTab() {}
 public:
-	void Update(int xofs, int yofs, int index);
-	void Draw() const;
+	void Update(int xofs, int yofs, int index, bool CanMove);
+	void Draw(bool CanMove) const;
 };
 
 class TaskDraw {
 	int m_YListPos = 0;
 	int m_Yoffset = 0;
+	float m_Yoffset_R = 0.f;
 	int m_YMax = 0;
 	std::vector<std::unique_ptr<TaskTab>> m_TaskTabs;
 	GraphHandle m_ListGraph{};
