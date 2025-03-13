@@ -136,10 +136,12 @@ class TaskTab {
 	std::string m_CheckFilePath;
 	std::string m_CheckKey;
 	bool m_isEraseTask = false;
+	LONGLONG m_StartTime = 0;
 public:
 	void Start() {
 		IsPlayTask = true;
 		m_IsEnd = false;
+		m_StartTime = GetNowHiPerformanceCount();
 	}
 	void EndTask() {
 		IsPlayTask = false;

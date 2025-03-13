@@ -111,10 +111,10 @@ public:
 		ofn.lStructSize = sizeof(OPENFILENAME);
 		ofn.hwndOwner = GetMainWindowHandle();
 		ofn.lpstrFilter =
+			TEXT("Picture files {*.png}\0*.png\0")
 			TEXT("Picture files {*.bmp}\0*.bmp\0")
 			TEXT("Picture files {*.dds}\0*.dds\0")
-			TEXT("Picture files {*.jpg}\0*.jpg\0")
-			TEXT("Picture files {*.png}\0*.png\0");
+			TEXT("Picture files {*.jpg}\0*.jpg\0");
 		ofn.lpstrCustomFilter = NULL;
 		ofn.nMaxCustFilter = NULL;
 		ofn.nFilterIndex = 0;

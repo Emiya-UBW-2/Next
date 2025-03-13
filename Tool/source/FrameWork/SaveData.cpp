@@ -85,7 +85,7 @@ void SaveData::Load() {
 			if (strncmpDx(line, TaskStr[0], static_cast<int>(strlenDx(TaskStr[0]))) == 0) {
 				m_TabData.emplace_back();
 				m_TabData.back().m_TabName = right;
-				m_TabData.back().m_Type = 0;
+				m_TabData.back().m_Time = 0;
 			}
 			if (strncmpDx(line, TaskStr[1], static_cast<int>(strlenDx(TaskStr[1]))) == 0) {
 				for (int loop = 0; loop < (sizeof(TaskTypeStr) / sizeof(TaskTypeStr[0])); ++loop) {
@@ -95,9 +95,9 @@ void SaveData::Load() {
 					}
 				}
 			}
-			if (strncmpDx(line, TaskStr[2], static_cast<int>(strlenDx(TaskStr[2]))) == 0) { m_TabData.back().m_Type += 60 * 60 * (std::atoi(right) % 24); }
-			if (strncmpDx(line, TaskStr[3], static_cast<int>(strlenDx(TaskStr[3]))) == 0) { m_TabData.back().m_Type += 60 * (std::atoi(right) % 60); }
-			if (strncmpDx(line, TaskStr[4], static_cast<int>(strlenDx(TaskStr[4]))) == 0) { m_TabData.back().m_Type += (std::atoi(right) % 60); }
+			if (strncmpDx(line, TaskStr[2], static_cast<int>(strlenDx(TaskStr[2]))) == 0) { m_TabData.back().m_Time += 60 * 60 * (std::atoi(right) % 24); }
+			if (strncmpDx(line, TaskStr[3], static_cast<int>(strlenDx(TaskStr[3]))) == 0) { m_TabData.back().m_Time += 60 * (std::atoi(right) % 60); }
+			if (strncmpDx(line, TaskStr[4], static_cast<int>(strlenDx(TaskStr[4]))) == 0) { m_TabData.back().m_Time += (std::atoi(right) % 60); }
 			if (strncmpDx(line, TaskStr[5], static_cast<int>(strlenDx(TaskStr[5]))) == 0) { m_TabData.back().m_CheckFilePath = right; }
 			if (strncmpDx(line, TaskStr[6], static_cast<int>(strlenDx(TaskStr[6]))) == 0) { m_TabData.back().m_CheckKey = right; }
 			if (strncmpDx(line, TaskStr[7], static_cast<int>(strlenDx(TaskStr[7]))) == 0) {

@@ -8,11 +8,13 @@
 enum class TaskType {
 	ClickPoint,
 	KeyType,
+	WaitTime,
 	Max,
 };
 static const char* TaskTypeStr[] = {
 	"ClickPoint",
 	"KeyType",
+	"WaitTime",
 };
 
 enum class TaskMove {
@@ -75,22 +77,22 @@ struct TabData {
 	TaskType m_TaskType = TaskType::ClickPoint;
 	TaskMove m_TaskMove = TaskMove::Trigger;
 	TaskNext m_TaskNext = TaskNext::GoNextTask;
-	int m_Type = GetTime(10, 0, 0);
+	int m_Time = GetTime(0, 0, 0);
 public:
 	int GetTime(int Hour, int Minute, int Second) {
 		return 60 * 60 * (Hour % 24) + 60 * (Minute % 60) + (Second % 60);
 	}
 	void SetTime(int Hour, int Minute, int Second) {
-		m_Type = GetTime(Hour, Minute, Second);
+		m_Time = GetTime(Hour, Minute, Second);
 	}
 	int GetHour() const {
-		return (m_Type / 60 / 60) % 24;
+		return (m_Time / 60 / 60) % 24;
 	}
 	int GetMinute() const {
-		return (m_Type / 60) % 60;
+		return (m_Time / 60) % 60;
 	}
 	int GetSecond() const {
-		return (m_Type) % 60;
+		return (m_Time) % 60;
 	}
 };
 
