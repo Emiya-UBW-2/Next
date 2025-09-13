@@ -115,6 +115,12 @@ static bool ClickKey(const std::string& CheckKey, TaskMove taskMove) {
 		Down = 0;
 		Up = KEYEVENTF_KEYUP;
 	}
+	if (CheckKey == "ESCAPE") {
+		type = INPUT_KEYBOARD;
+		VK = VK_ESCAPE;
+		Down = 0;
+		Up = KEYEVENTF_KEYUP;
+	}
 	if (CheckKey == "A") {
 		type = INPUT_KEYBOARD;
 		VK = 'A';
